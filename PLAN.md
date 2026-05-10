@@ -90,6 +90,8 @@ Bargained ratio (deal rate) per dataset. All models play as buyer/learner agains
 
 †GPT-5.4-mini Amazon BR >1.0 indicates reward hacking — the model exploits thin-margin scenarios by proposing prices below the seller's cost, which the instruct opponent sometimes accepts. This is exactly the failure mode our BATNA threshold is designed to address.
 
+**⚠ Note: Baselines need re-running.** After these baselines were collected, a regulate mechanism was added to the eval harness and training env that intercepts opponent actions where `opp_pts < 0` (i.e., the seller accepts a price below cost) and replaces them with `[REJECT]`. This changes the game rules for price scenarios — deals that previously inflated BR (especially GPT-5.4-mini's 1.62 on Amazon) can no longer occur. Multi-item results (CaSiNo, DnD, JI) are unaffected. All baselines should be re-run for an apples-to-apples comparison with trained models.
+
 Key observations:
 - **Price scenarios are hard**: Most models have negative or near-zero BR on Amazon/Craigslist as buyers. The Qwen opponent as seller anchors strongly, and smaller models cave to the seller's price.
 - **Multi-item scenarios are easier**: CaSiNo/DnD/JI BRs cluster around 0.45–0.75 across models, suggesting the cooperative opponent accepts reasonable splits.
@@ -104,7 +106,7 @@ Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This
 
 **Step 2: Surplus reward** - Train Qwen3-30B-A3B with GRPO using simple surplus as the reward (`bargained_ratio` for deals, 0 for no deal), following [Liu et al. (2026)](https://arxiv.org/abs/2604.09855). Applied across all 4 training datasets with uniform weighting. 60 steps, batch_size=64, group_size=8. **Done.**
 
-**Step 3: BATNA-aware reward (our contribution)** - Train Qwen3-30B-A3B with GRPO using the dataset-aware combined reward explained in the Unified Reward section. 70 steps, batch_size=64, group_size=8. **Done.**
+**Step 3: BATNA-aware reward (our contribution)** - Train Qwen3-30B-A3B with GRPO using the dataset-aware combined reward explained in the Unified Reward section. 80 steps, batch_size=64, group_size=8. **Done.**
 
 **Step 4: Persona-based opponent** - Re-run the best trained model (BATNA) against opponents with different negotiation personas (e.g., aggressive anchor, collaborative, passive conceder) to test whether the trained model adapts its strategy or relies on a fixed policy. Persona prompts injected into the opponent system prompt. Same 100 episodes per dataset per persona.
 
@@ -112,7 +114,7 @@ Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This
 
 ### Training Results
 
-Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs. BATNA-aware reward. All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
+Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs. BATNA-aware reward (80 steps). All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
 
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
@@ -156,13 +158,13 @@ The BATNA threshold is grounded in negotiation theory and supported by concurren
 ## Analysis & Findings
 Throughout training and evaluation, document interesting emergent behaviors as done in [Liu et al. (2026)](https://arxiv.org/abs/2604.09855).
 
-[.] How do negotiation strategies evolve over training steps?
-[.] Does the model learn to anchor more aggressively (first bid ratio)?
-[.] How do concession patterns change with training?
-[.] Does deal quality distribution shift (fewer bad deals with BATNA)?
-[.] Are strategies different across scenario types (integrative vs distributive)?
-[.] Does the model learn to walk away from bad deals?
-[.] Is there evidence of log-rolling in multi-item scenarios?
-[.] Does Pareto efficiency improve with training?
-[.] How does the model behave on JI zero-shot (novel scenario type)?
-[.] Collect qualitative examples of interesting negotiation behaviors
+- How do negotiation strategies evolve over training steps?
+- Does the model learn to anchor more aggressively (first bid ratio)?
+- How do concession patterns change with training?
+- Does deal quality distribution shift (fewer bad deals with BATNA)?
+- Are strategies different across scenario types (integrative vs distributive)?
+- Does the model learn to walk away from bad deals?
+- Is there evidence of log-rolling in multi-item scenarios?
+- Does Pareto efficiency improve with training?
+- How does the model behave on JI zero-shot (novel scenario type)?
+- Collect qualitative examples of interesting negotiation behaviors
