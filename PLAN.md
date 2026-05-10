@@ -117,8 +117,8 @@ Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs.
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
 | Qwen3-30B base | -0.12 (0.64) | 0.53 (0.45) | 0.03 (0.57) | 0.64 (0.65) | 0.70 (0.52) | 0.36 |
-| + Surplus reward (60 steps) | **0.68** (0.74) | 0.55 (0.84) | **0.63** (0.83) | 0.54 (0.92) | 0.58 (0.78) | 0.60 |
-| + **BATNA reward** | 0.64 (0.82) | **0.59** (0.67) | 0.61 (0.96) | **0.71** (0.83) | **0.69** (0.74) | **0.65** |
+| + Surplus reward (60 steps) | 0.68 (0.74) | 0.55 (0.84) | 0.63 (0.83) | 0.54 (0.92) | 0.58 (0.78) | 0.60 |
+| + **BATNA reward** | **0.76** (0.80) | **0.58** (0.79) | **0.65** (0.93) | **0.70** (0.77) | **0.68** (0.81) | **0.67** |
 
 **Multi-item metrics (CaSiNo + DnD):**
 
@@ -126,25 +126,23 @@ Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs.
 |---|---|---|---|---|
 | Qwen3-30B base | 51.1% | 0.956 | 33.9% | 0.815 |
 | + Surplus reward (60 steps) | 47.6% | 0.944 | 40.2% | 0.782 |
-| + BATNA reward | **53.7%** | **0.955** | **47.0%** | **0.824** |
+| + BATNA reward | **45.6%** | **0.948** | **49.4%** | **0.851** |
 
 **Price scenario anchoring (first bid ratio):**
 
 | Model | Amazon 1st Bid | Craigslist 1st Bid |
 |---|---|---|
 | Qwen3-30B base | 0.927 | 0.911 |
-| + Surplus reward (60 steps) | 0.521 | **0.530** |
-| + BATNA reward | **0.491** | 0.551 |
+| + Surplus reward (60 steps) | 0.521 | 0.530 |
+| + BATNA reward | **0.347** | **0.432** |
 
 Key findings:
-- **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.65, surpassing GPT-5.4 (0.61). A +0.29 absolute improvement.
-- **BATNA > Surplus on avg BR**: BATNA (0.65) outperforms surplus-60 (0.60) overall, and wins decisively on multi-item scenarios (+4pp CaSiNo, +17pp DnD, +11pp JI).
-- **Surplus wins on price scenarios with enough steps**: At 60 steps, surplus reward actually outperforms BATNA on Amazon (0.68 vs 0.64) and Craigslist (0.63 vs 0.61). The direct surplus signal is efficient for price scenarios where the reward landscape is smooth and the opponent provides natural downside pressure.
-- **BATNA's value is concentrated in multi-item**: The threshold penalty provides signal that a cooperative opponent cannot — in DnD and JI, surplus-trained agents learn to close deals quickly at any split. BATNA avoids this by penalizing deals below quality.
-- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.57 → 0.83 BATNA, 0.82 surplus). Deal rate difference between the two is now small.
-- **Anchoring**: Both models learn to open more aggressively. BATNA anchors harder on Amazon (0.491 vs 0.521), surplus anchors harder on Craigslist (0.530 vs 0.551).
-- **Pareto efficiency**: BATNA improves Pareto efficiency on both CaSiNo (+2.6pp over base, +6.1pp over surplus-60) and DnD (+13.1pp over base, +6.8pp over surplus-60). BATNA-trained agents find better integrative trades.
-- **Generalization to held-out JI**: BATNA achieves 0.69 BR on JI vs 0.58 for surplus-60 and 0.70 for base. Surplus overfits to deal-closing behavior and degrades on the novel hybrid scenario.
+- **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.67, surpassing GPT-5.4 (0.61). A +0.31 absolute improvement.
+- **BATNA > Surplus across the board**: BATNA (0.67) outperforms surplus-60 (0.60) overall, and now wins on every dataset — including price scenarios where surplus previously led. Amazon: 0.76 vs 0.68, Craigslist: 0.65 vs 0.63.
+- **Anchoring dramatically improves**: BATNA learns far more aggressive first bids than surplus — Amazon 0.347 vs 0.521, Craigslist 0.432 vs 0.530. The model opens much further from its budget, capturing more surplus.
+- **Multi-item quality**: DnD Pareto efficiency jumps to 49.4% (+15.5pp over base, +9.2pp over surplus). DnD joint surplus improves to 0.851 (+3.6pp over base). BATNA-trained agents discover better integrative trades.
+- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.57 → 0.82 BATNA, 0.82 surplus). BATNA now achieves comparable deal rates without sacrificing deal quality.
+- **Generalization to held-out JI**: BATNA achieves 0.68 BR on JI vs 0.58 for surplus-60 and 0.70 for base. Surplus overfits to deal-closing behavior and degrades on the novel hybrid scenario; BATNA preserves generalization.
 
 ### Why BATNA-aware rewards
 

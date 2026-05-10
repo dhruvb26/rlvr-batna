@@ -15,15 +15,17 @@ storage_dir: ./logs/eval
 
 matchups:
   - learner:
-      label: qwen3-30b-a3b-instruct-2507-surplus-reward
+      label: qwen3-30b-a3b-instruct-2507-batna-reward-final
       # label: qwen3-30b-a3b-instruct-2507-batna-reward
       base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
       api_key_env: TINKER_API_KEY
       # trained with surplus reward
-      model: "tinker://34d3260d-cc88-5e09-bf99-c56b437bea84:train:0/sampler_weights/final"
+      model: "tinker://e9eedaf2-b5af-5b1b-975f-ac96e8e8b666:train:0/sampler_weights/final"
       # 59b4165c-e30f-579b-b183-97c8c6e6aa11:train:0 - surplus with 60 steps
+      # 34d3260d-cc88-5e09-bf99-c56b437bea84:train:0 - surplus with 50 steps
       # trained with batna-aware reward
       # model: "tinker://e4157168-92af-53d1-8283-c96ed33c5545:train:0/sampler_weights/final"
+      # tinker://e9eedaf2-b5af-5b1b-975f-ac96e8e8b666:train:0/weights/final - batna more stepsw
       max_tokens: 512
     opponent:
       label: qwen3-30b-a3b-instruct-2507
