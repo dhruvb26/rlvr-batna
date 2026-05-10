@@ -1,0 +1,34 @@
+model_name: Qwen/Qwen3-30B-A3B-Instruct-2507
+
+datasets:
+  - name: casino
+    data_path: data/casino/ca.train.csv
+    weight: 0.25
+  - name: dnd
+    data_path: data/dnd/dnd.train.csv
+    weight: 0.25
+  - name: amazon
+    data_path: data/ahp
+    weight: 0.25
+  - name: craigslist
+    data_path: data/craigslist/train.json
+    weight: 0.25
+
+num_epochs: 1
+max_steps: 60
+batch_size: 64
+group_size: 8
+max_rounds: 6
+max_tokens: 512
+
+learning_rate: 3.0e-5
+lora_rank: 32
+opponent_temperature: 0.7
+kl_penalty_coef: 0.0
+batna_threshold: 0.0
+
+save_every: 10
+eval_every: 0
+
+resume_run: run-20260509-115751
+wandb_project: rlvr-batna
