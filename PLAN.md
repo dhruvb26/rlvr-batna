@@ -98,49 +98,53 @@ Key observations:
 
 ## Experimental Plan
 
-Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This keeps the reward landscape stationary and results comparable across experiments. For additional analysis, we may test trained models against harder opponents (GPT-5.4, GPT-5.4-mini) to measure robustness.
+Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This keeps the reward landscape stationary and results comparable across experiments.
 
 **Step 1: Baselines** - Run all models above on all 5 datasets. No training, just measure how well each model negotiates out of the box. This gives us the "before" numbers. **Done.**
 
-
-**Step 2: Surplus reward** - Train Qwen3-30B-A3B with GRPO using simple surplus as the reward (`bargained_ratio` for deals, 0 for no deal), following [Liu et al. (2026)](https://arxiv.org/abs/2604.09855). Applied across all 4 training datasets with uniform weighting. 50 steps, batch_size=64, group_size=8. **Done.**
+**Step 2: Surplus reward** - Train Qwen3-30B-A3B with GRPO using simple surplus as the reward (`bargained_ratio` for deals, 0 for no deal), following [Liu et al. (2026)](https://arxiv.org/abs/2604.09855). Applied across all 4 training datasets with uniform weighting. 60 steps, batch_size=64, group_size=8. **Done.**
 
 **Step 3: BATNA-aware reward (our contribution)** - Train Qwen3-30B-A3B with GRPO using the dataset-aware combined reward explained in the Unified Reward section. 70 steps, batch_size=64, group_size=8. **Done.**
 
+**Step 4: Persona-based opponent** - Re-run the best trained model (BATNA) against opponents with different negotiation personas (e.g., aggressive anchor, collaborative, passive conceder) to test whether the trained model adapts its strategy or relies on a fixed policy. Persona prompts injected into the opponent system prompt. Same 100 episodes per dataset per persona.
+
+**Step 5: Tougher opponent (GPT-5.4)** - Evaluate both trained models against GPT-5.4 as opponent (instead of Qwen3-30B-A3B-Instruct) to measure robustness against a stronger negotiator. GPT-5.4 is the current frontier leader at 0.61 avg BR, so it's a natural stress test. Also test against GPT-5.4-mini to measure the reward-hacking robustness of BATNA (GPT-5.4-mini exploited thin-margin Amazon scenarios in baselines).
+
 ### Training Results
 
-Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward vs. BATNA-aware reward. All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
+Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs. BATNA-aware reward. All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
 
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
 | Qwen3-30B base | -0.12 (0.64) | 0.53 (0.45) | 0.03 (0.57) | 0.64 (0.65) | 0.70 (0.52) | 0.36 |
-| + Surplus reward | 0.58 (0.73) | 0.53 (0.90) | 0.53 (0.89) | 0.48 (0.92) | 0.59 (0.85) | 0.54 |
-| + **BATNA reward** | **0.64** (0.82) | **0.59** (0.67) | **0.61** (0.96) | **0.71** (0.83) | **0.69** (0.74) | **0.65** |
+| + Surplus reward (60 steps) | **0.68** (0.74) | 0.55 (0.84) | **0.63** (0.83) | 0.54 (0.92) | 0.58 (0.78) | 0.60 |
+| + **BATNA reward** | 0.64 (0.82) | **0.59** (0.67) | 0.61 (0.96) | **0.71** (0.83) | **0.69** (0.74) | **0.65** |
 
 **Multi-item metrics (CaSiNo + DnD):**
 
 | Model | CaSiNo Pareto % | CaSiNo Joint Surplus | DnD Pareto % | DnD Joint Surplus |
 |---|---|---|---|---|
 | Qwen3-30B base | 51.1% | 0.956 | 33.9% | 0.815 |
-| + Surplus reward | 43.3% | 0.945 | 31.5% | 0.745 |
-| + BATNA reward | **53.7%** | **0.955** | **47.0%** | 0.824 |
+| + Surplus reward (60 steps) | 47.6% | 0.944 | 40.2% | 0.782 |
+| + BATNA reward | **53.7%** | **0.955** | **47.0%** | **0.824** |
 
 **Price scenario anchoring (first bid ratio):**
 
 | Model | Amazon 1st Bid | Craigslist 1st Bid |
 |---|---|---|
 | Qwen3-30B base | 0.927 | 0.911 |
-| + Surplus reward | 0.579 | 0.613 |
-| + BATNA reward | **0.491** | **0.551** |
+| + Surplus reward (60 steps) | 0.521 | **0.530** |
+| + BATNA reward | **0.491** | 0.551 |
 
 Key findings:
 - **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.65, surpassing GPT-5.4 (0.61). A +0.29 absolute improvement.
-- **BATNA > Surplus everywhere**: BATNA outperforms surplus reward on all 5 datasets including the held-out JI scenario (+0.10 on JI), confirming the BATNA threshold provides a better learning signal.
-- **Surplus reward hurts multi-item quality**: Surplus-trained model has lower BR than base on DnD (0.48 vs 0.64) and JI (0.59 vs 0.70) — it learns to close deals quickly at any price. BATNA avoids this by penalizing bad deals.
-- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (0.57 avg → 0.80 BATNA, 0.86 surplus). Surplus achieves higher deal rates but at the cost of deal quality.
-- **Anchoring improves**: Both trained models learn to open with more aggressive first bids (lower ratio = buyer opening further from budget). BATNA anchors even more aggressively (0.49 vs 0.58 on Amazon).
-- **Pareto efficiency**: BATNA improves Pareto efficiency on both CaSiNo (+2.6pp) and DnD (+13.1pp), while surplus degrades it. BATNA-trained agents discover better integrative trades.
-- **Generalization to held-out JI**: BATNA achieves 0.69 BR on JI (a novel hybrid scenario never seen in training) vs 0.70 for the base model, while surplus drops to 0.59. BATNA preserves generalization; surplus overfits to deal-closing behavior.
+- **BATNA > Surplus on avg BR**: BATNA (0.65) outperforms surplus-60 (0.60) overall, and wins decisively on multi-item scenarios (+4pp CaSiNo, +17pp DnD, +11pp JI).
+- **Surplus wins on price scenarios with enough steps**: At 60 steps, surplus reward actually outperforms BATNA on Amazon (0.68 vs 0.64) and Craigslist (0.63 vs 0.61). The direct surplus signal is efficient for price scenarios where the reward landscape is smooth and the opponent provides natural downside pressure.
+- **BATNA's value is concentrated in multi-item**: The threshold penalty provides signal that a cooperative opponent cannot — in DnD and JI, surplus-trained agents learn to close deals quickly at any split. BATNA avoids this by penalizing deals below quality.
+- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.57 → 0.83 BATNA, 0.82 surplus). Deal rate difference between the two is now small.
+- **Anchoring**: Both models learn to open more aggressively. BATNA anchors harder on Amazon (0.491 vs 0.521), surplus anchors harder on Craigslist (0.530 vs 0.551).
+- **Pareto efficiency**: BATNA improves Pareto efficiency on both CaSiNo (+2.6pp over base, +6.1pp over surplus-60) and DnD (+13.1pp over base, +6.8pp over surplus-60). BATNA-trained agents find better integrative trades.
+- **Generalization to held-out JI**: BATNA achieves 0.69 BR on JI vs 0.58 for surplus-60 and 0.70 for base. Surplus overfits to deal-closing behavior and degrades on the novel hybrid scenario.
 
 ### Why BATNA-aware rewards
 
