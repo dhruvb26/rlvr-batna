@@ -73,30 +73,26 @@ Evaluate all models on all 5 datasets (100 scenarios each) to establish pre-trai
 
 ### Baseline Results
 
-Bargained ratio (deal rate) per dataset. All models play as buyer/learner against Qwen3-30B-A3B-Instruct, 100 scenarios each.
+Bargained ratio (deal rate) per dataset. All models play as buyer/learner against Qwen3-30B-A3B-Instruct, 100 scenarios each. Opponent regulate mechanism active: seller actions where `opp_pts < 0` are intercepted and replaced with `[REJECT]`.
 
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
-| **GPT-5.4** | **0.87** (0.93) | 0.52 (0.55) | **0.33** (0.80) | **0.66** (0.90) | 0.69 (0.72) | **0.61** |
-| DeepSeek-V3.1 | 0.71 (0.94) | **0.45** (0.67) | 0.24 (0.89) | 0.61 (0.91) | **0.75** (0.83) | 0.55 |
-| Qwen3-235B-A22B-T | 0.71 (0.94) | 0.49 (0.61) | 0.13 (0.86) | 0.59 (0.77) | 0.74 (0.73) | 0.53 |
-| Qwen3-235B-A22B | 0.46 (0.89) | 0.53 (0.55) | 0.21 (0.79) | 0.63 (0.82) | 0.74 (0.72) | 0.51 |
-| Kimi-K2-Thinking | 0.26 (0.93) | 0.50 (0.80) | 0.16 (0.85) | 0.56 (0.80) | 0.73 (0.87) | 0.44 |
-| Qwen3-30B-A3B | -0.12 (0.64) | 0.53 (0.45) | 0.03 (0.57) | 0.64 (0.65) | 0.70 (0.52) | 0.36 |
-| Qwen3-30B-A3B-T | -0.16 (0.81) | 0.47 (0.69) | 0.02 (0.70) | 0.49 (0.71) | 0.78 (0.46) | 0.32 |
-| Qwen3-8B | -0.36 (0.72) | 0.44 (0.85) | 0.04 (0.54) | 0.52 (0.79) | 0.72 (0.74) | 0.27 |
-| Llama-4-Maverick | -0.49 (0.88) | 0.49 (0.74) | -0.09 (0.76) | 0.53 (0.87) | 0.75 (0.90) | 0.24 |
-| GPT-5.4-mini | 1.62† (0.84) | 0.49 (0.56) | 0.17 (0.76) | 0.64 (0.80) | 0.70 (0.79) | 0.72† |
-
-†GPT-5.4-mini Amazon BR >1.0 indicates reward hacking — the model exploits thin-margin scenarios by proposing prices below the seller's cost, which the instruct opponent sometimes accepts. This is exactly the failure mode our BATNA threshold is designed to address.
-
-**⚠ Note: Baselines need re-running.** After these baselines were collected, a regulate mechanism was added to the eval harness and training env that intercepts opponent actions where `opp_pts < 0` (i.e., the seller accepts a price below cost) and replaces them with `[REJECT]`. This changes the game rules for price scenarios — deals that previously inflated BR (especially GPT-5.4-mini's 1.62 on Amazon) can no longer occur. Multi-item results (CaSiNo, DnD, JI) are unaffected. All baselines should be re-run for an apples-to-apples comparison with trained models.
+| **GPT-5.4** | **0.60** (0.87) | 0.53 (0.46) | **0.31** (0.83) | 0.64 (0.86) | 0.71 (0.77) | **0.56** |
+| DeepSeek-V3.1 | 0.47 (0.96) | 0.46 (0.72) | 0.24 (0.87) | 0.62 (0.82) | **0.77** (0.81) | 0.51 |
+| Qwen3-235B-A22B | 0.43 (0.81) | **0.55** (0.60) | 0.17 (0.87) | **0.67** (0.86) | 0.72 (0.75) | 0.50 |
+| GPT-5.4-mini | 0.45 (0.77) | 0.47 (0.48) | 0.18 (0.79) | 0.61 (0.87) | 0.68 (0.81) | 0.48 |
+| Kimi-K2-Thinking | 0.39 (0.86) | 0.49 (0.74) | 0.17 (0.87) | 0.57 (0.77) | 0.73 (0.90) | 0.47 |
+| Qwen3-235B-A22B-T | 0.32 (0.89) | 0.50 (0.55) | 0.17 (0.85) | 0.50 (0.77) | 0.74 (0.78) | 0.45 |
+| Qwen3-30B-A3B | -0.04 (0.71) | 0.53 (0.46) | -0.00 (0.57) | 0.60 (0.62) | 0.70 (0.57) | 0.36 |
+| Qwen3-30B-A3B-T | -0.12 (0.71) | 0.47 (0.74) | 0.03 (0.58) | 0.54 (0.71) | 0.78 (0.46) | 0.34 |
+| Llama-4-Maverick | -0.38 (0.82) | 0.50 (0.77) | -0.10 (0.71) | 0.63 (0.89) | 0.75 (0.91) | 0.28 |
+| Qwen3-8B | -0.66 (0.75) | 0.45 (0.86) | 0.01 (0.54) | 0.61 (0.69) | 0.72 (0.68) | 0.23 |
 
 Key observations:
 - **Price scenarios are hard**: Most models have negative or near-zero BR on Amazon/Craigslist as buyers. The Qwen opponent as seller anchors strongly, and smaller models cave to the seller's price.
 - **Multi-item scenarios are easier**: CaSiNo/DnD/JI BRs cluster around 0.45–0.75 across models, suggesting the cooperative opponent accepts reasonable splits.
-- **Deal rate vs quality tradeoff**: Qwen3-30B-A3B-Instruct (our base model) has the lowest deal rates (0.45–0.65) but decent BR when deals happen. Thinking mode improves deal rate but tanks BR on price scenarios.
-- **Frontier gap**: GPT-5.4 leads with 0.61 avg BR. Our base model (Qwen3-30B-A3B) sits at 0.36 — a 0.25 gap to close with training.
+- **Deal rate vs quality tradeoff**: Qwen3-30B-A3B-Instruct (our base model) has the lowest deal rates (0.46–0.62) but decent BR when deals happen. Thinking mode improves deal rate but tanks BR on price scenarios.
+- **Frontier gap**: GPT-5.4 leads with 0.56 avg BR. Our base model (Qwen3-30B-A3B) sits at 0.36 — a 0.20 gap to close with training.
 
 ## Experimental Plan
 
@@ -110,7 +106,7 @@ Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This
 
 **Step 4: Persona-based opponent** - Re-run the best trained model (BATNA) against opponents with different negotiation personas (e.g., aggressive anchor, collaborative, passive conceder) to test whether the trained model adapts its strategy or relies on a fixed policy. Persona prompts injected into the opponent system prompt. Same 100 episodes per dataset per persona.
 
-**Step 5: Tougher opponent (GPT-5.4)** - Evaluate both trained models against GPT-5.4 as opponent (instead of Qwen3-30B-A3B-Instruct) to measure robustness against a stronger negotiator. GPT-5.4 is the current frontier leader at 0.61 avg BR, so it's a natural stress test. Also test against GPT-5.4-mini to measure the reward-hacking robustness of BATNA (GPT-5.4-mini exploited thin-margin Amazon scenarios in baselines).
+**Step 5: Tougher opponent (GPT-5.4)** - Evaluate both trained models against GPT-5.4 as opponent (instead of Qwen3-30B-A3B-Instruct) to measure robustness against a stronger negotiator. GPT-5.4 is the current frontier leader at 0.56 avg BR, so it's a natural stress test.
 
 ### Training Results
 
@@ -118,7 +114,7 @@ Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs.
 
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
-| Qwen3-30B base | -0.12 (0.64) | 0.53 (0.45) | 0.03 (0.57) | 0.64 (0.65) | 0.70 (0.52) | 0.36 |
+| Qwen3-30B base | -0.04 (0.71) | 0.53 (0.46) | -0.00 (0.57) | 0.60 (0.62) | 0.70 (0.57) | 0.36 |
 | + Surplus reward (60 steps) | 0.68 (0.74) | 0.55 (0.84) | 0.63 (0.83) | 0.54 (0.92) | 0.58 (0.78) | 0.60 |
 | + **BATNA reward** | **0.76** (0.80) | **0.58** (0.79) | **0.65** (0.93) | **0.70** (0.77) | **0.68** (0.81) | **0.67** |
 
@@ -126,7 +122,7 @@ Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs.
 
 | Model | CaSiNo Pareto % | CaSiNo Joint Surplus | DnD Pareto % | DnD Joint Surplus |
 |---|---|---|---|---|
-| Qwen3-30B base | 51.1% | 0.956 | 33.9% | 0.815 |
+| Qwen3-30B base | 32.6% | 0.939 | 29.0% | 0.767 |
 | + Surplus reward (60 steps) | 47.6% | 0.944 | 40.2% | 0.782 |
 | + BATNA reward | **45.6%** | **0.948** | **49.4%** | **0.851** |
 
@@ -134,16 +130,16 @@ Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs.
 
 | Model | Amazon 1st Bid | Craigslist 1st Bid |
 |---|---|---|
-| Qwen3-30B base | 0.927 | 0.911 |
+| Qwen3-30B base | 0.927 | 0.923 |
 | + Surplus reward (60 steps) | 0.521 | 0.530 |
 | + BATNA reward | **0.347** | **0.432** |
 
 Key findings:
-- **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.67, surpassing GPT-5.4 (0.61). A +0.31 absolute improvement.
+- **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.67, surpassing GPT-5.4 (0.56). A +0.31 absolute improvement.
 - **BATNA > Surplus across the board**: BATNA (0.67) outperforms surplus-60 (0.60) overall, and now wins on every dataset — including price scenarios where surplus previously led. Amazon: 0.76 vs 0.68, Craigslist: 0.65 vs 0.63.
 - **Anchoring dramatically improves**: BATNA learns far more aggressive first bids than surplus — Amazon 0.347 vs 0.521, Craigslist 0.432 vs 0.530. The model opens much further from its budget, capturing more surplus.
-- **Multi-item quality**: DnD Pareto efficiency jumps to 49.4% (+15.5pp over base, +9.2pp over surplus). DnD joint surplus improves to 0.851 (+3.6pp over base). BATNA-trained agents discover better integrative trades.
-- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.57 → 0.82 BATNA, 0.82 surplus). BATNA now achieves comparable deal rates without sacrificing deal quality.
+- **Multi-item quality**: DnD Pareto efficiency jumps to 49.4% (+20.4pp over base, +9.2pp over surplus). DnD joint surplus improves to 0.851 (+8.4pp over base). BATNA-trained agents discover better integrative trades.
+- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.59 → 0.82 BATNA, 0.82 surplus). BATNA now achieves comparable deal rates without sacrificing deal quality.
 - **Generalization to held-out JI**: BATNA achieves 0.68 BR on JI vs 0.58 for surplus-60 and 0.70 for base. Surplus overfits to deal-closing behavior and degrades on the novel hybrid scenario; BATNA preserves generalization.
 
 ### Why BATNA-aware rewards
