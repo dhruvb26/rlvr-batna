@@ -291,7 +291,7 @@ def _save_matchup(
 
     if failed:
         with open(matchup_dir / "failed.json", "w") as f:
-            json.dump(failed, f, indent=2)
+            json.dump(failed, f, indent=2, default=str)
         logger.warning(f"{len(failed)} episodes saved to {matchup_dir / 'failed.json'}")
 
     from .render import render_episodes_html

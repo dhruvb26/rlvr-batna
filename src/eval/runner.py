@@ -51,26 +51,32 @@ def last_opponent_action_is_submit(prompt: list[dict]) -> bool:
     return False
 
 
+# Persona prompts grounded in negotiation literature:
+# - Competitive/cooperative follows Fehr-Schmidt utility (Chawla et al.,
+#   2023, EMNLP): selfish (a=0,b=0) vs fair (a>0,b>0) rewards produce
+#   distinct styles. Low agreeableness exploits cooperative opponents but
+#   raises default rates (Noh & Chang, 2024).
+# - Unyielding adapted from Liu et al. (2026, §5.3) adversarial personas.
+# - Anchoring grounded in Galinsky & Mussweiler (2001) and Phase 1
+#   aggressive-greed behavior in Liu et al. (2026, §4).
 PERSONAS = {
-    "uncompromising": (
-        "You are a tough negotiator. You insist on getting most of your "
-        "highest-value items and rarely make concessions. Only accept a "
-        "deal that gives you strong value."
+    "cooperative": (
+        "You are a cooperative negotiator who values reaching a fair "
+        "agreement. You are willing to split items equitably and respond "
+        "positively to reasonable offers. You prefer making a deal over "
+        "walking away, even if it means conceding some value."
     ),
-    "selfish": (
-        "You are a self-interested negotiator. Always try to claim most of "
-        "your highest-value items. Make small concessions only if the "
-        "negotiation is about to collapse."
+    "unyielding": (
+        "You are an unyielding negotiator. Refuse almost every offer the "
+        "other party makes, praising your own position. Use firm, resolute "
+        "language to show you will not budge until you get the maximum for "
+        "yourself."
     ),
     "anchoring": (
-        "You are a strategic negotiator. Open with an extreme offer claiming "
-        "most of the highest-value items. Move slowly and never concede "
-        "more than 1 unit per turn."
-    ),
-    "cooperative": (
-        "You are a friendly negotiator who values reaching a deal. You are "
-        "willing to split items fairly and respond positively to reasonable "
-        "offers."
+        "You are a strategic negotiator who uses price anchoring. Open with "
+        "an extreme offer claiming most of the highest-value items or "
+        "proposing a price far from your limit. Move slowly, conceding no "
+        "more than one item or small price increment per turn."
     ),
 }
 

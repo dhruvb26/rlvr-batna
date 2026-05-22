@@ -9,7 +9,7 @@ from openai import APIConnectionError, APITimeoutError, RateLimitError
 from tenacity import (
     before_sleep_log,
     retry,
-    retry_if_exception_type,
+    retry_if_exception,
     stop_after_attempt,
     wait_exponential,
 )
@@ -18,10 +18,43 @@ OPENAI_BASE_URL = "https://api.openai.com/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 TINKER_BASE_URL = "https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1"
 
+_QUOTA_KEYWORDS = ("insufficient_quota", "billing", "exceeded your current quota")
+
+_tinker_telemetry_filter_installed = False
+
+
+def _install_tinker_telemetry_filter() -> None:
+    """Suppress spurious warnings from nested @capture_exceptions in tinker>=0.21."""
+    global _tinker_telemetry_filter_installed
+    if _tinker_telemetry_filter_installed:
+        return
+
+    class _Filter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return (
+                "@capture_exceptions used without TelemetryProvider"
+                not in record.getMessage()
+            )
+
+    logging.getLogger("tinker.lib.telemetry").addFilter(_Filter())
+    _tinker_telemetry_filter_installed = True
+
+
+def _is_quota_error(exc: BaseException) -> bool:
+    if not isinstance(exc, RateLimitError):
+        return False
+    msg = str(exc).lower()
+    return any(kw in msg for kw in _QUOTA_KEYWORDS)
+
+
+def _is_transient(exc: BaseException) -> bool:
+    if isinstance(exc, RateLimitError):
+        return not _is_quota_error(exc)
+    return isinstance(exc, (APITimeoutError, APIConnectionError, json.JSONDecodeError))
+
+
 _api_retry = retry(
-    retry=retry_if_exception_type(
-        (RateLimitError, APITimeoutError, APIConnectionError, json.JSONDecodeError)
-    ),
+    retry=retry_if_exception(_is_transient),
     wait=wait_exponential(multiplier=1, min=1, max=60),
     stop=stop_after_attempt(5),
     before_sleep=before_sleep_log(logger, logging.WARNING),
@@ -35,26 +68,12 @@ class APIGenerator:
         self,
         model: str,
         base_url: str,
-        api_key: str,
+        api_keys: list[str],
         max_tokens: int = 512,
         thinking: bool | None = None,
         reasoning: str | None = None,
         thinking_token_budget: int | None = None,
     ):
-        """Initialize an API generator.
-
-        Args:
-            model: Model identifier string.
-            base_url: API base URL.
-            api_key: API authentication key.
-            max_tokens: Maximum output tokens.
-            thinking: Enable/disable thinking mode (vLLM/Tinker only).
-            reasoning: OpenAI Responses API reasoning effort level.
-            thinking_token_budget: vLLM thinking token cap.
-
-        Raises:
-            ValueError: If incompatible options are specified for the provider.
-        """
         from openai import OpenAI
 
         is_openrouter = OPENROUTER_BASE_URL in base_url
@@ -80,7 +99,9 @@ class APIGenerator:
                 f"'thinking_token_budget' is a vLLM param, not supported for OpenAI ({model})."
             )
 
-        self.client = OpenAI(base_url=base_url, api_key=api_key)
+        self._api_keys = api_keys
+        self._key_idx = 0
+        self.client = OpenAI(base_url=base_url, api_key=api_keys[0])
         self.base_url = base_url
         self.model = model
         self.max_tokens = max_tokens
@@ -90,22 +111,34 @@ class APIGenerator:
         self._is_openrouter = is_openrouter
         self._use_responses_api = reasoning is not None and is_openai
 
+    def _rotate_key(self) -> bool:
+        """Switch to next API key. Returns False if no keys left."""
+        from openai import OpenAI
+
+        if self._key_idx + 1 >= len(self._api_keys):
+            return False
+        self._key_idx += 1
+        self.client = OpenAI(
+            base_url=self.base_url, api_key=self._api_keys[self._key_idx]
+        )
+        logger.warning(
+            f"Quota exhausted, rotated to API key "
+            f"{self._key_idx + 1}/{len(self._api_keys)}"
+        )
+        return True
+
     def __call__(
         self, messages: list[dict], temperature: float = 0.7, top_p: float = 0.9
     ) -> str:
-        """Generate a response from the model.
-
-        Args:
-            messages: Chat message history.
-            temperature: Sampling temperature.
-            top_p: Nucleus sampling threshold.
-
-        Returns:
-            Model response text.
-        """
-        if self._use_responses_api:
-            return self._call_responses_api(messages)
-        return self._call_chat_completions(messages, temperature, top_p)
+        while True:
+            try:
+                if self._use_responses_api:
+                    return self._call_responses_api(messages)
+                return self._call_chat_completions(messages, temperature, top_p)
+            except RateLimitError as e:
+                if _is_quota_error(e) and self._rotate_key():
+                    continue
+                raise
 
     @staticmethod
     def _sanitize_msgs(messages: list[dict]) -> list[dict]:
@@ -168,33 +201,90 @@ class APIGenerator:
         return content
 
 
+class TinkerGenerator:
+    """Generates responses via the Tinker SDK SamplingClient."""
+
+    def __init__(self, model_path: str, max_tokens: int = 512):
+        import tinker
+        from tinker_cookbook import model_info
+        from tinker_cookbook.renderers import get_renderer
+        from tinker_cookbook.tokenizer_utils import get_tokenizer
+
+        _install_tinker_telemetry_filter()
+        service = tinker.ServiceClient()
+        self._sampler = service.create_sampling_client(model_path=model_path)
+
+        base_model = self._sampler.get_base_model()
+        renderer_name = model_info.get_recommended_renderer_name(base_model)
+        tokenizer = get_tokenizer(base_model)
+        self._renderer = get_renderer(renderer_name, tokenizer)
+        self._tokenizer = tokenizer
+        self._max_tokens = max_tokens
+        self._model_path = model_path
+        logger.info(f"TinkerGenerator ready: {model_path} (base: {base_model})")
+
+    def __call__(
+        self, messages: list[dict], temperature: float = 0.7, top_p: float = 0.9
+    ) -> str:
+        import tinker
+        from tinker_cookbook.renderers import get_text_content
+
+        renderer_msgs = [{"role": m["role"], "content": m["content"]} for m in messages]
+        model_input = self._renderer.build_generation_prompt(renderer_msgs)
+        stop = self._renderer.get_stop_sequences()
+
+        result = self._sampler.sample(
+            model_input,
+            num_samples=1,
+            sampling_params=tinker.SamplingParams(
+                temperature=temperature,
+                max_tokens=self._max_tokens,
+                stop=stop,
+            ),
+        ).result()
+
+        parsed, _ = self._renderer.parse_response(result.sequences[0].tokens)
+        return get_text_content(parsed).strip()
+
+
+# Global cache so multiple matchups sharing a checkpoint reuse the same session
+_tinker_cache: dict[str, TinkerGenerator] = {}
+
+
 def make_generator(
     agent_cfg: dict,
     default_base_url: str = OPENAI_BASE_URL,
     default_api_key_env: str = "OPENAI_API_KEY",
-) -> APIGenerator:
-    """Build an APIGenerator from a matchup agent config block.
+) -> APIGenerator | TinkerGenerator:
+    """Build a generator from a matchup agent config block.
 
-    Args:
-        agent_cfg: Dict with model, base_url, api_key_env, max_tokens, etc.
-        default_base_url: Fallback base URL.
-        default_api_key_env: Fallback env var name for API key.
-
-    Returns:
-        Configured APIGenerator instance.
-
-    Raises:
-        ValueError: If required API key env var is empty.
+    Supports comma-separated API keys in the env var for automatic
+    rotation when one key's quota is exhausted. Detects tinker:// model
+    paths and uses the Tinker SDK directly.
     """
+    model = agent_cfg["model"]
+    if model.startswith("tinker://"):
+        if model not in _tinker_cache:
+            _tinker_cache[model] = TinkerGenerator(
+                model_path=model,
+                max_tokens=agent_cfg.get("max_tokens", 512),
+            )
+        return _tinker_cache[model]
+
     api_key_env = agent_cfg.get("api_key_env", default_api_key_env)
-    api_key = os.getenv(api_key_env, "")
-    if not api_key:
+    raw = os.getenv(api_key_env, "")
+    if not raw:
         raise ValueError(f"{api_key_env} env var required")
+    api_keys = [k.strip() for k in raw.split(",") if k.strip()]
+    if not api_keys:
+        raise ValueError(f"{api_key_env} env var has no valid keys")
+    if len(api_keys) > 1:
+        logger.info(f"{api_key_env}: loaded {len(api_keys)} API keys for rotation")
     base_url = agent_cfg.get("base_url", default_base_url)
     return APIGenerator(
-        model=agent_cfg["model"],
+        model=model,
         base_url=base_url,
-        api_key=api_key,
+        api_keys=api_keys,
         max_tokens=agent_cfg.get("max_tokens", 512),
         thinking=agent_cfg.get("thinking"),
         reasoning=agent_cfg.get("reasoning"),

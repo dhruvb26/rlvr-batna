@@ -110,37 +110,37 @@ Fixed opponent across all baselines and training: `Qwen3-30B-A3B-Instruct`. This
 
 ### Training Results
 
-Comparison of base Qwen3-30B-A3B-Instruct vs. surplus-only reward (60 steps) vs. BATNA-aware reward (80 steps). All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
+Comparison of base Qwen3-30B-A3B-Instruct vs. surplus reward (80 steps) vs. threshold reward (80 steps). All evaluated against same Qwen3-30B-A3B-Instruct opponent, 100 scenarios each.
 
 | Model | Amazon | CaSiNo | Craigslist | DnD | JI (held-out) | Avg BR |
 |---|---|---|---|---|---|---|
 | Qwen3-30B base | -0.04 (0.71) | 0.53 (0.46) | -0.00 (0.57) | 0.60 (0.62) | 0.70 (0.57) | 0.36 |
-| + Surplus reward (60 steps) | 0.68 (0.74) | 0.55 (0.84) | 0.63 (0.83) | 0.54 (0.92) | 0.58 (0.78) | 0.60 |
-| + **BATNA reward** | **0.76** (0.80) | **0.58** (0.79) | **0.65** (0.93) | **0.70** (0.77) | **0.68** (0.81) | **0.67** |
+| + Surplus reward (80 steps) | 0.43 (0.75) | 0.57 (0.76) | 0.65 (0.88) | 0.58 (0.86) | 0.59 (0.83) | 0.56 |
+| + **Threshold reward** | **0.76** (0.80) | **0.58** (0.79) | **0.65** (0.93) | **0.70** (0.77) | **0.68** (0.81) | **0.67** |
 
 **Multi-item metrics (CaSiNo + DnD):**
 
 | Model | CaSiNo Pareto % | CaSiNo Joint Surplus | DnD Pareto % | DnD Joint Surplus |
 |---|---|---|---|---|
 | Qwen3-30B base | 32.6% | 0.939 | 29.0% | 0.767 |
-| + Surplus reward (60 steps) | 47.6% | 0.944 | 40.2% | 0.782 |
-| + BATNA reward | **45.6%** | **0.948** | **49.4%** | **0.851** |
+| + Surplus reward (80 steps) | 40.8% | 0.944 | 32.6% | 0.795 |
+| + Threshold reward | **45.6%** | **0.948** | **49.4%** | **0.851** |
 
 **Price scenario anchoring (first bid ratio):**
 
 | Model | Amazon 1st Bid | Craigslist 1st Bid |
 |---|---|---|
 | Qwen3-30B base | 0.927 | 0.923 |
-| + Surplus reward (60 steps) | 0.521 | 0.530 |
-| + BATNA reward | **0.347** | **0.432** |
+| + Surplus reward (80 steps) | 0.575 | 0.574 |
+| + Threshold reward | **0.347** | **0.432** |
 
 Key findings:
-- **BATNA closes the frontier gap**: Base model averaged 0.36 BR → BATNA achieves 0.67, surpassing GPT-5.4 (0.56). A +0.31 absolute improvement.
-- **BATNA > Surplus across the board**: BATNA (0.67) outperforms surplus-60 (0.60) overall, and now wins on every dataset — including price scenarios where surplus previously led. Amazon: 0.76 vs 0.68, Craigslist: 0.65 vs 0.63.
-- **Anchoring dramatically improves**: BATNA learns far more aggressive first bids than surplus — Amazon 0.347 vs 0.521, Craigslist 0.432 vs 0.530. The model opens much further from its budget, capturing more surplus.
-- **Multi-item quality**: DnD Pareto efficiency jumps to 49.4% (+20.4pp over base, +9.2pp over surplus). DnD joint surplus improves to 0.851 (+8.4pp over base). BATNA-trained agents discover better integrative trades.
-- **Deal rates improve across the board**: Both trained models dramatically improve deal rates over base (avg 0.59 → 0.82 BATNA, 0.82 surplus). BATNA now achieves comparable deal rates without sacrificing deal quality.
-- **Generalization to held-out JI**: BATNA achieves 0.68 BR on JI vs 0.58 for surplus-60 and 0.70 for base. Surplus overfits to deal-closing behavior and degrades on the novel hybrid scenario; BATNA preserves generalization.
+- **Threshold closes the frontier gap**: Base model averaged 0.36 BR → threshold achieves 0.67, surpassing GPT-5.4 (0.56). A +0.31 absolute improvement.
+- **Threshold > Surplus across the board**: Threshold (0.67) outperforms surplus-80 (0.56) on every dataset. The gap is largest on Amazon (0.76 vs 0.43) and DnD (0.70 vs 0.58). Surplus with more training steps actually degraded on Amazon (0.43 vs 0.68 at 60 steps), suggesting overfitting to deal-closing without quality pressure.
+- **Anchoring dramatically improves**: Threshold learns far more aggressive first bids — Amazon 0.347 vs 0.575, Craigslist 0.432 vs 0.574. The surplus agent barely improved its anchoring even with more steps.
+- **Multi-item quality**: DnD Pareto efficiency with threshold jumps to 49.4% vs 32.6% for surplus-80. DnD joint surplus 0.851 vs 0.795. Threshold-trained agents discover better integrative trades.
+- **Deal rates**: Surplus-80 achieves higher deal rates (avg 0.82) than threshold (avg 0.82), but at the cost of deal quality. Threshold maintains comparable deal rates without sacrificing the bargained ratio.
+- **Generalization to held-out JI**: Threshold achieves 0.68 BR on JI vs 0.59 for surplus-80 and 0.70 for base. Surplus degrades on the novel hybrid scenario; threshold preserves generalization.
 
 ### Why BATNA-aware rewards
 

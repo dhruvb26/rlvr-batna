@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+.cache/
 
 # Environment variables
 .env
@@ -17,3 +18,10 @@ logs/
 
 # Zip files
 *.zip
+
+# LaTeX build artifacts
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.out
