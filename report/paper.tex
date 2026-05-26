@@ -42,19 +42,18 @@
 \setlength{\heavyrulewidth}{0.02em}
 \setlength{\lightrulewidth}{0.02em}
 
-\title{Walking Away from Bad Deals: BATNA-Aware Reward Design for Negotiation}
+\title{The Art of Saying No: BATNA-Aware Reward Design for LLM Strategic Negotiation}
 
 \author{
   \textbf{Dhruv Bansal},
   \textbf{Bradley Breisch},
-  \textbf{Luan Nguyen},
-  \textbf{Wenhui Zhu},
   \textbf{Rui Yin},
+  \textbf{Wenhui Zhu},
   \textbf{Yaling Wang}
 \\
   Arizona State University \\
   \small{
-    \texttt{\{dbansa11, bbreisc1, ltnguy58, wzhu59, ryin12, ylwang\}@asu.edu}
+    \texttt{\{dbansa11, bbreisc1, ryin12, wzhu59, ylwang\}@asu.edu}
   }
 }
 
@@ -62,17 +61,13 @@
 \maketitle
 \raggedbottom
 
-% \begin{abstract}
-% Reinforcement learning can train LLM negotiation agents without human supervision, yet prior work is fragmented across datasets and task types, and relies on surplus rewards that treat any closed deal as better than no deal. We ground our reward in the theory of Best Alternative to a Negotiated Agreement: walking away should be preferable to accepting a deal below a quality threshold. We apply the threshold selectively to multi-item scenarios where no structural quality floor exists, while retaining surplus rewards for price settings. We train a single agent across four benchmarks and evaluate against both a fixed and a frontier opponent, as well as on a held-out job interview dataset whose hybrid structure mirrors real-world negotiation. Our threshold reward achieves higher average bargained ratio than both surplus training and frontier models, with the largest gains on multi-item tasks where surplus fails to distinguish good deals from bad.
-% \end{abstract}
-
 \begin{abstract}
 Reinforcement learning enables the training of large language model (LLM) negotiation agents without human supervision. However, existing methods are often fragmented between disjoint task types and heavily rely on surplus rewards that treat the finalized agreement as superior to no deal. To address this, we ground our reward design in the bargaining theory of Best Alternative to a Negotiated Agreement (BATNA), positing that a rational agent should walk away rather than accept a contract below a critical quality threshold. We formalize this formulation as a parameterized utility floor and apply it selectively to multi-item scenarios where no natural structural floor exists, while retaining surplus rewards for price bargaining settings. We train a single unified agent across four distinct price and multi-item benchmarks, evaluating its performance against both fixed and frontier opponents alongside a held-out dataset featuring a hybrid, multi-attribute structure. Our reward modeling consistently achieves the highest overall average bargained ratio, outperforming both surplus-based training and larger frontier models while effectively eliminating the deal-closing bias on tasks where baseline incentives fail to distinguish fair compromises from poor agreements.
 \end{abstract}
 
 \section{Introduction}
 
-Negotiation has progressed from early neural models \citep{lewis2017deal, he2018decoupling} to large language model \citep[LLM;][]{minaee2024llmsurvey} benchmarks spanning single-item price bargaining and multi-item allocation \citep{xia2024measuring, kwon2024llmseffectivenegotiators, bianchi2024negotiationarena, noh2024personalities, chatterjee2024agreemate, hua2024gametheoretic}, which reveal that even frontier models routinely accept negative-utility deals. Reinforcement learning has been applied to close this gap \citep{liu2026instructing, bergemann2026bilateral, vendrell2026gametalk, zeng2025repo, long2025evoemo, oh2026merit}, but each trains on a single dataset or task type and relies on surplus rewards that treat any closed deal as a positive signal. The Best Alternative to a Negotiated Agreement (BATNA) \citep{fisher1981gettingtoyes}, the principle that a rational negotiator should prefer walking away to accepting a deal worse than their outside option, has not been incorporated into reward design.
+Negotiation research has progressed from early neural models \citep{lewis2017deal, he2018decoupling} to large language model \citep[LLM;][]{minaee2024llmsurvey} benchmarks spanning price bargaining and multi-item allocation \citep{xia2024measuring, kwon2024llmseffectivenegotiators, bianchi2024negotiationarena, noh2024personalities, chatterjee2024agreemate, hua2024gametheoretic}, revealing that even frontier models routinely accept negative-utility deals. Reinforcement learning has been used to address this gap \citep{liu2026instructing, bergemann2026bilateral, vendrell2026gametalk, zeng2025repo, long2025evoemo, oh2026merit}, but existing methods typically train on  a single task type and rely on surplus rewards that treat any closed deal as positive. The Best Alternative to a Negotiated Agreement (BATNA) \citep{fisher1981gettingtoyes}, the principle that rational negotiators should prefer walking away to accepting deals worse than their outside option, has not been incorporated into reward design.
 
 \begin{figure}[t]
 \centering
@@ -141,42 +136,35 @@ Negotiation has progressed from early neural models \citep{lewis2017deal, he2018
 \label{fig:batna_hero}
 \end{figure}
 
-Surplus rewards are reasonable for single-item price bargaining, where the seller's reservation price floors deal quality, but fail in multi-item settings where no such floor exists. \citet{bergemann2026bilateral} diagnose this directly: surplus-only training produces a deal-closing bias where agents optimize for closure rather than quality. Meanwhile, \citet{liu2026instructing} show that verifiable rewards alone produce sophisticated strategic behavior (including aggressive anchoring and multi-turn persuasion) on a single price dataset, and \citet{chawla2023selfish} find that self-interested agents outperform those optimizing for fairness, suggesting that self-interested optimization can be more effective than fairness-weighted objectives. The missing piece is a negative signal for low-quality multi-item deals, but it must be selective: applying a threshold uniformly would penalize thin-margin price deals that are rational.
+Surplus rewards are reasonable for single-item price bargaining, where the seller's reservation price floors deal quality, but fail in multi-item settings where no such floor exists. \citet{bergemann2026bilateral} diagnose this directly: surplus-only training produces a deal-closing bias where agents optimize for closure rather than quality. Meanwhile, \citet{liu2026instructing} show that verifiable rewards alone produce sophisticated strategic behavior (including aggressive anchoring and multi-turn persuasion) on a single price dataset, and \citet{chawla2023selfish} find that self-interested agents outperform fairness-oriented ones. The missing piece is a negative signal for low-quality multi-item deals, but it must be selective: applying a threshold uniformly would penalize thin-margin price agreements.
 
-We provide this selective signal and train a single agent across four benchmarks spanning both task types, evaluating on a held-out fifth dataset.
+We provide this selective signal and train a single agent across four benchmarks spanning both task types, evaluating on a held-out fifth dataset. Our contributions are threefold: (1) we introduce a BATNA-aware threshold reward that teaches negotiation agents to prefer walking away over accepting low-quality agreements; (2) we show that reward design in negotiation should be selective, applying threshold-based penalties only to task settings lacking natural utility floors; and (3) we train a unified negotiation agent across heterogeneous benchmarks and demonstrate improved deal quality, reduced deal-closing bias, and strong transfer to unseen negotiation structures compared to both surplus-based training and frontier LLM baselines.
 
 \section{Methodology}
 
-We model negotiation as a single-agent Markov Decision Process (MDP) in which only the learner's policy is optimized; the opponent is a frozen language model that forms part of the environment. Following \citet{he2018decoupling}, each turn consists of a private thought stripped before reaching the opponent, a visible talk utterance, and a formal action: one of \textbf{Submit Deal}, \textbf{Accept Deal}, \textbf{Reject Deal}, or \textbf{Walk Away}. A \textbf{Submit Deal} is a price proposal in price scenarios and an item allocation in multi-issue scenarios. In price scenarios, the learner is always the buyer and the opponent always the seller; in multi-item scenarios, roles are symmetric and randomly assigned. A regulation mechanism intercepts opponent actions that would yield negative utility for the opponent, replacing them with rejections to prevent the learner from exploiting irrational concessions. Episodes terminate on mutual agreement, walk-away, a reject loop, or after $T{=}6$ rounds per agent.
+We model negotiation as a single-agent Markov Decision Process (MDP) in which only the learner's policy is optimized; while the opponent is a frozen language model forming part of the environment. Following \citet{he2018decoupling}, each turn consists of a private thought hidden from the opponent, a visible utterance, and a formal action: \textbf{Submit Deal}, \textbf{Accept Deal}, \textbf{Reject Deal}, or \textbf{Walk Away}. A \textbf{Submit Deal} corresponds to a price proposal in price scenarios and an item allocation in multi-issue scenarios. In price tasks, the learner is always the buyer and the opponent the seller; in CaSiNo and DnD, roles are symmetric and randomly assigned; in JI, the learner is always the job applicant. A regulation mechanism intercepts opponent actions that would yield negative utility, replacing them with rejections to prevent exploitation of irrational concessions. Episodes terminate on agreement, walk-away, reject loops, or after $T{=}6$ rounds per agent.
 
 Modeling the opponent as a frozen copy of the base model rather than a co-adapting agent isolates the effect of reward design. In self-play, policy updates for one agent shift the reward landscape for the other, entangling reward effects with environmental non-stationarity. A stationary opponent ensures that differences between surplus and threshold training arise from the reward function alone.
 
-Regulation creates an asymmetry. In price scenarios it ensures $P \geq \mathcal{C}$, so all closed deals yield positive surplus. In multi-item scenarios no such floor exists, and a cooperative opponent will accept lopsided splits that yield the learner minimal utility. This motivates the selective reward design in \S\ref{sec:reward}.
-
-\subsection{Reward Design}
-\label{sec:reward}
+Regulation creates an asymmetry. In price scenarios, it ensures $P \geq \mathcal{C}$, so all closed deals yield positive surplus. In multi-item scenarios no such floor exists, and a cooperative opponent may accept lopsided splits that yield the learner minimal utility. This motivates the selective reward design in \S\ref{sec:reward}.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/reward_design.png}
-\caption{Surplus vs.\ threshold reward for multi-item scenarios.}
+\caption{Surplus vs.\ threshold reward for multi-item scenarios; threshold rewards discourage poor deals.}
 \label{fig:reward_design}
 \end{figure}
 
+\subsection{Reward Design}
+\label{sec:reward}
+
 The reward is terminal and verifiable, computed solely from deal terms and private constraints at episode end, requiring no learned reward model or human annotation. We measure deal quality by the \textit{bargained ratio} $\rho$, the fraction of maximum surplus captured by the learner: $\rho_{\textit{price}} = (\mathcal{B} - P) / |\mathcal{B} - \mathcal{C}|$ for a buyer with budget $\mathcal{B}$ negotiating price $P$ against a seller with cost $\mathcal{C}$, and $\rho_{\textit{multi}} = u(x) / u(x^*)$ for multi-item allocation with achieved utility $u(x)$ and maximum $u(x^*)$. Normalizing by the maximum possible surplus makes deal quality comparable across scenarios with different value scales, enabling a single reward function across heterogeneous benchmarks.
 
-\paragraph{Surplus reward.} Following \citet{liu2026instructing}, any closed deal receives $\rho$ as reward and all other outcomes receive zero, treating every agreement as a positive signal regardless of quality. While natural for settings where all closed deals have positive surplus, this conflates two distinct signals in multi-item settings: \textit{whether} a deal was reached and \textit{whether} the deal was good. A policy that consistently closes low-quality deals receives positive advantage over policies that walk away, reinforcing deal-closing even when walking away would be rational.
+\paragraph{Surplus reward.} Following \citet{liu2026instructing}, any closed deal receives $\rho$ as reward and all other outcomes receive zero, treating every agreement as a positive signal regardless of quality. While natural when all closed deals have positive surplus, this conflates two distinct signals in multi-item settings: \textit{whether} a deal was reached and \textit{whether} it was good. A policy that consistently closes low-quality deals therefore gains positive advantage over policies that walk away, reinforcing deal-closing even when disagreement would be the rational outcome.
 
-% \paragraph{Threshold reward.} We introduce a quality threshold $\tau{=}0.4$ for multi-item scenarios only (Figure~\ref{fig:reward_design}), operationalizing the BATNA principle that a rational negotiator should prefer their outside option to a bad deal. Deals with $\rho \geq \tau$ receive $\rho$ as reward; deals below $\tau$ receive $-0.5$, making walk-away at reward $0$ strictly preferable. No-deal outcomes receive $0$ and format violations receive $-1.0$. The asymmetric application is deliberate: in price bargaining, regulation already ensures $\rho > 0$ for all closed deals, so a threshold would penalize thin-margin deals that are rational given a tough opponent; in multi-item settings no such guarantee exists and the threshold provides the missing quality floor. The value $\tau{=}0.4$ requires the agent to capture at least two-fifths of its maximum utility---low enough to reward genuine compromises where both parties hold strong preferences, but high enough to filter out lopsided agreements that offer little benefit over walking away. Price settings retain the surplus reward unchanged.
-
-\paragraph{Threshold Reward Modeling.} To operationalize the BATNA principle, we introduce a parameterized quality threshold $\tau \in [0, 1]$ for multi-item scenarios (Figure~\ref{fig:reward_design}). Completed deals where the normalized surplus $\rho$ satisfies $\rho \geq \tau$ receive $\rho$ as a reward. Deals below $\tau$ receive a negative penalty $-\gamma$, making a walk-away outcome preferable. Formally, the reward $R(x)$ for a contract $x$ is:
-\[
-R(x) = \begin{cases} 
-\rho & \text{if } \rho \geq \tau, \\ 
--\gamma & \text{otherwise,} 
-\end{cases}
-\]
-where no-deal outcomes receive $0$ and format violations receive $-\psi$. This asymmetric application is deliberate. In price bargaining, regulation ensures $\rho > 0$ for all closed deals, so a strict threshold would penalize low-margin deals that remain rational against tough opponents. In multi-item settings, no such guarantee exists, making the threshold necessary to establish a utility floor. Using an abstract parameter balances the trade-off between rewarding compromises and filtering lopsided agreements without binding the formulation to a specific task distribution. Price settings retain the surplus reward unchanged.
+\paragraph{Threshold Reward Modeling.} To operationalize the BATNA principle, we introduce a parameterized quality threshold $\tau \in [0, 1]$ for multi-item scenarios (Figure~\ref{fig:reward_design}). Completed deals with normalized surplus $\rho$ satisfies $\rho \geq \tau$ receive reward $\rho$, while deals below $\tau$ receive a penalty $-\gamma$, making walk-away outcomes preferable. Formally, the reward $R(x)$ for a contract $x$ is: $R(x) = 
+\rho$ if $\rho \geq \tau$, and $R(x) = 
+-\gamma$ otherwise, where no-deal outcomes receive $0$ and format violations receive $-\psi$. This asymmetry is deliberate. In price bargaining, regulation ensures $\rho > 0$ for all closed deals, so a strict threshold would penalize low-margin agreements. In multi-item settings, no such guarantee exists, making the threshold necessary to establish a utility floor. The abstract parameter balances rewarding compromises against filtering lopsided agreements without tying the formulation to a specific task distribution while price settings retain the original surplus reward.
 
 \begin{table}[t]
 \centering
@@ -214,7 +202,6 @@ Llama-4-Maverick      & $-1.61$ (85)      & .51 (76)          & $-.19$ (72)     
 \label{tab:results-qwen}
 \end{table}
 
-
 \section{Experimental Results}
 
 \begin{figure}[t]
@@ -224,7 +211,9 @@ Llama-4-Maverick      & $-1.61$ (85)      & .51 (76)          & $-.19$ (72)     
 \label{fig:bar_results}
 \end{figure}
 
-For the full experimental setup and training details, see Appendix~\ref{app:training}. We fine-tune \model{Qwen3-30B-A3B-Instruct} \citep{qwen2025qwen3}, a mixture-of-experts model activating 3B of 30B parameters, with Group Relative Policy Optimization \citep{shao2024deepseekmath} and LoRA against a frozen copy of the base model as opponent. Training draws uniformly from four datasets: AmazonHistoryPrice (AHP; \citealp{xia2024measuring}) and CraigslistBargains (CRA; \citealp{he2018decoupling}) for price bargaining, CaSiNo (CA; \citealp{chawla2021casino}) and Deal or No Deal (DnD; \citealp{lewis2017deal}) for multi-item allocation. Each step generates 512 complete negotiation rollouts with no KL penalty; reward curves plateau well before step~80 (Figure~\ref{fig:reward_curves}). We evaluate on all four training sets plus a held-out Job Interview dataset (JI; \citealp{yamaguchi2021dialogue}) that combines salary negotiation with multi-attribute allocation. All evaluations use 100 scenarios per dataset with temperature $0.7$ and nucleus sampling ($p{=}0.9$).
+For the full experimental setup and training details, see Appendix~\ref{app:training}. We fine-tune \model{Qwen3-30B-A3B-Instruct} \citep{qwen2025qwen3}, a mixture-of-experts model activating 3B of 30B parameters, with Group Relative Policy Optimization \citep{shao2024deepseekmath} and LoRA against a frozen copy of the base model as opponent. Training draws uniformly from four datasets: AmazonHistoryPrice (AHP; \citealp{xia2024measuring}) and CraigslistBargains (CRA; \citealp{he2018decoupling}) for price bargaining, CaSiNo (CA; \citealp{chawla2021casino}) and Deal or No Deal (DnD; \citealp{lewis2017deal}) for multi-item allocation. Each step generates 512 negotiation rollouts without a KL penalty; reward curves plateau well before step~80 (Figure~\ref{fig:reward_curves}). We evaluate on all four training sets plus a held-out Job Interview dataset (JI; \citealp{yamaguchi2021dialogue}) combining salary negotiation with multi-attribute allocation. All evaluations use 100 scenarios per dataset with temperature $0.7$ and nucleus sampling ($p{=}0.9$). 
+
+Table~\ref{tab:results-qwen} reports bargained ratio and deal rate against the frozen training opponent. The threshold agent achieves the highest average bargained ratio at $0.69$, outperforming surplus at $0.57$, \model{GPT-5.4} at $0.54$, and \model{DeepSeek-V3.1} at $0.50$ (Figure~\ref{fig:bar_results}). The early reward gap in Figure~\ref{fig:reward_curves} reflects the penalty on low-quality deals, which closes as the agent learns to avoid them. Untrained models struggle most on price bargaining: on AHP and CRA, base models score near zero or negative because they concede to the seller's anchor. On average, threshold scores $0.72$ bargained ratio on price tasks versus $0.54$ for surplus, and $0.64$ on multi-item tasks versus $0.57$.
 
 \begin{figure}[t]
 \centering
@@ -233,10 +222,8 @@ For the full experimental setup and training details, see Appendix~\ref{app:trai
 \label{fig:reward_curves}
 \end{figure}
 
-Table~\ref{tab:results-qwen} reports bargained ratio and deal rate against the frozen training opponent. The threshold agent achieves the highest average bargained ratio at $0.69$, outperforming surplus at $0.57$, \model{GPT-5.4} at $0.54$, and \model{DeepSeek-V3.1} at $0.50$ (Figure~\ref{fig:bar_results}). The early reward gap in Figure~\ref{fig:reward_curves} reflects the penalty on low-quality deals, which closes as the agent learns to avoid them. Untrained models struggle most on price bargaining: on AHP and CRA, base models score near zero or negative because they concede to the seller's anchor. On average, threshold scores $0.72$ bargained ratio on price tasks versus $0.54$ for surplus, and $0.64$ on multi-item tasks versus $0.57$.
-
 \paragraph{Quality over closure.}
-The sharpest contrast between reward designs appears on multi-item tasks. On DnD, the surplus agent closes $90\%$ of deals but at $0.55$ bargained ratio; the threshold agent closes $78\%$ at $0.70$ (Table~\ref{tab:results-qwen}). Surplus training produces the deal-closing bias \citet{bergemann2026bilateral} diagnose, accepting lopsided splits rather than walking away; the threshold reward inverts this by making bad deals worse than no deal. The surviving deals are also more jointly efficient: Pareto efficiency on DnD rises from $0.29$ (surplus) to $0.50$ (threshold), because the lopsided splits that the agent now refuses sit far from the efficient frontier (Table~\ref{tab:fbr_pareto_vs_qwen}). On DnD, self-interested quality filtering improves joint outcomes as a side effect.
+The sharpest contrast between reward designs appears on multi-item tasks. On DnD, the surplus agent closes $90\%$ of deals but at $0.55$ bargained ratio; the threshold agent closes $78\%$ at $0.70$ (Table~\ref{tab:results-qwen}). Surplus training produces the deal-closing bias \citet{bergemann2026bilateral} diagnose, accepting lopsided splits rather than walking away; the threshold reward inverts this by making bad deals worse than no deal. The surviving deals are also more jointly efficient: Pareto efficiency on DnD rises from $0.29$ (surplus) to $0.50$ (threshold), because lopsided splits sit far from the efficient frontier (Table~\ref{tab:fbr_pareto_vs_qwen}). On DnD, self-interested quality filtering improves joint outcomes as a side effect.
 
 \begin{table}[!t]
 \centering
@@ -252,7 +239,7 @@ The sharpest contrast between reward designs appears on multi-item tasks. On DnD
 \midrule
 \rowcolor{tablerow}
 Threshold (Ours) & .58          & .50          & \textbf{.36} & \textbf{.40} \\
-Surplus (Ours)   & .49          & .29          & \underline{.59} & \underline{.56} \\
+Surplus   & .49          & .29          & \underline{.59} & \underline{.56} \\
 \lightrule
 \rowcolor{tablerow}
 Qwen3-30B        & .44          & .31          & .95          & .92 \\
@@ -288,25 +275,26 @@ First-bid ratio, defined for price scenarios where the opening offer is a scalar
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/deal_walk_rate.png}
-\caption{Deal and walk-away rates (threshold agent). Deal rate increases monotonically with no deadlock phase.}
+\caption{Deal and walk-away rates for the threshold agent. Deal rate increases monotonically with no deadlock phase.}
 \label{fig:deal_walk}
 \end{figure}
 
 \paragraph{Cross-task transfer.}
-Neither reward sees JI during training, yet the threshold agent transfers at $0.70$ bargained ratio, trailing only \model{Qwen3-30B-Think} ($0.79$) and \model{DeepSeek-V3.1} ($0.77$), models $8{\times}$ and $200{\times}$ larger. The ability to discriminate good from bad deals, learned on pure price and multi-item tasks, generalizes to JI's hybrid structure without explicit exposure, suggesting that quality-aware negotiation transfers across formats rather than overfitting to task-specific patterns.
+Neither reward sees JI during training, yet the threshold agent transfers at $0.70$ bargained ratio, trailing only \model{Qwen3-30B-Think} ($0.79$) and \model{DeepSeek-V3.1} ($0.77$), models $8{\times}$ and $200{\times}$ larger. The ability to distinguish good from bad deals, learned on pure price and multi-item tasks, generalizes to JI's hybrid structure without explicit exposure, suggesting that quality-aware negotiation generalizes across formats.
 
 \paragraph{Selective deal-making.}
-Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving: the agent initially walks away from sub-$\tau$ deals, but as deal quality improves walk-away rates fall---not from reduced selectivity but from learning to negotiate deals that clear the threshold. By training end, deal rates match surplus while bargained ratio remains higher. Unlike \citet{liu2026instructing}, where aggressive anchoring triggers a deadlock phase, our agent bypasses this: the penalty provides the quality floor directly.
+Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving. The agent initially walks away from sub-$\tau$ deals, but as deal quality improves walk-away rates fall---not from reduced specificity but from learning to negotiate better deals. By the time training ends, deal rates match surplus while bargained ratio remains higher. Unlike \citet{liu2026instructing}, who observe a deadlock phase under surplus training on a single price dataset, our agent bypasses this across the mixed tasks.
 
 \section{Discussion}
 
-Our fixed threshold is the simplest operationalization of the walk-away principle. In negotiation theory, a party's outside option is context-dependent, private, and actively shaped during the negotiation itself \citep{fisher1981gettingtoyes, raiffa1982art}. A uniform scalar ignores all of this. Two extensions preserve verifiability while adding context-sensitivity: a dynamic threshold that adapts to the item configuration or opponent behavior would capture structure that the fixed value misses, and an opponent-aware threshold informed by the Nash bargaining solution \citep{nash1950bargaining} could shift up when the opponent is weak and down when concessions are necessary to avoid deadlock.
+Our fixed threshold is the simplest operationalization of the walk-away principle. In negotiation theory, a party's outside option is context-dependent, private, and shaped during the negotiation itself \citep{fisher1981gettingtoyes, raiffa1982art}. A uniform scalar ignores much of this complexity. Two extensions could preserve verifiability while adding context sensitivity: a dynamic threshold adapting to item configurations or opponent behavior, and an opponent-aware threshold informed by the Nash bargaining solution \citep{nash1950bargaining}, increasing against weak opponents and decreasing when concessions are needed to avoid deadlock.
 
-Real-world negotiations combine price, terms, and relationship dynamics in ways our benchmarks only partially capture. \citet{zeng2025repo} study commercial negotiations that require learned reward models and rule-based constraints; our threshold reward needs no additional training signal beyond the deal terms themselves, but bridging to settings with evolving outside options and multi-deal relationships will likely require population-based or self-play approaches \citep{liu2025spiral}. More broadly, the asymmetry between price bargaining (where structural quality floors exist) and multi-item allocation (where they do not) demonstrates that reward design for negotiation should be \textit{selective}.
+Real-world negotiations combine price, terms, and relationship dynamics in ways our benchmarks only partially capture. \citet{zeng2025repo} study commercial negotiations requiring learned reward models and rule-based constraints; by contrast, our threshold reward relies only on deal terms. Extending this framework to settings with evolving outside options and multi-deal relationships will likely require population-based or self-play approaches \citep{liu2025spiral}. More broadly, the asymmetry between price bargaining (where structural quality floors exist) and multi-item allocation (where they do not) suggests that negotiation reward design should be \textit{selective}, adapting to the structure of the bargaining environment rather than relying on a universal objective.
+
 
 \section*{Limitations}
 
-Existing negotiation benchmarks in the NLP and financial AI communities evaluate agents on single-episode, complete-information settings, ignoring the sequential and information-asymmetric structure of real procurement and contract negotiation. This gap means that no current evaluation, including ours, tests whether learned strategies transfer to multi-round settings where each deal reshapes the next round's outside options. Separately, the regulation mechanism that prevents the opponent from accepting irrational deals assumes access to private constraints, an assumption shared by all controlled negotiation setups but absent in deployment. Constructing multi-round, partial-information negotiation corpora and evaluating reward design under those conditions is a necessary direction to be explored.
+Existing negotiation benchmarks in the NLP and financial AI communities evaluate agents on single-episode, complete-information settings, ignoring the sequential and information-asymmetric structure of real procurement and contract negotiation. This gap means that no current evaluation, including ours, tests whether learned strategies transfer to multi-round settings where each deal reshapes the next round's outside options. Separately, the regulation mechanism that prevents the opponent from accepting irrational deals assumes access to private constraints, an assumption shared by all controlled negotiation setups but absent in deployment. Constructing multi-round, partial-information negotiation corpora and evaluating reward design under those conditions remains an open direction.
 
 \section*{Acknowledgments}
 AI coding assistants were used during codebase development and paper writing; all outputs were reviewed and validated by the authors.
@@ -318,7 +306,6 @@ AI coding assistants were used during codebase development and paper writing; al
 
 \section{Training Details}
 \label{app:training}
-
 
 Both agents are fine-tuned from \model{Qwen3-30B-A3B-Instruct-2507} (30.5B total parameters, 3.3B activated per token) using Group Relative Policy Optimization \citep{shao2024deepseekmath} with LoRA. The two training runs differ only in the reward function: the threshold run penalizes multi-item deals with bargained ratio below $\tau = 0.4$ with penalty $\gamma{=}0.5$, while the surplus run rewards any closed deal proportionally to surplus captured. Format violations receive $-\psi$ with $\psi{=}1.0$ in both runs. All deal rewards are clipped to $[-1, 1]$ to bound gradient magnitude. Training and evaluation were conducted on the Tinker platform \citep{tinker2025}, a cloud-based RL fine-tuning API that handles distributed sampling and gradient computation. The total compute cost for both training runs and all evaluations was approximately \$250 USD. Table~\ref{tab:hyperparams} lists the shared hyperparameters.
 
@@ -422,7 +409,7 @@ Avg  & \textbf{79} & .66 & \underline{75} & \underline{.69} & 53 & \textbf{.75} 
 \midrule
 \rowcolor{tablerow}
 Threshold (Ours) & .01 (\underline{87}) & \textbf{.57} (77) & \textbf{.32} (\underline{92}) & \textbf{.72} (87) & .60 (\textbf{99}) \\
-Surplus (Ours)   & $-.02$ (86)          & .50 (\textbf{96})  & \underline{.22} (\textbf{98})  & .57 (\textbf{98})  & .54 (\underline{98}) \\
+Surplus   & $-.02$ (86)          & .50 (\textbf{96})  & \underline{.22} (\textbf{98})  & .57 (\textbf{98})  & .54 (\underline{98}) \\
 \lightrule
 \rowcolor{tablerow}
 Qwen3-30B        & $-.25$ (66)          & .51 (56)           & $-.19$ (65)          & .63 (90)           & .58 (84)          \\
@@ -459,7 +446,7 @@ Llama-4-Maverick & $-1.61$ (77)         & .51 (\underline{91}) & $-.13$ (63)    
 \midrule
 \rowcolor{tablerow}
 Threshold (Ours) & .48              & \underline{.67}  & \textbf{.33} & \textbf{.37} \\
-Surplus (Ours)   & .56              & .58              & \underline{.56} & \underline{.50} \\
+Surplus   & .56              & .58              & \underline{.56} & \underline{.50} \\
 \lightrule
 \rowcolor{tablerow}
 Qwen3-30B        & .43              & .50              & .96          & .90 \\
