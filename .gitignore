@@ -19,9 +19,8 @@ logs/
 # Zip files
 *.zip
 
-# LaTeX build artifacts
-report/*.aux
-report/*.bbl
-report/*.blg
-report/*.log
-report/*.out
+*-submission/*.aux
+*-submission/*.bbl
+*-submission/*.blg
+*-submission/*.log
+*-submission/*.out
