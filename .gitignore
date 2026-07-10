@@ -19,8 +19,15 @@ logs/
 # Zip files
 *.zip
 
+# macOS
+.DS_Store
+
 *-submission/*.aux
 *-submission/*.bbl
 *-submission/*.blg
 *-submission/*.log
 *-submission/*.out
+
+*-submission/files/rebuttal.md
+
+review/

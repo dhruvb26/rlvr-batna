@@ -202,9 +202,21 @@ class APIGenerator:
 
 
 class TinkerGenerator:
-    """Generates responses via the Tinker SDK SamplingClient."""
+    """Generates responses via the Tinker SDK SamplingClient.
 
-    def __init__(self, model_path: str, max_tokens: int = 512):
+    Serves either a trained checkpoint (``tinker://`` path, via ``model_path``)
+    or an untrained base model (bare HF name, via ``base_model``). ``renderer_name``
+    overrides the recommended renderer so evaluation can match the renderer used
+    at training time (e.g. a non-thinking renderer for a checkpoint trained with
+    thinking disabled).
+    """
+
+    def __init__(
+        self,
+        model_path: str,
+        max_tokens: int = 512,
+        renderer_name: str | None = None,
+    ):
         import tinker
         from tinker_cookbook import model_info
         from tinker_cookbook.renderers import get_renderer
@@ -212,16 +224,24 @@ class TinkerGenerator:
 
         _install_tinker_telemetry_filter()
         service = tinker.ServiceClient()
-        self._sampler = service.create_sampling_client(model_path=model_path)
+        if model_path.startswith("tinker://"):
+            self._sampler = service.create_sampling_client(model_path=model_path)
+            base_model = self._sampler.get_base_model()
+        else:
+            self._sampler = service.create_sampling_client(base_model=model_path)
+            base_model = model_path
 
-        base_model = self._sampler.get_base_model()
-        renderer_name = model_info.get_recommended_renderer_name(base_model)
+        if renderer_name is None:
+            renderer_name = model_info.get_recommended_renderer_name(base_model)
         tokenizer = get_tokenizer(base_model)
         self._renderer = get_renderer(renderer_name, tokenizer)
         self._tokenizer = tokenizer
         self._max_tokens = max_tokens
         self._model_path = model_path
-        logger.info(f"TinkerGenerator ready: {model_path} (base: {base_model})")
+        logger.info(
+            f"TinkerGenerator ready: {model_path} "
+            f"(base: {base_model}, renderer: {renderer_name})"
+        )
 
     def __call__(
         self, messages: list[dict], temperature: float = 0.7, top_p: float = 0.9
@@ -263,13 +283,17 @@ def make_generator(
     paths and uses the Tinker SDK directly.
     """
     model = agent_cfg["model"]
-    if model.startswith("tinker://"):
-        if model not in _tinker_cache:
-            _tinker_cache[model] = TinkerGenerator(
+    use_tinker = model.startswith("tinker://") or agent_cfg.get("provider") == "tinker"
+    if use_tinker:
+        renderer_name = agent_cfg.get("renderer_name")
+        cache_key = f"{model}|{renderer_name}"
+        if cache_key not in _tinker_cache:
+            _tinker_cache[cache_key] = TinkerGenerator(
                 model_path=model,
                 max_tokens=agent_cfg.get("max_tokens", 512),
+                renderer_name=renderer_name,
             )
-        return _tinker_cache[model]
+        return _tinker_cache[cache_key]
 
     api_key_env = agent_cfg.get("api_key_env", default_api_key_env)
     raw = os.getenv(api_key_env, "")

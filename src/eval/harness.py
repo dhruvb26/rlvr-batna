@@ -30,7 +30,7 @@ from .runner import (
 DEFAULT_DATA_PATHS: dict[str, str] = {
     "casino": "data/casino/ca.test.csv",
     "dnd": "data/dnd/dnd.test.csv",
-    "amazon": "data/ahp",
+    "amazon": "data/ahp/test",
     "craigslist": "data/craigslist/test.json",
     "ji": "data/ji/ji.test.json",
 }

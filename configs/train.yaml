@@ -8,7 +8,7 @@ datasets:
     data_path: data/dnd/dnd.train.csv
     weight: 0.25
   - name: amazon
-    data_path: data/ahp
+    data_path: data/ahp/train
     weight: 0.25
   - name: craigslist
     data_path: data/craigslist/train.json
@@ -32,3 +32,52 @@ eval_every: 0
 
 resume_run: run-20260509-115751 # surplus-training and run-20260509-142749 is threshold-training
 wandb_project: rlvr-batna
+
+# Transfer-mechanism ablation (rebuttal): train the threshold agent on
+# multi-item tasks ONLY (CaSiNo + DnD), then evaluate on the price tasks
+# (AHP, CRA) it never saw. If walk-away tolerance transfers as aggressive
+# anchoring, first-bid ratio on price tasks should drop well below the
+# untrained base model (~0.8).
+#
+# Base model: Qwen3.6-35B-A3B (official Tinker replacement for the retired
+# Qwen3-30B-A3B-Instruct-2507). Non-thinking learner AND opponent, matching the
+# paper's non-thinking Instruct setup as closely as the hybrid replacement
+# allows. Note: standalone sampling put first-turn format violations at ~50% on
+# DnD (the model reasons inside Thought: and can drop Talk:); temp 0.7 keeps
+# generations from rambling/truncating without hurting compliance. Format
+# violations are penalized (-1.0) while good deals earn positive reward, so the
+# full-batch GRPO signal should push the policy toward format compliance over
+# training. Watch env/all/outcome_format_violation over the first ~15-20 steps.
+
+# model_name: Qwen/Qwen3.6-35B-A3B
+# renderer_name: qwen3_5_disable_thinking
+# opponent_renderer_name: qwen3_5_disable_thinking
+# opponent_max_tokens: 512
+# train_temperature: 0.7
+# recipe_name: rlvr_batna_multiitem
+
+# datasets:
+#   - name: casino
+#     data_path: data/casino/ca.train.csv
+#     weight: 0.5
+#   - name: dnd
+#     data_path: data/dnd/dnd.train.csv
+#     weight: 0.5
+
+# num_epochs: 1
+# max_steps: 80
+# batch_size: 64
+# group_size: 8
+# max_rounds: 6
+# max_tokens: 512
+
+# learning_rate: 3.0e-5
+# lora_rank: 32
+# opponent_temperature: 0.7
+# kl_penalty_coef: 0.0
+# batna_threshold: 0.4
+
+# save_every: 10
+# eval_every: 0
+
+# wandb_project: rlvr-batna

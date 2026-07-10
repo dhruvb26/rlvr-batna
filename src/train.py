@@ -536,12 +536,17 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
     opponent_temperature: float = 0.7
     eval_group_size: int = 4
     batna_threshold: float = 0.0
+    renderer_name: str | None = None
+    opponent_renderer_name: str | None = None
+    opponent_max_tokens: int = 300
 
     async def __call__(self) -> tuple[RLDataset, RLDataset | None]:
         service_client = tinker.ServiceClient()
 
-        opp_renderer_name = model_info.get_recommended_renderer_name(
-            self.opponent_model
+        opp_renderer_name = (
+            self.opponent_renderer_name
+            or self.renderer_name
+            or model_info.get_recommended_renderer_name(self.opponent_model)
         )
         opp_tokenizer = get_tokenizer(self.opponent_model)
         opp_renderer = get_renderer(opp_renderer_name, opp_tokenizer)
@@ -551,12 +556,13 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
         opponent = TinkerMessageCompleter(
             sampling_client=opp_client,
             renderer=opp_renderer,
-            max_tokens=300,
+            max_tokens=self.opponent_max_tokens,
             temperature=self.opponent_temperature,
         )
 
-        learner_renderer_name = model_info.get_recommended_renderer_name(
-            self.model_name_for_tokenizer
+        learner_renderer_name = (
+            self.renderer_name
+            or model_info.get_recommended_renderer_name(self.model_name_for_tokenizer)
         )
         learner_tokenizer = get_tokenizer(self.model_name_for_tokenizer)
         learner_renderer = get_renderer(learner_renderer_name, learner_tokenizer)
@@ -608,7 +614,7 @@ def _parse_datasets_str(datasets_str: str) -> list[dict]:
 DEFAULT_TRAIN_PATHS: dict[str, str] = {
     "casino": "data/casino/ca.train.csv",
     "dnd": "data/dnd/dnd.train.csv",
-    "amazon": "data/ahp",
+    "amazon": "data/ahp/train",
     "craigslist": "data/craigslist/train.json",
     "ji": "data/ji/ji.test.json",
 }
@@ -636,6 +642,10 @@ class CLIConfig:
     """CLI configuration for training runs."""
 
     model_name: str = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    renderer_name: str | None = None
+    opponent_renderer_name: str | None = None
+    opponent_max_tokens: int = 300
+    recipe_name: str = "rlvr_batna"
     datasets: str = "casino:data/casino/ca.train.csv"
     group_size: int = 2
     batch_size: int = 2
@@ -645,6 +655,7 @@ class CLIConfig:
     max_tokens: int = 300
     max_rounds: int = 6
 
+    train_temperature: float = 1.0
     opponent_temperature: float = 0.7
     kl_penalty_coef: float = 0.0
     batna_threshold: float = 0.0
@@ -668,7 +679,9 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
     """
     from datetime import datetime
 
-    renderer_name = model_info.get_recommended_renderer_name(cli.model_name)
+    renderer_name = cli.renderer_name or model_info.get_recommended_renderer_name(
+        cli.model_name
+    )
 
     if cli.resume_run:
         run_name = cli.resume_run
@@ -687,16 +700,21 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
         opponent_model=cli.model_name,
         opponent_temperature=cli.opponent_temperature,
         batna_threshold=cli.batna_threshold,
+        renderer_name=cli.renderer_name,
+        opponent_renderer_name=cli.opponent_renderer_name,
+        opponent_max_tokens=cli.opponent_max_tokens,
     )
 
     config = train.Config(
         model_name=cli.model_name,
+        recipe_name=cli.recipe_name,
         renderer_name=renderer_name,
         log_path=log_path,
         dataset_builder=dataset_builder,
         learning_rate=cli.learning_rate,
         lora_rank=cli.lora_rank,
         max_tokens=cli.max_tokens,
+        temperature=cli.train_temperature,
         kl_penalty_coef=cli.kl_penalty_coef,
         max_steps=cli.max_steps,
         save_every=cli.save_every,
