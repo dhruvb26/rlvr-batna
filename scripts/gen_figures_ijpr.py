@@ -1,5 +1,3 @@
-"""Generate all paper figures from training metrics."""
-
 import json
 from pathlib import Path
 
@@ -9,18 +7,21 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-THRESHOLD = "#EF4444"
-SURPLUS = "#3B82F6"
-BASE = "#D1D5DB"
+THRESHOLD = "#C0463B"
+SURPLUS = "#2F6DA8"
+WALK = "#64748B"
+BASE = "#9CA3AF"
 
-TEXT = "#1A1A1A"
+TEXT = "#1F2937"
 
 COL_W = 3.25
 plt.rcParams.update(
     {
         "font.family": "serif",
-        "font.serif": ["Times", "Times New Roman"],
-        "mathtext.fontset": "stix",
+        "font.serif": ["cmr10", "CMU Serif", "DejaVu Serif"],
+        "mathtext.fontset": "cm",
+        "axes.formatter.use_mathtext": True,
+        "axes.unicode_minus": False,
         "font.size": 9,
         "axes.titlesize": 10,
         "axes.labelsize": 9,
@@ -40,7 +41,7 @@ plt.rcParams.update(
         "figure.facecolor": "white",
         "savefig.facecolor": "white",
         "axes.linewidth": 0.6,
-        "axes.edgecolor": "#999999",
+        "axes.edgecolor": BASE,
         "xtick.major.width": 0.5,
         "ytick.major.width": 0.5,
         "xtick.direction": "out",
@@ -51,11 +52,12 @@ plt.rcParams.update(
 ROOT = Path(__file__).resolve().parent.parent
 SURPLUS_METRICS = ROOT / "logs/negotiation/run-20260509-115751/metrics.jsonl"
 THRESHOLD_METRICS = ROOT / "logs/negotiation/run-20260509-142749/metrics.jsonl"
-FIG_DIR = ROOT / "report" / "figures"
-FIG_DIR.mkdir(exist_ok=True)
+FIG_DIR = ROOT / "ijpr-submission" / "figures"
+
+XLABEL = "Training Steps"
 
 
-def _style(ax, ylabel=None, xlabel="Training Step"):
+def _style(ax, ylabel=None, xlabel=XLABEL):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.set_axisbelow(True)
@@ -94,7 +96,7 @@ def fig1_reward(surplus, batna):
     ax.plot(ss, sr_sm, color=SURPLUS, lw=1.2, ls="--", label="Surplus")
     ax.plot(bs, br_sm, color=THRESHOLD, lw=1.6, ls="-", label="Threshold (Ours)")
 
-    _style(ax, "Mean Reward")
+    _style(ax, "Mean Episode Reward")
     ax.legend(frameon=False, loc="upper left")
     ax.set_xlim(0, max(bs))
     ax.set_ylim(0, 0.72)
@@ -129,9 +131,9 @@ def fig2_first_bid(surplus, batna):
         markeredgewidth=0.3,
         label="Threshold",
     )
-    ax.axhline(0.89, color="#4B5563", ls=":", lw=0.9, label="Base", alpha=0.9)
+    ax.axhline(0.89, color=WALK, ls=":", lw=0.9, label="Base", alpha=0.9)
 
-    _style(ax, "First Bid / Budget")
+    _style(ax, "Opening Bid / Budget")
     ax.legend(frameon=False, loc="upper right")
     ax.set_xlim(0, max(bs))
     ax.set_ylim(0.15, 1.0)
@@ -151,9 +153,9 @@ def fig3_deal_walk(batna):
 
     ax.fill_between(steps, deal_sm, walk_sm, color=THRESHOLD, alpha=0.07)
     ax.plot(steps, deal_sm, color=THRESHOLD, lw=1.4, ls="-", label="Deal rate")
-    ax.plot(steps, walk_sm, color=SURPLUS, lw=0.9, ls="-.", label="Walk-away rate")
+    ax.plot(steps, walk_sm, color=WALK, lw=0.9, ls="-.", label="Walk-away rate")
 
-    _style(ax, "Rate")
+    _style(ax, "Episode Rate")
     ax.legend(frameon=False, loc="center right")
     ax.set_xlim(0, max(steps))
     ax.set_ylim(0, 1.0)
@@ -188,9 +190,9 @@ def fig4_per_dataset(batna):
             v = np.array([m.get(key, float("nan")) for m in batna])
             v_sm = smooth(v)
             ax.plot(steps, v_sm, color=c, lw=0.9, ls=ls, label=name)
-        ax.axhline(0, color="#D1D5DB", lw=0.6)
+        ax.axhline(0, color=BASE, lw=0.6)
         ax.set_title(title, fontsize=9)
-        _style(ax, "Bargained Ratio")
+        _style(ax, r"Bargained Ratio ($\rho$)")
         ax.set_xlim(0, max(steps))
         ax.legend(
             frameon=False,
@@ -204,48 +206,10 @@ def fig4_per_dataset(batna):
         print(f"  {fname}")
 
 
-def fig_reward_design():
-    fig, ax = plt.subplots(figsize=(COL_W, 2.0))
-    tau = 0.4
-    rho = np.linspace(0, 1, 500)
-    surplus_r = rho.copy()
-    thresh_r = np.where(rho >= tau, rho, -0.5)
-
-    ax.axvspan(0, tau, color=THRESHOLD, alpha=0.04, zorder=0)
-    ax.axhline(0, color="#666666", ls="-", lw=0.6, zorder=2)
-
-    ax.plot(rho, surplus_r, color=SURPLUS, lw=1.4, ls="--", label="Surplus", zorder=3)
-    ax.plot(
-        rho[rho < tau],
-        thresh_r[rho < tau],
-        color=THRESHOLD,
-        lw=1.8,
-        ls="-",
-        label="Threshold (Ours)",
-        zorder=4,
-    )
-    ax.plot(
-        rho[rho >= tau], thresh_r[rho >= tau], color=THRESHOLD, lw=1.8, ls="-", zorder=4
-    )
-    ax.plot(tau, -0.5, "o", color=THRESHOLD, ms=4, mfc="white", mew=1.2, zorder=5)
-    ax.plot(tau, tau, "o", color=THRESHOLD, ms=4, mfc=THRESHOLD, mew=0.6, zorder=5)
-
-    ax.axvline(tau, color=THRESHOLD, ls=":", lw=0.7, alpha=0.5)
-    ax.text(tau + 0.04, -0.55, f"τ = {tau}", fontsize=8, color=THRESHOLD, ha="left")
-
-    _style(ax, ylabel="Reward", xlabel="Deal Quality (ρ)")
-    ax.legend(frameon=False, loc="lower right", fontsize=7.5)
-    ax.set_xlim(-0.03, 1.03)
-    ax.set_ylim(-0.65, 1.08)
-    fig.savefig(FIG_DIR / "reward_design.png")
-    plt.close(fig)
-    print("  reward_design.png")
-
-
 def fig_bar_results():
     names = ["Amazon", "CaSiNo", "Craigslist", "Deal or No Deal", "Job Interview"]
-    base_v = [-0.561, 0.519, -0.019, 0.668, 0.711]
-    surplus_v = [0.473, 0.582, 0.604, 0.550, 0.625]
+    base_v = [-0.054, 0.519, 0.013, 0.668, 0.711]
+    surplus_v = [0.635, 0.582, 0.607, 0.550, 0.625]
     batna_v = [0.800, 0.581, 0.646, 0.701, 0.703]
 
     x = np.arange(len(names))
@@ -296,13 +260,13 @@ def fig_bar_results():
 
     ax.set_xticks(x)
     ax.set_xticklabels(names, rotation=20, ha="right")
-    _style(ax, ylabel="Bargained Ratio", xlabel=None)
+    _style(ax, ylabel=r"Bargained Ratio ($\rho$)", xlabel=None)
     ax.set_ylim(-0.65, 0.95)
     ax.axhline(0, color=TEXT, lw=0.25)
-    gpt_avg = np.mean([0.52, 0.52, 0.27, 0.69, 0.73])
+    gpt_avg = np.mean([0.517, 0.519, 0.268, 0.687, 0.731])
     ax.axhline(
         gpt_avg,
-        color="#4B5563",
+        color=WALK,
         ls=":",
         lw=0.9,
         alpha=0.9,
@@ -323,13 +287,59 @@ def fig_bar_results():
     print("  bar_results.png")
 
 
+def fig_reward_design():
+    fig, ax = plt.subplots(figsize=(COL_W, 2.0))
+    tau = 0.4
+    rho = np.linspace(0, 1, 500)
+    surplus_r = rho.copy()
+    thresh_r = np.where(rho >= tau, rho, -0.5)
+
+    ax.axvspan(0, tau, color=THRESHOLD, alpha=0.04, zorder=0)
+    ax.axhline(0, color=WALK, ls="-", lw=0.6, zorder=2)
+
+    ax.plot(rho, surplus_r, color=SURPLUS, lw=1.4, ls="--", label="Surplus", zorder=3)
+    ax.plot(
+        rho[rho < tau],
+        thresh_r[rho < tau],
+        color=THRESHOLD,
+        lw=1.8,
+        ls="-",
+        label="Threshold (Ours)",
+        zorder=4,
+    )
+    ax.plot(
+        rho[rho >= tau], thresh_r[rho >= tau], color=THRESHOLD, lw=1.8, ls="-", zorder=4
+    )
+    ax.plot(tau, -0.5, "o", color=THRESHOLD, ms=4, mfc="white", mew=1.2, zorder=5)
+    ax.plot(tau, tau, "o", color=THRESHOLD, ms=4, mfc=THRESHOLD, mew=0.6, zorder=5)
+
+    ax.axvline(tau, color=THRESHOLD, ls=":", lw=0.7, alpha=0.5)
+    ax.text(
+        tau - 0.05,
+        -0.43,
+        rf"$\tau = {tau}$",
+        fontsize=8,
+        color=THRESHOLD,
+        ha="right",
+        va="bottom",
+    )
+
+    _style(ax, ylabel="Terminal Reward", xlabel=r"Deal Quality $\rho$")
+    ax.legend(frameon=False, loc="lower right", fontsize=7.5)
+    ax.set_xlim(-0.03, 1.03)
+    ax.set_ylim(-0.65, 1.08)
+    fig.savefig(FIG_DIR / "reward_design.png")
+    plt.close(fig)
+    print("  reward_design.png")
+
+
 if __name__ == "__main__":
     print("Loading metrics...")
     surplus = load_metrics(SURPLUS_METRICS)
     batna = load_metrics(THRESHOLD_METRICS)
-    print(f"  Surplus: {len(surplus)} steps, THRESHOLD: {len(batna)} steps")
+    print(f"  Surplus: {len(surplus)} steps, Threshold: {len(batna)} steps")
 
-    print("Generating figures...")
+    print("Generating IJPR figures...")
     fig_reward_design()
     fig_bar_results()
     fig1_reward(surplus, batna)
