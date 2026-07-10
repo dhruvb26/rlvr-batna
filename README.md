@@ -15,7 +15,7 @@ Both build with `make` (requires a LaTeX toolchain); `make clean` removes build 
 
 ## Stack
 
-- **[Tinker](https://tinker.thinkingmachines.dev)** — GRPO training and serving trained model checkpoints
+- **[Tinker](https://tinker.thinkingmachines.dev)** ([docs](https://tinker-docs.thinkingmachines.ai/)) — GRPO training and serving trained model checkpoints
 - **[Weights & Biases](https://wandb.ai)** — experiment tracking (`wandb_project: rlvr-batna`)
 - **[OpenRouter](https://openrouter.ai)** — frontier model inference for baselines and opponent
 
