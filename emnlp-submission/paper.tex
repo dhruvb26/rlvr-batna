@@ -144,9 +144,9 @@ We provide this selective signal and train a single agent across four benchmarks
 
 We model negotiation as a single-agent Markov Decision Process (MDP) in which only the learner's policy is optimized; while the opponent is a frozen language model forming part of the environment. Following \citet{he2018decoupling}, each turn consists of a private thought hidden from the opponent, a visible utterance, and a formal action: \textbf{Submit Deal}, \textbf{Accept Deal}, \textbf{Reject Deal}, or \textbf{Walk Away}. A \textbf{Submit Deal} corresponds to a price proposal in price scenarios and an item allocation in multi-issue scenarios. In price tasks, the learner is always the buyer and the opponent the seller; in CaSiNo and DnD, roles are symmetric and randomly assigned; in JI, the learner is always the job applicant. A regulation mechanism intercepts opponent actions that would yield negative utility, replacing them with rejections to prevent exploitation of irrational concessions; this control applies only to the frozen opponent, and the learner never accesses its counterpart's constraints. Episodes terminate on agreement, walk-away, reject loops, or after $T{=}6$ rounds per agent.
 
-Modeling the opponent as a frozen copy of the base model rather than a co-adapting agent isolates the effect of reward design. In self-play, policy updates for one agent shift the reward landscape for the other, entangling reward effects with environmental non-stationarity. A stationary opponent ensures that differences between surplus and threshold training arise from the reward function alone.
+Modeling the opponent as a frozen copy of the base model rather than a co-adapting self-play agent isolates the effect of reward design: a stationary opponent ensures that differences between surplus and threshold training arise from the reward function alone, not from environmental non-stationarity.
 
-Regulation creates an asymmetry. In price scenarios, it ensures the negotiated price $P$ never falls below the seller's private cost $\mathcal{C}$, so all closed deals yield positive surplus. In multi-item scenarios no such floor exists, and a cooperative opponent may accept lopsided splits that yield the learner minimal utility. This motivates the selective reward design in \S\ref{sec:reward}.
+Regulation creates an asymmetry. In price scenarios, it keeps the price $P$ at or above the seller's cost $\mathcal{C}$, and the task's reservation values give a quality reference where overpaying is penalized through $\rho < 0$. In multi-item scenarios no such reference exists, and a cooperative opponent may accept lopsided splits that yield the learner minimal utility. This motivates the selective reward design in \S\ref{sec:reward}.
 
 \begin{figure}[t]
 \centering
@@ -164,7 +164,7 @@ The reward is terminal and verifiable, computed solely from deal terms and priva
 
 \paragraph{Threshold Reward Modeling.} To operationalize the BATNA principle, we introduce a parameterized quality threshold $\tau \in [0, 1]$ for multi-item scenarios (Figure~\ref{fig:reward_design}). Completed deals with normalized surplus $\rho$ satisfying $\rho \geq \tau$ receive reward $\rho$, while deals below $\tau$ receive a penalty $-\gamma$, making walk-away outcomes preferable. Formally, the reward $R(x)$ for a contract $x$ is: $R(x) = 
 \rho$ if $\rho \geq \tau$, and $R(x) = 
--\gamma$ otherwise, where no-deal outcomes receive $0$ and format violations receive $-\psi$. This asymmetry is deliberate. In price bargaining, regulation ensures $\rho > 0$ for all closed deals, so a strict threshold would penalize low-margin agreements. In multi-item settings, no such guarantee exists, making the threshold necessary to establish a utility floor. The abstract parameter balances rewarding compromises against filtering lopsided agreements without tying the formulation to a specific task distribution while price settings retain the original surplus reward.
+-\gamma$ otherwise, where no-deal outcomes receive $0$ and format violations receive $-\psi$. This asymmetry is deliberate. In price bargaining, the task's reservation values already give a quality reference, so a strict threshold would penalize legitimately thin-margin agreements. In multi-item settings, no such reference exists, making the threshold necessary to establish a utility floor. The abstract parameter balances rewarding compromises against filtering lopsided agreements without tying the formulation to a specific task distribution while price settings retain the original surplus reward.
 
 \begin{table}[t]
 \centering
@@ -283,7 +283,7 @@ First-bid ratio, defined for price scenarios where the opening offer is a scalar
 Neither reward sees JI during training, yet the threshold agent reaches $0.70$ bargained ratio, comparable to frontier models $8$--$200{\times}$ larger (mostly $0.71$--$0.79$) and well above surplus ($0.63$). Quality discrimination learned on price and multi-item tasks thus generalizes to JI's hybrid structure without explicit exposure.
 
 \paragraph{Selective deal-making.}
-Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving: the agent initially walks away from sub-$\tau$ deals, but as it learns to negotiate better deals walk-away rates fall until deal rates match surplus while bargained ratio stays higher. Unlike \citet{liu2026instructing}, who observe a deadlock phase under surplus training on a single price dataset, our agent bypasses this across the mixed tasks.
+Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving: the agent initially walks away from sub-$\tau$ deals, but as it learns to negotiate better deals walk-away rates fall until deal rates approach surplus while bargained ratio stays higher. Unlike \citet{liu2026instructing}, who observe a deadlock phase under surplus training on a single price dataset, our agent bypasses this across the mixed tasks.
 
 \section{Discussion}
 
