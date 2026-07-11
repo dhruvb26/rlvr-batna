@@ -400,9 +400,9 @@ class NegotiationEnv(Env):
             )
             if opp_pts < 0:
                 opponent_text = (
-                    "Thought: That price is too low for me.\n"
+                    "Thought: This offer leaves me with too little.\n"
                     "Talk: I can't accept that offer.\n"
-                    "Action: [REJECT]"
+                    "Action: [REJECT_DEAL]"
                 )
         elif "[SUBMIT_DEAL]" in opp_action_pre_upper:
             opp_deal = self.env.parse_deal(opp_action_pre)
@@ -413,9 +413,9 @@ class NegotiationEnv(Env):
                 )
                 if opp_pts < 0:
                     opponent_text = (
-                        "Thought: I need to protect my margins.\n"
-                        "Talk: I can't go that low.\n"
-                        "Action: [REJECT]"
+                        "Thought: This split gives me too little.\n"
+                        "Talk: I can't agree to that.\n"
+                        "Action: [REJECT_DEAL]"
                     )
 
         self.opponent_turns.append({"role": "assistant", "content": opponent_text})

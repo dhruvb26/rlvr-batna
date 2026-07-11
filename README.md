@@ -1,6 +1,6 @@
 # rlvr-batna
 
-BATNA-aware reinforcement learning from verifiable rewards for negotiation. Trains `Qwen3-30B-A3B` with GRPO across five negotiation datasets using a dataset-aware reward that penalizes deals below a quality threshold — encoding the negotiation principle of [BATNA](https://en.wikipedia.org/wiki/Best_alternative_to_a_negotiated_agreement) directly into the reward signal.
+BATNA-aware reinforcement learning from verifiable rewards for negotiation. Trains `Qwen3-30B-A3B` with GRPO across four negotiation datasets (evaluating on a fifth held-out set) using a dataset-aware reward that penalizes deals below a quality threshold — encoding the negotiation principle of [BATNA](https://en.wikipedia.org/wiki/Best_alternative_to_a_negotiated_agreement) directly into the reward signal.
 
 See [`PLAN.md`](./PLAN.md) for the full experimental plan, baseline results, and training outcomes.
 
@@ -96,7 +96,7 @@ The transfer ablation (multi-item-only training, evaluated zero-shot on price ta
 | `renderer_name` | Optional renderer override (e.g. `qwen3_5_disable_thinking` for hybrid thinking models) |
 | `datasets` | Training datasets with sampling weights |
 | `batch_size` / `group_size` | GRPO batch and group size |
-| `batna_threshold` | BR threshold below which multi-item deals are penalized (default `0.4`) |
+| `batna_threshold` | BR threshold below which multi-item deals are penalized; default `0.0` (surplus reward), set to `0.4` for the threshold agent |
 | `train_temperature` | Learner sampling temperature during training |
 | `max_steps` | Training steps |
 | `resume_run` | Tinker run ID to resume from |

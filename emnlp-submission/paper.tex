@@ -142,7 +142,7 @@ We provide this selective signal and train a single agent across four benchmarks
 
 \section{Methodology}
 
-We model negotiation as a single-agent Markov Decision Process (MDP) in which only the learner's policy is optimized; while the opponent is a frozen language model forming part of the environment. Following \citet{he2018decoupling}, each turn consists of a private thought hidden from the opponent, a visible utterance, and a formal action: \textbf{Submit Deal}, \textbf{Accept Deal}, \textbf{Reject Deal}, or \textbf{Walk Away}. A \textbf{Submit Deal} corresponds to a price proposal in price scenarios and an item allocation in multi-issue scenarios. In price tasks, the learner is always the buyer and the opponent the seller; in CaSiNo and DnD, roles are symmetric and randomly assigned; in JI, the learner is always the job applicant. A regulation mechanism intercepts opponent actions that would yield negative utility, replacing them with rejections to prevent exploitation of irrational concessions; this control applies only to the frozen opponent, and the learner never accesses its counterpart's constraints. Episodes terminate on agreement, walk-away, reject loops, or after $T{=}6$ rounds per agent.
+We model negotiation as a single-agent Markov Decision Process (MDP) in which only the learner's policy is optimized; while the opponent is a frozen language model forming part of the environment. Following \citet{he2018decoupling}, each turn consists of a private thought hidden from the opponent, a visible utterance, and a formal action: \textbf{Submit Deal}, \textbf{Accept Deal}, \textbf{Reject Deal}, or \textbf{Walk Away}. A \textbf{Submit Deal} corresponds to a price proposal in price scenarios and an item allocation in multi-issue scenarios. In price tasks, the learner is always the buyer and the opponent the seller; in CaSiNo and DnD, roles are symmetric and randomly assigned; in JI, the learner is always the job applicant. A regulation mechanism intercepts opponent actions that would yield negative utility, replacing them with rejections to prevent exploitation of irrational concessions; this control applies only to the frozen opponent, and the learner never accesses its counterpart's constraints. Episodes terminate on agreement, walk-away, or after $T{=}6$ rounds per agent; during evaluation we additionally halt reject loops (three consecutive identical proposals), while during training a format violation ends the episode with a penalty.
 
 Modeling the opponent as a frozen copy of the base model rather than a co-adapting self-play agent isolates the effect of reward design: a stationary opponent ensures that differences between surplus and threshold training arise from the reward function alone, not from environmental non-stationarity.
 
@@ -541,7 +541,7 @@ Threshold training retains its first-bid anchoring advantage and improves DnD Pa
 \section{Outcome Breakdown}
 \label{app:outcomes}
 
-Tables~\ref{tab:deal_rates_qwen} and~\ref{tab:deal_rates_gpt} report deal closure rates across all models and datasets, against the \model{Qwen3-30B-A3B} and \model{GPT-5.4} opponents respectively. The complement consists of walk-aways, reject-loops (repeated rejections without counter-offers), and max-turn timeouts.
+Tables~\ref{tab:deal_rates_qwen} and~\ref{tab:deal_rates_gpt} report deal closure rates across all models and datasets, against the \model{Qwen3-30B-A3B} and \model{GPT-5.4} opponents respectively. The complement consists of walk-aways, reject-loops (the agent re-proposes identical terms without progress), and max-turn timeouts.
 
 \begin{table}[ht]
 \centering
@@ -618,7 +618,7 @@ Despite penalizing bad deals, the threshold agent closes 76--87\% of negotiation
 \section{Prompt Templates}
 \label{app:prompts}
 
-Each scenario uses a structured prompt with three output fields: \texttt{Thought} (private reasoning, stripped before forwarding to the counterpart), \texttt{Talk} (visible dialogue), and \texttt{Action} (structured move). Template variables in braces are filled at runtime with scenario-specific values. Each prompt ends with a one-shot example turn (shown below).
+Each scenario uses a structured prompt with three output fields: \texttt{Thought} (private reasoning, stripped before forwarding to the counterpart), \texttt{Talk} (visible dialogue), and \texttt{Action} (structured move). Template variables in braces are filled at runtime with scenario-specific values. Each prompt ends with a one-shot example turn (omitted here for space).
 
 \paragraph{Buyer prompt.} Used for \texttt{AmazonHistoryPrice} and \texttt{CraigslistBargains}. The \texttt{buyer\_budget} field is the agent's private maximum willingness to pay.
 
@@ -719,7 +719,7 @@ Thought: brief strategic reasoning (private, not shown to neighbor)\newline
 Talk: what you say to your neighbor\newline
 Action: [SUBMIT\_DEAL] food:F water:W firewood:FW | [ACCEPT\_DEAL] | [REJECT\_DEAL] | [WALK\_AWAY]\newline
 
-[SUBMIT\_DEAL] = propose or counter-propose. Specify YOUR allocation; partner gets the remainder. Use this whenever your Talk includes specific numbers.\newline
+[SUBMIT\_DEAL] = propose or counter-propose. Specify YOUR allocation; neighbor gets the remainder. Use this whenever your Talk includes specific numbers.\newline
 [ACCEPT\_DEAL] = accept a [SUBMIT\_DEAL] only. Cannot accept a [REJECT\_DEAL].\newline
 [REJECT\_DEAL] = reject without proposing new terms.
 \end{promptbox}

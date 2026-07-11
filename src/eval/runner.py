@@ -245,7 +245,9 @@ class AggregateMetrics:
             "learner_total_turns": self.learner_total_turns,
             "opponent_total_turns": self.opponent_total_turns,
             "avg_bargained_ratio": round(
-                sum(self.bargained_ratios) / len(self.bargained_ratios), 4
+                sum(max(-1.0, min(1.0, br)) for br in self.bargained_ratios)
+                / len(self.bargained_ratios),
+                4,
             )
             if self.bargained_ratios
             else None,
@@ -374,9 +376,9 @@ def run_episode(
                         _intercepted = True
             if _intercepted:
                 raw_response = (
-                    "Thought: That price is too low for me.\n"
-                    "Talk: I can't go that low.\n"
-                    "Action: [REJECT]"
+                    "Thought: This offer leaves me with too little.\n"
+                    "Talk: I can't accept that offer.\n"
+                    "Action: [REJECT_DEAL]"
                 )
                 cleaned = raw_response
 

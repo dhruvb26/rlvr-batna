@@ -56,11 +56,11 @@ Listed at: ${listing_price}
 
 Reply format (always in this order):
 
-Thought: brief strategic reasoning (private, not shown to seller)
+Thought: brief strategic reasoning (private)
 Talk: what you say to the seller
 Action: [SUBMIT_DEAL] price:P | [ACCEPT_DEAL] | [REJECT_DEAL] | [WALK_AWAY]
 
-[SUBMIT_DEAL] = propose or counter-propose a price (whole dollar, no $ sign). Use this whenever your Talk mentions a specific price.
+[SUBMIT_DEAL] = propose or counter-propose a price (whole dollar, no $ sign).
 [ACCEPT_DEAL] = accept a [SUBMIT_DEAL] only. Cannot accept a [REJECT_DEAL].
 [REJECT_DEAL] = reject without proposing a new price.
 
@@ -80,11 +80,11 @@ Listed at: ${listing_price}
 
 Reply format (always in this order):
 
-Thought: brief strategic reasoning (private, not shown to buyer)
+Thought: brief strategic reasoning (private)
 Talk: what you say to the buyer
 Action: [SUBMIT_DEAL] price:P | [ACCEPT_DEAL] | [REJECT_DEAL] | [WALK_AWAY]
 
-[SUBMIT_DEAL] = propose or counter-propose a price (whole dollar, no $ sign). Use this whenever your Talk mentions a specific price.
+[SUBMIT_DEAL] = propose or counter-propose a price (whole dollar, no $ sign).
 [ACCEPT_DEAL] = accept a [SUBMIT_DEAL] only. Cannot accept a [REJECT_DEAL].
 [REJECT_DEAL] = reject without proposing a new price.
 
