@@ -117,6 +117,20 @@ Addresses y3Tq (W1–W3), DPWH (W3, C3), and SmhC (W3).
   near 0.8 around step 73 before settling around 0.7").
 - **Sample conversations:** "the same camping-supply scenario" → "camping-supply scenarios."
 
+## I. Page-limit fit and consistency pass
+
+- **Trimmed main body to the 4-page short-paper limit** (Limitations excluded). Condensed the
+  experimental-setup paragraph, the "Quality over closure", "Aggressive anchoring", "Cross-task
+  transfer", and "Selective deal-making" paragraphs, and the Discussion — no information removed;
+  the Discussion now ends on page 4 and Limitations begins on page 5.
+- **Standardized the replacement-model name** to `Qwen3.6-35B-A3B` across all result tables
+  (previously `Qwen3.6-35B`), matching the appendix and eval configs.
+- **Linked the ablation base to the baseline row:** the Transfer Ablation appendix now notes
+  `Qwen3.6-35B-A3B` is the same model shown as a frontier baseline in Tables 1 and 5, served under
+  the ablation's non-thinking renderer.
+- **Removed em dashes** introduced in the new prose (Discussion closing, uniform-threshold
+  appendix), replaced with parentheses/commas per standard usage.
+
 ---
 
 ## Known open items (not yet in `paper.tex`)
@@ -129,6 +143,6 @@ Addresses y3Tq (W1–W3), DPWH (W3, C3), and SmhC (W3).
   still needs to be created and substituted (see `% TODO(resubmission)` marker in §1).
 - **Confidence intervals / significance tests** on the headline threshold-vs-surplus gaps
   (computable post-hoc from `logs/baseline_qwen` and `logs/baseline_gpt` episodes; not yet added).
-- **Reconcile `emnlp-overleaf` with this version** — the Overleaf copy predates several of these
-  edits (older abstract, missing Limitations clause, grammar fixes, and everything in sections
-  E–G).
+- **Push `emnlp-overleaf` to Overleaf** — the Overleaf copy's content has been reconciled with this
+  version (preamble/author block preserved); the change is in the working tree and still needs to be
+  committed and pushed to the Overleaf remote by the author.

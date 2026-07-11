@@ -187,7 +187,7 @@ Qwen3-30B-T      & .17 (76)          & .49 (70)          & .02 (69)          & .
 Qwen3-235B       & .34 (80)          & .55 (51)          & .14 (84)          & .63 (83)          & .74 (75)          \\
 Qwen3-235B-T     & .32 (90)          & .50 (60)          & .19 (85)          & .55 (71)          & .74 (72)          \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & .46 (81)          & .50 (33)          & .24 (62)          & .60 (47)          & .63 (33)          \\
+Qwen3.6-35B-A3B  & .46 (81)          & .50 (33)          & .24 (62)          & .60 (47)          & .63 (33)          \\
 GPT-5.4          & .52 (\underline{92}) & .52 (63) & .27 (89) & \underline{.69} (\underline{90}) & .73 (78) \\
 \rowcolor{tablerow}
 GPT-5.4-mini     & .47 (72)          & .47 (57)          & .12 (81)          & .65 (83)          & .71 (85)          \\
@@ -211,7 +211,7 @@ Llama-4-Maverick      & .07 (85)      & .51 (76)          & $-.08$ (72)       & 
 \label{fig:bar_results}
 \end{figure}
 
-For the full experimental setup and training details, see Appendix~\ref{app:training}. We fine-tune \model{Qwen3-30B-A3B-Instruct} \citep{qwen2025qwen3}, a mixture-of-experts model activating 3B of 30B parameters, with Group Relative Policy Optimization \citep{shao2024deepseekmath} and LoRA against a frozen copy of the base model as opponent. Training draws uniformly from four datasets: AmazonHistoryPrice (AHP; \citealp{xia2024measuring}) and CraigslistBargains (CRA; \citealp{he2018decoupling}) for price bargaining, CaSiNo (CA; \citealp{chawla2021casino}) and Deal or No Deal (DnD; \citealp{lewis2017deal}) for multi-item allocation. Each step generates 512 negotiation rollouts without a KL penalty; reward curves plateau well before step~80 (Figure~\ref{fig:reward_curves}). We evaluate on held-out test splits of all four training datasets (Appendix~\ref{app:training}) plus a held-out Job Interview dataset (JI; \citealp{yamaguchi2021dialogue}) combining salary negotiation with multi-attribute allocation. All evaluations use 100 scenarios per dataset with temperature $0.7$ and nucleus sampling ($p{=}0.9$). Consistent with the training reward, we clip the bargained ratio to $[-1,1]$ when reporting, so that a handful of degenerate thin-margin price episodes cannot dominate the per-dataset mean. 
+We fine-tune \model{Qwen3-30B-A3B-Instruct} \citep{qwen2025qwen3} with Group Relative Policy Optimization \citep{shao2024deepseekmath} and LoRA against a frozen copy of the base model as opponent (full setup in Appendix~\ref{app:training}). Training draws uniformly from four datasets: AmazonHistoryPrice (AHP; \citealp{xia2024measuring}) and CraigslistBargains (CRA; \citealp{he2018decoupling}) for price bargaining, CaSiNo (CA; \citealp{chawla2021casino}) and Deal or No Deal (DnD; \citealp{lewis2017deal}) for multi-item allocation. Each step generates 512 rollouts without a KL penalty; reward curves plateau well before step~80 (Figure~\ref{fig:reward_curves}). We evaluate on held-out test splits of the four training datasets plus a held-out Job Interview dataset (JI; \citealp{yamaguchi2021dialogue}) combining salary negotiation with multi-attribute allocation, using 100 scenarios per dataset (temperature $0.7$, $p{=}0.9$). We clip the bargained ratio to $[-1,1]$ when reporting so a few degenerate thin-margin price episodes cannot dominate the mean.
 
 Table~\ref{tab:results-qwen} reports bargained ratio and deal rate against the frozen training opponent. The threshold agent achieves the highest average bargained ratio at $0.69$, outperforming surplus at $0.60$, \model{GPT-5.4} at $0.54$, and \model{DeepSeek-V3.1} at $0.50$ (Figure~\ref{fig:bar_results}). The early reward gap in Figure~\ref{fig:reward_curves} reflects the penalty on low-quality deals, which closes as the agent learns to avoid them. Untrained models struggle most on price bargaining: on AHP and CRA, base models score near zero or negative because they concede to the seller's anchor. On average, threshold scores $0.72$ bargained ratio on price tasks versus $0.62$ for surplus, and $0.64$ on multi-item tasks versus $0.57$.
 
@@ -223,7 +223,7 @@ Table~\ref{tab:results-qwen} reports bargained ratio and deal rate against the f
 \end{figure}
 
 \paragraph{Quality over closure.}
-The sharpest contrast between reward designs appears on multi-item tasks. On DnD, the surplus agent closes $90\%$ of deals but at $0.55$ bargained ratio; the threshold agent closes $78\%$ at $0.70$ (Table~\ref{tab:results-qwen}). Surplus training produces the deal-closing bias \citet{bergemann2026bilateral} diagnose, accepting lopsided splits rather than walking away; the threshold reward inverts this by making bad deals worse than no deal. The surviving deals are also more jointly efficient: Pareto efficiency on DnD rises from $0.29$ (surplus) to $0.50$ (threshold), because lopsided splits sit far from the efficient frontier (Table~\ref{tab:fbr_pareto_vs_qwen}). On DnD, self-interested quality filtering improves joint outcomes as a side effect.
+The sharpest contrast between reward designs appears on multi-item tasks. On DnD, the surplus agent closes $90\%$ of deals but at $0.55$ bargained ratio; the threshold agent closes $78\%$ at $0.70$ (Table~\ref{tab:results-qwen}). Surplus training produces the deal-closing bias \citet{bergemann2026bilateral} diagnose, accepting lopsided splits rather than walking away; the threshold reward inverts this by making bad deals worse than no deal. The surviving deals are also more jointly efficient: DnD Pareto efficiency rises from $0.29$ (surplus) to $0.50$ (threshold), since lopsided splits sit far from the efficient frontier (Table~\ref{tab:fbr_pareto_vs_qwen}).
 
 \begin{table}[!t]
 \centering
@@ -248,7 +248,7 @@ Qwen3-30B-T      & .51          & \underline{.51} & .92       & .91 \\
 Qwen3-235B       & .41          & .41          & .81          & .84 \\
 Qwen3-235B-T     & .52          & .42          & .81          & .85 \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & \underline{.61} & .49          & .78          & .84 \\
+Qwen3.6-35B-A3B  & \underline{.61} & .49          & .78          & .84 \\
 GPT-5.4          & .38          & \textbf{.60} & .72          & .78 \\
 \rowcolor{tablerow}
 GPT-5.4-mini     & .44          & .50          & .75          & .83 \\
@@ -270,7 +270,7 @@ Llama-4-Maverick      & .47          & .42          & .91          & .95 \\
 \end{figure}
 
 \paragraph{Aggressive anchoring without deadlock.}
-First-bid ratio, defined for price scenarios where the opening offer is a scalar, measures how aggressively the buyer anchors below budget \citep{galinsky2001firstoffers, xia2024measuring}. The threshold agent anchors far more aggressively than surplus or the base model: its first-bid ratio falls to ${\approx}\,0.30$ of budget over training (Figure~\ref{fig:first_bid}) and averages $0.36$/$0.40$ on AHP/CRA at evaluation, versus $0.59$/$0.56$ for surplus and $0.95$/$0.92$ for the base model (Table~\ref{tab:fbr_pareto_vs_qwen}), despite the threshold penalty applying only to multi-item deals. Because the agent learns a single policy across all tasks, one might hypothesize that walk-away tolerance learned on multi-item scenarios transfers to price bargaining as deeper anchoring. A controlled ablation rejects this explanation: an agent trained on multi-item tasks alone shows no positive transfer to price bargaining (Appendix~\ref{app:transfer}), indicating that the price gains arise from the direct price-task surplus reward during joint training rather than from cross-task transfer. This direct signal drives the largest single-dataset gain: on AHP, bargained ratio recovers from $-0.05$ (base) to $0.80$.
+First-bid ratio, defined for price scenarios where the opening offer is a scalar, measures how aggressively the buyer anchors below budget \citep{galinsky2001firstoffers, xia2024measuring}. The threshold agent anchors far more aggressively than surplus or the base model: its first-bid ratio falls to ${\approx}\,0.30$ of budget over training (Figure~\ref{fig:first_bid}) and averages $0.36$/$0.40$ on AHP/CRA at evaluation, versus $0.59$/$0.56$ for surplus and $0.95$/$0.92$ for the base model (Table~\ref{tab:fbr_pareto_vs_qwen}), despite the threshold penalty applying only to multi-item deals. One might hypothesize that walk-away tolerance from multi-item training transfers to price as deeper anchoring; a controlled ablation rejects this (Appendix~\ref{app:transfer}): training on multi-item tasks alone yields no positive transfer to price, so the price gains stem from the direct price-task surplus reward rather than cross-task transfer. This signal drives the largest single-dataset gain: on AHP, bargained ratio recovers from $-0.05$ (base) to $0.80$.
 
 \begin{figure}[t]
 \centering
@@ -280,16 +280,14 @@ First-bid ratio, defined for price scenarios where the opening offer is a scalar
 \end{figure}
 
 \paragraph{Cross-task transfer.}
-Neither reward sees JI during training, yet the threshold agent transfers at $0.70$ bargained ratio, comparable to frontier models $8$--$200{\times}$ larger (most spanning $0.71$--$0.79$ on JI) and well above surplus ($0.63$). The ability to distinguish good from bad deals, learned on pure price and multi-item tasks, generalizes to JI's hybrid structure without explicit exposure, suggesting that quality-aware negotiation generalizes across formats.
+Neither reward sees JI during training, yet the threshold agent reaches $0.70$ bargained ratio, comparable to frontier models $8$--$200{\times}$ larger (mostly $0.71$--$0.79$) and well above surplus ($0.63$). Quality discrimination learned on price and multi-item tasks thus generalizes to JI's hybrid structure without explicit exposure.
 
 \paragraph{Selective deal-making.}
-Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving. The agent initially walks away from sub-$\tau$ deals, but as deal quality improves walk-away rates fall---not from reduced specificity but from learning to negotiate better deals. By the time training ends, deal rates match surplus while bargained ratio remains higher. Unlike \citet{liu2026instructing}, who observe a deadlock phase under surplus training on a single price dataset, our agent bypasses this across the mixed tasks.
+Figure~\ref{fig:deal_walk} shows selectivity and quality co-evolving: the agent initially walks away from sub-$\tau$ deals, but as it learns to negotiate better deals walk-away rates fall until deal rates match surplus while bargained ratio stays higher. Unlike \citet{liu2026instructing}, who observe a deadlock phase under surplus training on a single price dataset, our agent bypasses this across the mixed tasks.
 
 \section{Discussion}
 
-Our fixed threshold is the simplest operationalization of the walk-away principle. In negotiation theory, a party's outside option is context-dependent, private, and shaped during the negotiation itself \citep{fisher1981gettingtoyes, raiffa1982art}. A uniform scalar ignores much of this complexity. Two extensions could preserve verifiability while adding context sensitivity: a dynamic threshold adapting to item configurations or opponent behavior, and an opponent-aware threshold informed by the Nash bargaining solution \citep{nash1950bargaining}, increasing against weak opponents and decreasing when concessions are needed to avoid deadlock.
-
-Real-world negotiations combine price, terms, and relationship dynamics in ways our benchmarks only partially capture. \citet{zeng2025repo} study commercial negotiations requiring learned reward models and rule-based constraints; by contrast, our threshold reward relies only on deal terms. Extending this framework to settings with evolving outside options and multi-deal relationships will likely require population-based or self-play approaches \citep{liu2025spiral}. More broadly, the asymmetry between price bargaining (where structural quality floors exist) and multi-item allocation (where they do not) suggests that negotiation reward design should be \textit{selective}, adapting to the structure of the bargaining environment rather than relying on a universal objective.
+Our fixed threshold is the simplest operationalization of the walk-away principle; a real outside option is context-dependent and shaped during negotiation \citep{fisher1981gettingtoyes, raiffa1982art}. Two extensions could add context sensitivity while preserving verifiability: a dynamic threshold conditioned on item configurations or opponent behavior, and an opponent-aware threshold informed by the Nash bargaining solution \citep{nash1950bargaining}. Extending the framework to evolving outside options and multi-deal relationships \citep{zeng2025repo} will likely require population-based or self-play training \citep{liu2025spiral}. More broadly, this asymmetry (structural quality floors in price bargaining, none in multi-item allocation) suggests reward design should be \textit{selective}, not universal.
 
 
 \section*{Limitations}
@@ -421,7 +419,7 @@ Avg  & \textbf{79} & .66 & \underline{75} & \underline{.69} & 53 & \textbf{.75} 
 \section{Transfer Ablation: Multi-Item-Only Training}
 \label{app:transfer}
 
-To isolate the source of the joint agent's price-bargaining gains, we train a threshold agent on multi-item tasks \emph{only} (CaSiNo and DnD, 50/50) and evaluate it on the price tasks it never saw. Because the base model used in the main experiments was retired by the training provider after submission, this ablation uses its official replacement, \model{Qwen3.6-35B-A3B}, with otherwise identical hyperparameters ($\tau{=}0.4$, 80 steps, batch 64, group size 8); all comparisons are against the \emph{same-base} untrained model, served identically, so the only difference is training. AHP is evaluated on the product-disjoint held-out split, and the evaluation opponent matches the main tables (\model{Qwen3-30B-A3B-Instruct-2507}).
+To isolate the source of the joint agent's price-bargaining gains, we train a threshold agent on multi-item tasks \emph{only} (CaSiNo and DnD, 50/50) and evaluate it on the price tasks it never saw. Because the base model used in the main experiments was retired by the training provider after submission, this ablation uses its official replacement, \model{Qwen3.6-35B-A3B} (the same model evaluated as a frontier baseline in Tables~\ref{tab:results-qwen} and~\ref{tab:results-gpt}), with otherwise identical hyperparameters ($\tau{=}0.4$, 80 steps, batch 64, group size 8); all comparisons are against the \emph{same-base} untrained model, served identically under the ablation's non-thinking renderer, so the only difference is training. AHP is evaluated on the product-disjoint held-out split, and the evaluation opponent matches the main tables (\model{Qwen3-30B-A3B-Instruct-2507}).
 
 \begin{table}[ht]
 \centering
@@ -455,7 +453,7 @@ Table~\ref{tab:transfer} shows a clean dissociation. On its training distributio
 \section{Uniform vs.\ Selective Thresholding}
 \label{app:uniform}
 
-A natural alternative to our selective design is to apply the threshold uniformly, including to price tasks. We quantify why this is harmful post-hoc, using the closed price deals from the main evaluation. Among the threshold agent's \emph{positive-surplus} price deals against the training opponent, only $1\%$ (AHP) and $14\%$ (CRA) fall below $\tau{=}0.4$; against the stronger \model{GPT-5.4} opponent, however, $35\%$ and $45\%$ do---and for the untrained base against the training opponent, $65$--$88\%$ do. Because regulation guarantees these deals have positive surplus, sub-$\tau$ price outcomes against strong opposition are frequently the \emph{best achievable} result (Appendix~\ref{app:frontier}: even the best agent reaches only $0.32$--$0.35$ bargained ratio on price vs.\ \model{GPT-5.4}), not avoidable concessions. A uniform threshold would assign these optimal thin-margin agreements the same penalty as genuine failures, pushing the policy toward the deadlock regime observed by \citet{liu2026instructing}. By contrast, on multi-item tasks filtering sub-$\tau$ deals \emph{improves} quality and Pareto efficiency while deal rates recover (\S\ref{sec:reward}, Table~\ref{tab:results-qwen}), indicating that sub-$\tau$ multi-item deals are predominantly avoidable. This asymmetry is the empirical basis for selective thresholding.
+A natural alternative to our selective design is to apply the threshold uniformly, including to price tasks. We quantify why this is harmful post-hoc, using the closed price deals from the main evaluation. Among the threshold agent's \emph{positive-surplus} price deals against the training opponent, only $1\%$ (AHP) and $14\%$ (CRA) fall below $\tau{=}0.4$; against the stronger \model{GPT-5.4} opponent, however, $35\%$ and $45\%$ do, and for the untrained base against the training opponent, $65$--$88\%$ do. Because regulation guarantees these deals have positive surplus, sub-$\tau$ price outcomes against strong opposition are frequently the \emph{best achievable} result (Appendix~\ref{app:frontier}: even the best agent reaches only $0.32$--$0.35$ bargained ratio on price vs.\ \model{GPT-5.4}), not avoidable concessions. A uniform threshold would assign these optimal thin-margin agreements the same penalty as genuine failures, pushing the policy toward the deadlock regime observed by \citet{liu2026instructing}. By contrast, on multi-item tasks filtering sub-$\tau$ deals \emph{improves} quality and Pareto efficiency while deal rates recover (\S\ref{sec:reward}, Table~\ref{tab:results-qwen}), indicating that sub-$\tau$ multi-item deals are predominantly avoidable. This asymmetry is the empirical basis for selective thresholding.
 
 \section{Frontier Opponent Results}
 \label{app:frontier}
@@ -481,7 +479,7 @@ Qwen3-30B-T      & $-.08$ (\underline{87}) & .50 (84)        & $-.06$ (78)      
 Qwen3-235B       & .15 (\textbf{88})    & \underline{.53} (73) & .04 (81)          & \underline{.71} (91) & .64 (94)        \\
 Qwen3-235B-T     & .19 (\textbf{88})    & .51 (73)           & .02 (86)             & .60 (83)           & .68 (84) \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & .27 (65)    & .50 (31)           & .09 (45)             & .68 (44)           & .65 (5)           \\
+Qwen3.6-35B-A3B  & .27 (65)    & .50 (31)           & .09 (45)             & .68 (44)           & .65 (5)           \\
 GPT-5.4          & \underline{.28} (86)    & .51 (87)           & .09 (81)             & \textbf{.72} (93)  & .65 (94)          \\
 GPT-5.4-mini     & .18 (79)             & .49 (82)           & $-.04$ (79)          & .66 (87)           & .58 (97)          \\
 \rowcolor{tablerow}
@@ -518,7 +516,7 @@ Qwen3-30B-T      & .44              & \textbf{.74}     & .93          & .92 \\
 Qwen3-235B       & .41              & .59              & .79          & .80 \\
 Qwen3-235B-T     & \textbf{.64}     & .59              & .82          & .84 \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & .42              & .64              & .81          & .84 \\
+Qwen3.6-35B-A3B  & .42              & .64              & .81          & .84 \\
 GPT-5.4          & .49              & .61              & .71          & .77 \\
 GPT-5.4-mini     & .40              & .64              & .78          & .83 \\
 \rowcolor{tablerow}
@@ -564,7 +562,7 @@ Qwen3-30B-T      & 76 & 70 & 69 & 70 & 46 \\
 Qwen3-235B       & 80 & 51 & 84 & 83 & 75 \\
 Qwen3-235B-T     & 90 & 60 & 85 & 71 & 72 \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & 81 & 33 & 62 & 47 & 33 \\
+Qwen3.6-35B-A3B  & 81 & 33 & 62 & 47 & 33 \\
 GPT-5.4          & \textbf{92} & 63 & 89 & \textbf{90} & 78 \\
 \rowcolor{tablerow}
 GPT-5.4-mini     & 72 & 57 & 81 & 83 & 85 \\
@@ -599,7 +597,7 @@ Qwen3-30B-T      & 87 & 84 & 78 & 87 & 76 \\
 Qwen3-235B       & \textbf{88} & 73 & 81 & 91 & 94 \\
 Qwen3-235B-T     & \textbf{88} & 73 & 86 & 83 & 84 \\
 \rowcolor{tablerow}
-Qwen3.6-35B      & 65 & 31 & 45 & 44 & 5 \\
+Qwen3.6-35B-A3B  & 65 & 31 & 45 & 44 & 5 \\
 GPT-5.4          & 86 & 87 & 81 & 93 & 94 \\
 \rowcolor{tablerow}
 GPT-5.4-mini     & 79 & 82 & 79 & 87 & 97 \\
