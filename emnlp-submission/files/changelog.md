@@ -89,16 +89,18 @@ Addresses y3Tq (W1–W3), DPWH (W3, C3), and SmhC (W3).
 - **Contribution (3) softened:** "strong transfer to unseen negotiation structures" → "transfer to
   unseen negotiation structures" (consistency with the now-resolved transfer question).
 
-## F. Uniform vs. selective thresholding (DPWH C2)
+## F. Why the threshold is applied selectively (DPWH C2)
 
-- **New Appendix "Uniform vs. Selective Thresholding"** (`app:uniform`): post-hoc analysis on the
-  main evaluation's closed price deals quantifying why a uniform τ is harmful. Among
-  positive-surplus price deals below τ=0.4: threshold agent 1% (AHP) / 14% (CRA) vs. the training
-  opponent, but 35% / 45% vs. GPT-5.4, and 65–88% for the untrained base — i.e., sub-τ price
-  outcomes against strong opposition are frequently the best achievable result, which a uniform
-  threshold would penalize as failures (deadlock risk per Liu et al.). Contrasted with multi-item,
-  where filtering sub-τ deals improves quality and Pareto efficiency — the empirical basis for
-  selective thresholding.
+- **New Appendix "Why the Threshold is Applied Selectively"** (`app:uniform`): a post-hoc analysis
+  motivating (not proving) the selective design. Corrected regulation wording: it only prevents
+  sub-cost prices (P ≥ C, non-negative *seller* surplus), so the *buyer's* surplus can be thin.
+  Reports counts with denominators for positive-surplus price deals below τ=0.4: 1/73 (AHP) and
+  11/78 (CRA) vs. the training opponent, 23/66 and 33/74 vs. GPT-5.4, and 15/23 and 23/26 for the
+  untrained base — the share grows with opponent strength, and since the best agent reaches only
+  0.32–0.35 BR on price vs. GPT-5.4 (Appendix `app:frontier`), many such deals are legitimately
+  thin-margin. Explicitly framed as descriptive, single-checkpoint reclassification; a controlled
+  uniform-threshold training run is deferred to future work. (An earlier draft overclaimed this as
+  causal evidence of "harm"/"deadlock"; the reframed version states it as motivation only.)
 
 ## G. Code availability (y3Tq/DPWH Datasets & Software = 1)
 
