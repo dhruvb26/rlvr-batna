@@ -44,3 +44,27 @@ evaluations used OpenRouter/v2; Uniform seed42 and later GPT-5.4 runs used direc
 OpenAI/v3. Variation across seeds therefore includes these implementation and
 provider differences. The plots should not be treated as new runs under the
 current source or as a full tau .2/.4/.6 comparison.
+
+
+## Local regeneration
+
+From the repository root, run:
+
+```bash
+uv run --locked python -m scripts.gen_revision_handoff_figures --output files/revision-figure-preview
+```
+
+The generator writes nine PNG/PDF pairs (the reward illustration, five training
+plots, and three `bar_*` plots) plus `figure_data.json` only inside the selected
+output directory. It never reads or writes the handoff document. Importing it
+also does not generate files. The three overview/sensitivity plots are separate
+snapshot artifacts outside this generator's original scope.
+
+It requires the local `inventory-2026-10-04/inventory.json` and
+`analysis-quality-mechanism-2026-10-04/results.json` evidence files under
+`ijpr-submission/`, plus the training metrics referenced by that inventory under
+`logs/`. These inputs remain outside the figure/scripts commits. Use `--root`,
+`--inventory`, and `--analysis` to select another evidence location; relative
+arguments resolve under `--root`. Historical absolute log paths are rebased to
+the selected root. Generated provenance paths are relative to that root when
+possible; this committed snapshot retains its original historical references.
