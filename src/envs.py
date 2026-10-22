@@ -19,6 +19,20 @@ from .prompts import (
 class NegotiateEnv(ABC):
     """Interface that dataset-specific negotiation envs must implement."""
 
+    divides_items = False
+
+    def describe_proposal(self, deal: dict, scenario: dict) -> str:
+        """Describe a proposer's deal to its receiver without changing speech."""
+        def terms(allocation):
+            return " ".join(f"{key}:{value}" for key, value in allocation.items())
+
+        if self.divides_items:
+            return (
+                f"You receive: {terms(self.invert_alloc(deal, scenario))}\n"
+                f"Partner receives: {terms(deal)}"
+            )
+        return f"Proposed terms: {terms(deal)}"
+
     @abstractmethod
     def load_scenarios(self, csv_path: str) -> list[dict]:
         """Load negotiation scenarios from a data file.
@@ -46,7 +60,10 @@ class NegotiateEnv(ABC):
 
     @abstractmethod
     def parse_deal(self, action_text: str) -> dict | None:
-        """Parse a [SUBMIT_DEAL] action into a structured allocation.
+        """Parse a complete [SUBMIT_DEAL] action into a structured allocation.
+
+        Reject unconsumed text instead of accepting a numeric prefix (for
+        example, interpreting an indivisible-item quantity of 0.5 as 0).
 
         Args:
             action_text: Raw action text from model output.
@@ -182,6 +199,8 @@ _CASINO_DEAL_RE = re.compile(
 class CasinoEnv(NegotiateEnv):
     """CaSiNo: food/water/firewood, 3 packages each, High/Medium/Low priorities."""
 
+    divides_items = True
+
     def load_scenarios(self, csv_path: str) -> list[dict]:
         scenarios = []
         with open(csv_path, encoding="utf-8") as f:
@@ -200,7 +219,7 @@ class CasinoEnv(NegotiateEnv):
         return CASINO_SYSTEM_PROMPT.format(items_block=items_block)
 
     def parse_deal(self, action_text: str) -> dict[str, int] | None:
-        m = _CASINO_DEAL_RE.search(action_text)
+        m = _CASINO_DEAL_RE.fullmatch(action_text.strip())
         if m is None:
             return None
         return {
@@ -258,15 +277,40 @@ _DND_DEAL_RE = re.compile(
 class DNDEnv(NegotiateEnv):
     """Deal or No Deal: book/hat/ball, variable counts, raw point values."""
 
+    divides_items = True
+
     def load_scenarios(self, csv_path: str) -> list[dict]:
+        """Load each distinct allocation context once, regardless of seat order.
+
+        Rows are not guaranteed to be adjacent mirrored pairs. Read every row
+        and deduplicate by item counts and the unordered pair of valuations.
+        Preserve the first occurrence's agent ordering for prompts and scoring.
+        This samples contexts uniformly instead of weighting repeated dialogues.
+        """
         scenarios = []
+        seen = set()
         with open(csv_path, encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
 
-        for i in range(0, len(rows), 2):
-            row = rows[i]
+        for row_number, row in enumerate(rows, start=2):
             my = json.loads(row["input"])
             partner = json.loads(row["partner_input"])
+            if (
+                len(my["count"]) != 3
+                or my["count"] != partner["count"]
+                or len(my["value"]) != 3
+                or len(partner["value"]) != 3
+            ):
+                raise ValueError(
+                    f"Invalid DnD counts or valuations at {csv_path}:{row_number}"
+                )
+            key = (
+                tuple(my["count"]),
+                tuple(sorted((tuple(my["value"]), tuple(partner["value"])))),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
             counts = {
                 "book": my["count"][0],
                 "hat": my["count"][1],
@@ -312,7 +356,7 @@ class DNDEnv(NegotiateEnv):
         )
 
     def parse_deal(self, action_text: str) -> dict[str, int] | None:
-        m = _DND_DEAL_RE.search(action_text)
+        m = _DND_DEAL_RE.fullmatch(action_text.strip())
         if m is None:
             return None
         return {
@@ -384,7 +428,7 @@ class _PriceEnv(NegotiateEnv):
     """Base for single-issue price negotiation (Amazon, Craigslist)."""
 
     def parse_deal(self, action_text: str) -> dict | None:
-        m = _PRICE_DEAL_RE.search(action_text)
+        m = _PRICE_DEAL_RE.fullmatch(action_text.strip())
         if m is None:
             return None
         return {"price": round(float(m.group(1)))}
@@ -498,39 +542,13 @@ class CraigslistEnv(_PriceEnv):
         with open(data_path, encoding="utf-8") as f:
             dialogues = json.load(f)
 
-        scenarios = []
-        for d in dialogues:
-            kbs = d["scenario"]["kbs"]
-            buyer_kb = next(
-                (kb for kb in kbs if kb["personal"]["Role"] == "buyer"), None
-            )
-            if buyer_kb is None:
-                continue
+        from .craigslist_data import loaded_scenario
 
-            listing_price = buyer_kb["item"]["Price"]
-            buyer_budget = buyer_kb["personal"]["Target"]
-            seller_cost = round(listing_price * 0.5)
-
-            if buyer_budget <= seller_cost:
-                continue
-
-            title = buyer_kb["item"].get("Title", "")
-            raw_desc = buyer_kb["item"].get("Description", [])
-            description = " ".join(raw_desc)[:300] if raw_desc else ""
-            category = d["scenario"].get("category", "")
-
-            scenarios.append(
-                {
-                    "title": title,
-                    "category": category,
-                    "description": description,
-                    "listing_price": listing_price,
-                    "buyer_budget": buyer_budget,
-                    "seller_cost": seller_cost,
-                    "agent_ids": ["buyer", "seller"],
-                }
-            )
-        return scenarios
+        return [
+            scenario
+            for row in dialogues
+            if (scenario := loaded_scenario(row)) is not None
+        ]
 
     def build_system_prompt(self, scenario: dict, agent_id: str) -> str:
         return self._build_price_prompt(scenario, agent_id)
@@ -695,7 +713,7 @@ class JobInterviewEnv(NegotiateEnv):
         )
 
     def parse_deal(self, action_text: str) -> dict | None:
-        m = _JI_DEAL_RE.search(action_text)
+        m = _JI_DEAL_RE.fullmatch(action_text.strip())
         if m is None:
             return None
         return {

@@ -19,10 +19,17 @@ def cli():
         "--config", type=str, default="configs/train.yaml", help="YAML config file"
     )
 
+    train_parser.add_argument("--seed", type=int, default=None, help="Override the training run seed")
+    train_parser.add_argument("--dry-run", action="store_true", help="Validate training config and data without API calls")
+    train_parser.add_argument("--run-steps", type=int, default=None,
+                              help="Run at most N additional steps this launch, then checkpoint and exit; retain the full YAML budget")
+    train_parser.add_argument("--resume-run", type=str, default=None,
+                              help="Resume the named local run with its optimizer state (directory name only)")
+
     # Eval
     eval_parser = subparsers.add_parser("eval", help="Run negotiation evaluation")
     eval_parser.add_argument(
-        "--config", type=str, default="configs/eval.yaml", help="YAML config file"
+        "--config", type=str, default="configs/eval.yaml", help="YAML or TOML config file"
     )
     eval_parser.add_argument(
         "--score-only",
@@ -47,8 +54,11 @@ def cli():
 
     if args.command == "train":
         from src.train import main
+        from src.wandb_tracking import reuse_wandb_run
 
-        main(args.config)
+        with reuse_wandb_run():
+            main(args.config, seed=args.seed, dry_run=args.dry_run,
+                 run_steps=args.run_steps, resume_run=args.resume_run)
 
     elif args.command == "eval":
         from src.eval.harness import main

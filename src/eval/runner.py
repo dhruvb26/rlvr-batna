@@ -4,6 +4,9 @@ import random
 import re
 from dataclasses import dataclass, field
 
+from ..protocol import PROTOCOL_VERSION, parse_response, partner_observation
+
+EVAL_PROTOCOL_VERSION = f"{PROTOCOL_VERSION}-turn-limit-v1"
 from ..envs import NegotiateEnv
 from .generator import APIGenerator
 
@@ -108,6 +111,13 @@ class EpisodeResult:
     first_bid_ratio: float | None = None
     pareto_efficient: bool | None = None
     joint_surplus_norm: float | None = None
+    scenario_id: str = ""
+    repeat: int = 0
+    economic_regulation: bool | None = None
+    regulation_interventions: list[dict] = field(default_factory=list)
+    protocol_version: str | None = None
+    format_failures: list[dict] = field(default_factory=list)
+    repeated_offer_events: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -119,6 +129,8 @@ class AggregateMetrics:
     walk_away_count: int = 0
     reject_loop_count: int = 0
     max_turns_count: int = 0
+    repeated_offer_episode_count: int = 0
+    repeated_offer_event_count: int = 0
 
     learner_points_on_deals: list[int] = field(default_factory=list)
     opponent_points_on_deals: list[int] = field(default_factory=list)
@@ -135,10 +147,19 @@ class AggregateMetrics:
     pareto_count: int = 0
     pareto_total: int = 0
     joint_surplus_norms: list[float] = field(default_factory=list)
+    regulation_logged_episodes: int = 0
+    regulated_episodes: int = 0
+    regulation_intervention_count: int = 0
 
     def add(self, ep: EpisodeResult):
         """Accumulate metrics from a single episode result."""
         self.total_episodes += 1
+        self.repeated_offer_episode_count += bool(ep.repeated_offer_events)
+        self.repeated_offer_event_count += len(ep.repeated_offer_events)
+        if ep.economic_regulation is not None:
+            self.regulation_logged_episodes += 1
+            self.regulated_episodes += bool(ep.regulation_interventions)
+            self.regulation_intervention_count += len(ep.regulation_interventions)
         self.all_turns.append(ep.num_turns)
 
         self.learner_total_turns += ep.learner_total_turns
@@ -220,6 +241,16 @@ class AggregateMetrics:
 
         return {
             "total_episodes": self.total_episodes,
+            "repeated_offer_episode_count": self.repeated_offer_episode_count,
+            "repeated_offer_event_count": self.repeated_offer_event_count,
+            "regulation_logged_episodes": self.regulation_logged_episodes,
+            "regulation_interventions": self.regulation_intervention_count
+            if self.regulation_logged_episodes
+            else None,
+            "regulation_episode_rate": self.regulated_episodes
+            / self.regulation_logged_episodes
+            if self.regulation_logged_episodes
+            else None,
             "deal_rate": self.deal_count / n,
             "walk_away_rate": self.walk_away_count / n,
             "reject_loop_rate": self.reject_loop_count / n,
@@ -280,6 +311,12 @@ def run_episode(
     max_turns: int = 18,
     temperature: float = 0.7,
     top_p: float = 0.9,
+    *,
+    learner_agent_id: str | None = None,
+    learner_goes_first: bool | None = None,
+    scenario_id: str = "",
+    repeat: int = 0,
+    economic_regulation: bool = True,
 ) -> EpisodeResult:
     """Run a single negotiation episode between learner and opponent.
 
@@ -296,18 +333,26 @@ def run_episode(
         max_turns: Maximum number of turns before timeout.
         temperature: Sampling temperature.
         top_p: Nucleus sampling threshold.
+        learner_agent_id: Explicit manifest role; otherwise use environment/local RNG.
+        learner_goes_first: Explicit manifest first mover; otherwise use local RNG.
+        scenario_id: Stable scenario identity for paired analysis.
+        repeat: Explicit generation-trial index (not a provider sampling seed).
+        economic_regulation: Replace negative-utility opponent actions with rejection.
 
     Returns:
         EpisodeResult with outcome, points, messages, and metadata.
     """
+    if type(economic_regulation) is not bool:
+        raise ValueError("economic_regulation must be a boolean")
     fixed = env.fixed_learner_role()
-    if fixed is not None:
-        learner_id = fixed
-        opponent_id = [a for a in agent_ids if a != fixed][0]
-    else:
-        learner_id, opponent_id = agent_ids[0], agent_ids[1]
-        if random.random() < 0.5:
-            learner_id, opponent_id = opponent_id, learner_id
+    # Harness calls pass explicit assignments; standalone callers get local RNG.
+    rng = random.Random()
+    learner_id = learner_agent_id or fixed or rng.choice(agent_ids)
+    if learner_id not in agent_ids or (fixed is not None and learner_id != fixed):
+        raise ValueError("Invalid learner role for this environment")
+    opponent_id = next(a for a in agent_ids if a != learner_id)
+    if learner_goes_first is None:
+        learner_goes_first = rng.random() < 0.5
 
     learner_system = env.build_system_prompt(scenario, learner_id)
     base_opponent_system = env.build_system_prompt(scenario, opponent_id)
@@ -327,9 +372,12 @@ def run_episode(
         outcome="max_turns",
         learner_agent_id=learner_id,
         opponent_agent_id=opponent_id,
+        scenario_id=scenario_id,
+        repeat=repeat,
+        economic_regulation=economic_regulation,
+        protocol_version=EVAL_PROTOCOL_VERSION,
     )
 
-    learner_goes_first = random.random() < 0.5
     result.learner_goes_first = learner_goes_first
     last_submit_deal: dict[str, int] | None = None
     last_submit_by: str | None = None
@@ -337,90 +385,69 @@ def run_episode(
     for turn_index in range(max_turns):
         is_learner_turn = (turn_index % 2 == 0) == learner_goes_first
 
-        if is_learner_turn:
-            if len(learner_msgs) == 1:
-                learner_msgs.append(
-                    {"role": "user", "content": env.opening_prompt(learner_id)}
-                )
-            raw_response = learner_gen(learner_msgs, temperature, top_p)
-            learner_msgs.append({"role": "assistant", "content": raw_response})
-            cleaned = strip_think_block(raw_response)
-            opponent_msgs.append(
-                {
-                    "role": "user",
-                    "content": env.flip_deal(strip_thought(cleaned), scenario),
-                }
-            )
-        else:
-            if len(opponent_msgs) == 1:
-                opponent_msgs.append(
-                    {"role": "user", "content": env.opening_prompt(opponent_id)}
-                )
-            raw_response = opponent_gen(opponent_msgs, temperature, top_p)
-            cleaned = strip_think_block(raw_response)
+        speaker_msgs = learner_msgs if is_learner_turn else opponent_msgs
+        receiver_msgs = opponent_msgs if is_learner_turn else learner_msgs
+        speaker_id = learner_id if is_learner_turn else opponent_id
+        generator = learner_gen if is_learner_turn else opponent_gen
+        other_party = "opponent" if is_learner_turn else "learner"
+        if len(speaker_msgs) == 1:
+            speaker_msgs.append({"role": "user", "content": env.opening_prompt(speaker_id)})
+        raw_response = generator(speaker_msgs, temperature, top_p)
+        parsed = parse_response(raw_response, env, scenario, last_submit_by == other_party)
 
-            # Regulate: intercept any opponent action that violates cost constraint.
-            _opp_act = extract_section(cleaned, "Action") or ""
-            _intercepted = False
-            if "[ACCEPT_DEAL]" in _opp_act and last_submit_deal is not None:
+        # Regulate only a fully valid opponent response. Malformed responses
+        # cannot become valid rejections through the economic guard.
+        opp_points = None
+        if not is_learner_turn and economic_regulation and parsed.error is None:
+            if parsed.kind == "ACCEPT_DEAL":
                 opp_alloc = env.invert_alloc(last_submit_deal, scenario)
-                opp_pts = env.compute_points(opp_alloc, scenario, opponent_id)
-                if opp_pts < 0:
-                    _intercepted = True
-            elif "[SUBMIT_DEAL]" in _opp_act:
-                opp_deal = env.parse_deal(_opp_act)
-                if opp_deal is not None:
-                    opp_alloc = env.invert_alloc(opp_deal, scenario)
-                    opp_pts = env.compute_points(opp_alloc, scenario, opponent_id)
-                    if opp_pts < 0:
-                        _intercepted = True
-            if _intercepted:
-                raw_response = (
-                    "Thought: This offer leaves me with too little.\n"
-                    "Talk: I can't accept that offer.\n"
-                    "Action: [REJECT_DEAL]"
-                )
-                cleaned = raw_response
-
-            opponent_msgs.append({"role": "assistant", "content": raw_response})
-            learner_msgs.append(
-                {
-                    "role": "user",
-                    "content": env.flip_deal(strip_thought(cleaned), scenario),
-                }
+                opp_points = env.compute_points(opp_alloc, scenario, opponent_id)
+            elif parsed.kind == "SUBMIT_DEAL":
+                opp_alloc = env.parse_deal(parsed.action)
+                opp_points = env.compute_points(opp_alloc, scenario, opponent_id)
+        if opp_points is not None and opp_points < 0:
+            original_response, original_parsed = raw_response, parsed
+            raw_response = (
+                "Thought: This offer leaves me with too little.\n"
+                "Talk: I can't accept that offer.\n"
+                "Action: [REJECT_DEAL]"
             )
+            parsed = parse_response(raw_response, env, scenario, False)
+            result.regulation_interventions.append({
+                "turn_index": turn_index,
+                "opponent_agent_id": opponent_id,
+                "opponent_utility": opp_points,
+                "original_response": original_response,
+                "replacement_response": raw_response,
+                "reason": "negative_opponent_utility",
+                "opponent_message_index": len(opponent_msgs),
+                "learner_message_index": len(learner_msgs),
+                "original_turn": {
+                    "role": "assistant", "content": original_response,
+                    "action": original_parsed.action,
+                    "learner_visible_content": partner_observation(original_parsed, env, scenario),
+                },
+                "final_turn": {
+                    "role": "assistant", "content": raw_response,
+                    "action": parsed.action,
+                    "learner_visible_content": partner_observation(parsed, env, scenario),
+                },
+            })
 
-        thought = extract_section(cleaned, "Thought")
-        talk = extract_section(cleaned, "Talk")
-        action = extract_section(cleaned, "Action")
-
-        format_ok = False
-        if thought is not None and talk is not None and action is not None:
-            try:
-                order_ok = (
-                    re.search(r"(?:^|\n)\s*Thought\s*:", cleaned, re.IGNORECASE).start()
-                    < re.search(r"(?:^|\n)\s*Talk\s*:", cleaned, re.IGNORECASE).start()
-                    < re.search(
-                        r"(?:^|\n)\s*Action\s*:", cleaned, re.IGNORECASE
-                    ).start()
-                )
-            except (ValueError, AttributeError):
-                order_ok = False
-
-            if order_ok:
-                if re.search(r"\[SUBMIT_DEAL\]", action, re.IGNORECASE):
-                    deal = env.parse_deal(action)
-                    format_ok = env.validate_deal(deal, scenario)
-                elif re.fullmatch(
-                    r"\s*\[(ACCEPT_DEAL|REJECT_DEAL|WALK_AWAY)\]\s*",
-                    action,
-                    re.IGNORECASE,
-                ):
-                    if re.search(r"\[ACCEPT_DEAL\]", action, re.IGNORECASE):
-                        msgs = learner_msgs if is_learner_turn else opponent_msgs
-                        format_ok = last_opponent_action_is_submit(msgs)
-                    else:
-                        format_ok = True
+        # Keep raw output on the speaker's side; expose only validated public
+        # content (or an explicit invalid-turn observation) to the receiver.
+        speaker_msgs.append({"role": "assistant", "content": raw_response})
+        receiver_msgs.append({"role": "user", "content": partner_observation(parsed, env, scenario)})
+        action = parsed.action
+        format_ok = parsed.error is None
+        if not format_ok:
+            speaker_msgs[-1]["format_error"] = parsed.error
+            result.format_failures.append({
+                "turn_index": turn_index,
+                "speaker": "learner" if is_learner_turn else "opponent",
+                "reason": parsed.error,
+                "raw_response": raw_response,
+            })
 
         if is_learner_turn:
             result.learner_total_turns += 1
@@ -433,8 +460,19 @@ def run_episode(
                 result.opponent_format_ok += 1
             opponent_msgs[-1]["format_ok"] = format_ok
 
+        if not format_ok:
+            # Invalid actions cannot create or accept an allocation. Invalidate
+            # any pending offer so a later acceptance cannot revive stale terms.
+            last_submit_deal = None
+            last_submit_by = None
+            continue
+        action = action.upper()
+        if "[REJECT_DEAL]" in action:
+            last_submit_deal = None
+            last_submit_by = None
+        # Parse original case-preserving text (categorical JI values matter).
         if action:
-            parsed_deal = env.parse_deal(action)
+            parsed_deal = env.parse_deal(parsed.action)
             if parsed_deal is not None:
                 last_submit_deal = parsed_deal
                 last_submit_by = "learner" if is_learner_turn else "opponent"
@@ -481,11 +519,14 @@ def run_episode(
                 recent_deals.append(a)
             if len(recent_deals) >= 3:
                 break
-        if len(recent_deals) >= 3 and len(set(recent_deals)) == 1:
-            result.outcome = "reject_loop"
-            result.who_terminated = who_label
-            result.num_turns = turn_index + 1
-            break
+        if parsed.kind == "SUBMIT_DEAL" and len(recent_deals) >= 3 and len(set(recent_deals)) == 1:
+            # Repetition is diagnostic only: allow the counterpart to respond,
+            # and let agreement, walk-away, or the turn budget end the episode.
+            result.repeated_offer_events.append({
+                "turn_index": turn_index,
+                "speaker": who_label,
+                "action": parsed.action,
+            })
     else:
         result.num_turns = max_turns
 

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
-import random
 import time
+import tomllib
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from copy import deepcopy
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -18,20 +20,24 @@ from rich.progress import (
 )
 
 from ..envs import get_env
+from ..scenarios import deserialize_scenario, digest, serialize_scenario
 from .display import print_comparison_table, print_matchup_report
 from .generator import OPENAI_BASE_URL, make_generator
+from .manifest import build_manifest, load_manifest
 from .runner import (
+    EVAL_PROTOCOL_VERSION as PROTOCOL_VERSION,
     AggregateMetrics,
     EpisodeResult,
     compute_episode_metrics,
     run_episode,
 )
+from .shared import episode_from_dict, refresh_shared_run, validate_subset
 
 DEFAULT_DATA_PATHS: dict[str, str] = {
     "casino": "data/casino/ca.test.csv",
     "dnd": "data/dnd/dnd.test.csv",
     "amazon": "data/ahp/test",
-    "craigslist": "data/craigslist/test.json",
+    "craigslist": "data/craigslist/revision/test.json",
     "ji": "data/ji/ji.test.json",
 }
 
@@ -61,7 +67,7 @@ def _resolve_datasets(cfg: dict) -> list[dict]:
                     f"No data_path for dataset {name!r} and no default known. "
                     f"Known defaults: {list(DEFAULT_DATA_PATHS)}"
                 )
-            resolved.append({"name": name, "data_path": data_path})
+            resolved.append({**entry, "name": name, "data_path": data_path})
         return resolved
 
     name = cfg.get("dataset", "casino")
@@ -80,14 +86,17 @@ def run_evaluation(cfg: dict) -> dict:
     Returns:
         Dict mapping run_key to matchup summary dicts.
     """
+    economic_regulation = cfg.get("economic_regulation", True)
+    if type(economic_regulation) is not bool:
+        raise ValueError("economic_regulation must be a YAML boolean (true/false)")
     dataset_specs = _resolve_datasets(cfg)
 
-    ts = time.strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
     output_dir = (
         Path(cfg.get("storage_dir", cfg.get("output_dir", "logs/negotiate")))
         / f"run_{ts}"
     )
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=False)
 
     num_episodes = cfg.get("num_episodes", 200)
     max_turns = cfg.get("max_turns", 18)
@@ -95,10 +104,6 @@ def run_evaluation(cfg: dict) -> dict:
     top_p = cfg.get("top_p", 0.9)
     seed = cfg.get("seed", 42)
     max_concurrent = cfg.get("max_concurrent", 1)
-
-    pw = cfg.get("persona_weights") or {}
-    persona_names = list(pw.keys()) if pw else ["none"]
-    persona_weights = list(pw.values()) if pw else [1.0]
 
     default_base_url = cfg.get("base_url", OPENAI_BASE_URL)
     default_api_key_env = cfg.get("api_key_env", "OPENAI_API_KEY")
@@ -114,7 +119,41 @@ def run_evaluation(cfg: dict) -> dict:
         scenarios = env.load_scenarios(data_path)
         logger.info(f"Dataset: {dataset} — {len(scenarios)} scenarios from {data_path}")
 
-        random.seed(seed)
+        if ds_spec.get("manifest_path"):
+            manifest = load_manifest(ds_spec["manifest_path"], dataset, env, scenarios)
+        else:
+            manifest = build_manifest(
+                dataset,
+                env,
+                scenarios,
+                seed=seed,
+                num_episodes=ds_spec.get("num_episodes", num_episodes),
+                repeats=ds_spec.get("repeats", cfg.get("repeats", 1)),
+                persona_weights=cfg.get("persona_weights"),
+            )
+        comparison = None
+        if ds_spec.get("comparison_manifest_path"):
+            comparison = load_manifest(
+                ds_spec["comparison_manifest_path"], dataset, env, scenarios
+            )
+            validate_subset(manifest, comparison)
+        schedule = manifest["episodes"]
+        manifest_sha = digest(manifest)
+        save_dir = output_dir / dataset
+        save_dir.mkdir(parents=True, exist_ok=True)
+        (save_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+        if comparison is not None:
+            (save_dir / "comparison_manifest.json").write_text(
+                json.dumps(comparison, indent=2) + "\n"
+            )
+        if (
+            manifest["selected_unique_scenarios"]
+            < manifest["requested_unique_scenarios"]
+        ):
+            logger.warning(
+                f"{dataset}: capped selection at {manifest['selected_unique_scenarios']} "
+                "unique scenarios; use repeats for explicit repeated trials"
+            )
 
         for matchup in matchups:
             learner_cfg = matchup["learner"]
@@ -124,15 +163,12 @@ def run_evaluation(cfg: dict) -> dict:
             logger.info(f"\n{'#' * 60}\n{run_key}\n{'#' * 60}")
 
             learner_gen = make_generator(
-                learner_cfg, default_base_url, default_api_key_env
+                learner_cfg, default_base_url, default_api_key_env,
+                default_tinker_project_id=cfg.get("tinker_project_id"),
             )
             opponent_gen = make_generator(
-                opponent_cfg, default_base_url, default_api_key_env
-            )
-
-            sampled_scenarios = random.choices(scenarios, k=num_episodes)
-            sampled_personas = random.choices(
-                persona_names, weights=persona_weights, k=num_episodes
+                opponent_cfg, default_base_url, default_api_key_env,
+                default_tinker_project_id=cfg.get("tinker_project_id"),
             )
 
             overall = AggregateMetrics()
@@ -149,54 +185,70 @@ def run_evaluation(cfg: dict) -> dict:
                 transient=True,
             ) as progress:
                 task = progress.add_task(
-                    f"{dataset} | {matchup_name}", total=num_episodes
+                    f"{dataset} | {matchup_name}", total=len(schedule)
                 )
 
-                def _run_one(idx: int, sc: dict, pers: str) -> EpisodeResult:
+                def _run_one(
+                    entry: dict,
+                    *,
+                    scenarios=scenarios,
+                    env=env,
+                    learner_gen=learner_gen,
+                    opponent_gen=opponent_gen,
+                    learner_label=learner_cfg["label"],
+                    opponent_label=opponent_cfg["label"],
+                ) -> EpisodeResult:
+                    sc = deepcopy(scenarios[entry["scenario_index"]])
                     return run_episode(
                         env=env,
                         learner_gen=learner_gen,
                         opponent_gen=opponent_gen,
                         scenario=sc,
                         agent_ids=sc["agent_ids"],
-                        persona=pers,
-                        episode_id=idx,
-                        learner_label=learner_cfg["label"],
-                        opponent_label=opponent_cfg["label"],
+                        persona=entry["persona"],
+                        episode_id=entry["episode_id"],
+                        learner_label=learner_label,
+                        opponent_label=opponent_label,
                         max_turns=max_turns,
                         temperature=temperature,
                         top_p=top_p,
+                        learner_agent_id=entry["learner_agent_id"],
+                        learner_goes_first=entry["learner_goes_first"],
+                        scenario_id=entry["scenario_id"],
+                        repeat=entry["repeat"],
+                        economic_regulation=economic_regulation,
                     )
 
                 with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
                     futures = {
-                        executor.submit(_run_one, i, sc, pers): i
-                        for i, (sc, pers) in enumerate(
-                            zip(sampled_scenarios, sampled_personas)
-                        )
+                        executor.submit(_run_one, entry): entry for entry in schedule
                     }
                     for future in as_completed(futures):
-                        idx = futures[future]
+                        entry = futures[future]
+                        idx = entry["episode_id"]
+                        sc = scenarios[entry["scenario_index"]]
                         try:
                             ep = future.result()
-                        except Exception as e:
+                        except Exception as e:  # noqa: BLE001 - persist each failed episode for retry
                             logger.warning(f"Episode {idx} failed: {e}")
                             failed.append(
                                 {
-                                    "episode_id": idx,
-                                    "scenario": sampled_scenarios[idx],
-                                    "persona": sampled_personas[idx],
+                                    **entry,
+                                    "scenario": serialize_scenario(dataset, sc),
+                                    "economic_regulation": economic_regulation,
                                     "error": str(e),
                                 }
                             )
                             progress.advance(task)
                             continue
-                        compute_episode_metrics(ep, env, sampled_scenarios[idx])
+                        compute_episode_metrics(ep, env, sc)
                         episodes.append(ep)
                         overall.add(ep)
                         per_persona[ep.persona].add(ep)
                         progress.advance(task)
 
+            episodes.sort(key=lambda ep: ep.episode_id)
+            failed.sort(key=lambda entry: entry["episode_id"])
             elapsed = time.time() - t0
             logger.info(f"Finished {run_key} in {elapsed:.1f}s")
             if failed:
@@ -210,6 +262,27 @@ def run_evaluation(cfg: dict) -> dict:
                 "dataset": dataset,
                 "learner": learner_cfg["label"],
                 "opponent": opponent_cfg["label"],
+                "manifest_sha256": manifest_sha,
+                "protocol_version": PROTOCOL_VERSION,
+                "economic_regulation": economic_regulation,
+                "comparison_group": digest(
+                    {
+                        "opponent": opponent_cfg,
+                        "protocol_version": PROTOCOL_VERSION,
+                        "economic_regulation": economic_regulation,
+                        "max_turns": max_turns,
+                        "temperature": temperature,
+                        "top_p": top_p,
+                    }
+                ),
+                "evaluation_settings": {
+                    "max_turns": max_turns,
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "economic_regulation": economic_regulation,
+                },
+                "scheduled_episodes": len(schedule),
+                "failed_episodes": len(failed),
                 "overall": overall.summary(),
                 "per_persona": per_persona_summaries,
                 "elapsed_seconds": round(elapsed, 1),
@@ -228,6 +301,7 @@ def run_evaluation(cfg: dict) -> dict:
 
     _save_comparison_csv(output_dir / "comparison.csv", all_summaries)
     print_comparison_table(all_summaries)
+    refresh_shared_run(output_dir)
     logger.info(f"Results saved to {output_dir}")
     return all_summaries
 
@@ -237,6 +311,13 @@ def _serialize_episodes(episodes: list[EpisodeResult]) -> list[dict]:
     return [
         {
             "episode_id": ep.episode_id,
+            "scenario_id": ep.scenario_id,
+            "repeat": ep.repeat,
+            "economic_regulation": ep.economic_regulation,
+            "regulation_interventions": ep.regulation_interventions,
+            "protocol_version": ep.protocol_version,
+            "format_failures": ep.format_failures,
+            "repeated_offer_events": ep.repeated_offer_events,
             "persona": ep.persona,
             "outcome": ep.outcome,
             "learner_points": ep.learner_points,
@@ -334,10 +415,12 @@ def score_negotiate_logs(log_dir: str) -> dict:
             raw_episodes = json.load(f)
 
         dataset = None
+        saved_metadata = {}
         metrics_path = ep_path.parent / "metrics.json"
         if metrics_path.exists():
             with open(metrics_path) as f:
-                dataset = json.load(f).get("dataset")
+                saved_metadata = json.load(f)
+                dataset = saved_metadata.get("dataset")
         if not dataset:
             dataset = dataset_name
 
@@ -345,41 +428,17 @@ def score_negotiate_logs(log_dir: str) -> dict:
         per_persona: dict[str, AggregateMetrics] = defaultdict(AggregateMetrics)
 
         for raw in raw_episodes:
-            ep = EpisodeResult(
-                episode_id=raw["episode_id"],
-                learner_label=raw.get(
-                    "learner_label",
-                    matchup_name.split("_vs_")[0] if "_vs_" in matchup_name else "",
-                ),
-                opponent_label=raw.get(
-                    "opponent_label",
-                    matchup_name.split("_vs_")[-1] if "_vs_" in matchup_name else "",
-                ),
-                persona=raw["persona"],
-                outcome=raw["outcome"],
-                learner_points=raw.get("learner_points"),
-                opponent_points=raw.get("opponent_points"),
-                num_turns=raw["num_turns"],
-                learner_messages=raw.get("learner_messages", []),
-                opponent_messages=raw.get("opponent_messages", []),
-                learner_agent_id=raw.get("learner_agent_id", ""),
-                opponent_agent_id=raw.get("opponent_agent_id", ""),
-                who_terminated=raw.get("who_terminated", ""),
-                learner_goes_first=raw.get("learner_goes_first", True),
-                learner_total_turns=raw.get("learner_total_turns", 0),
-                learner_format_ok=raw.get("learner_format_ok", 0),
-                opponent_total_turns=raw.get("opponent_total_turns", 0),
-                opponent_format_ok=raw.get("opponent_format_ok", 0),
-                bargained_ratio=raw.get("bargained_ratio"),
-                first_bid_ratio=raw.get("first_bid_ratio"),
-                pareto_efficient=raw.get("pareto_efficient"),
-                joint_surplus_norm=raw.get("joint_surplus_norm"),
+            ep = episode_from_dict(
+                raw,
+                learner=saved_metadata.get("learner", ""),
+                opponent=saved_metadata.get("opponent", ""),
             )
             overall.add(ep)
             per_persona[ep.persona].add(ep)
 
         per_persona_summaries = {p: m.summary() for p, m in sorted(per_persona.items())}
         matchup_summary = {
+            **saved_metadata,
             "matchup": matchup_name,
             "dataset": dataset,
             "overall": overall.summary(),
@@ -396,6 +455,7 @@ def score_negotiate_logs(log_dir: str) -> dict:
         json.dump(all_summaries, f, indent=2)
 
     _save_comparison_csv(root / "comparison.csv", all_summaries)
+    refresh_shared_run(root)
     logger.info(f"Saved summary.json and comparison.csv to {root}")
 
     return all_summaries
@@ -408,6 +468,7 @@ def _save_comparison_csv(path: Path, all_summaries: dict) -> None:
     fields = [
         "matchup",
         "dataset",
+        "economic_regulation",
         "deal_rate",
         "bargained_ratio",
         "learner_pts",
@@ -427,6 +488,7 @@ def _save_comparison_csv(path: Path, all_summaries: dict) -> None:
                 {
                     "matchup": name,
                     "dataset": s.get("dataset", ""),
+                    "economic_regulation": s.get("economic_regulation"),
                     "deal_rate": o.get("deal_rate"),
                     "bargained_ratio": o.get("avg_bargained_ratio"),
                     "learner_pts": o.get("avg_learner_points"),
@@ -440,24 +502,31 @@ def _save_comparison_csv(path: Path, all_summaries: dict) -> None:
             )
 
 
+def load_eval_config(config_path: str) -> dict:
+    """Load an evaluation config from YAML or TOML."""
+    path = Path(config_path)
+    if path.suffix.lower() == ".toml":
+        return tomllib.loads(path.read_text())
+    return yaml.safe_load(path.read_text())
+
+
 def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
     """Retry failed episodes in a log directory and merge results back.
 
     Finds all failed.json files under log_dir, re-runs the failed episodes using
-    model configs from the eval YAML (matched by learner/opponent labels from
+    model configs from the eval config (matched by learner/opponent labels from
     sibling metrics.json), and merges successful results into episodes.json.
 
     Args:
         log_dir: Path to the run directory containing matchup subdirs.
-        config_path: Path to the eval YAML config (for model/matchup settings).
+        config_path: Path to the eval YAML or TOML config (for model/matchup settings).
     """
     root = Path(log_dir)
     if not root.is_dir():
         logger.error(f"Directory not found: {root}")
         return
 
-    with open(config_path) as f:
-        cfg = yaml.safe_load(f)
+    cfg = load_eval_config(config_path)
 
     max_turns = cfg.get("max_turns", 18)
     temperature = cfg.get("temperature", 0.7)
@@ -488,6 +557,19 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
         with open(metrics_path) as f:
             metrics = json.load(f)
 
+        if metrics.get("protocol_version") != PROTOCOL_VERSION:
+            raise ValueError(
+                "Cannot retry evaluations from a different negotiation protocol. "
+                "Start a fresh run; saved-result scoring remains available."
+            )
+        settings = metrics.get("evaluation_settings", {})
+        original_regulation = metrics.get("economic_regulation", True)
+        if cfg.get("economic_regulation", True) != original_regulation:
+            logger.warning(
+                "Retry preserves the original economic regulation setting; use a fresh run to change regimes"
+            )
+        if type(original_regulation) is not bool:
+            raise ValueError("Invalid saved economic regulation setting")
         dataset = metrics.get("dataset", "")
         learner_label = metrics.get("learner", "")
         opponent_label = metrics.get("opponent", "")
@@ -501,10 +583,12 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
 
         matchup = matchup_cfgs[lookup_key]
         learner_gen = make_generator(
-            matchup["learner"], default_base_url, default_api_key_env
+            matchup["learner"], default_base_url, default_api_key_env,
+            default_tinker_project_id=cfg.get("tinker_project_id"),
         )
         opponent_gen = make_generator(
-            matchup["opponent"], default_base_url, default_api_key_env
+            matchup["opponent"], default_base_url, default_api_key_env,
+            default_tinker_project_id=cfg.get("tinker_project_id"),
         )
 
         env = get_env(dataset)
@@ -512,6 +596,13 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
         with open(failed_path) as f:
             failed_entries = json.load(f)
 
+        if any(
+            "learner_goes_first" not in e or "learner_agent_id" not in e
+            for e in failed_entries
+        ):
+            logger.warning(
+                "Legacy failures lack role/first-mover metadata; retries cannot guarantee pairing"
+            )
         logger.info(f"Retrying {len(failed_entries)} failed episodes in {matchup_dir}")
 
         succeeded: list[EpisodeResult] = []
@@ -526,8 +617,26 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
         ) as progress:
             task = progress.add_task(f"retry {matchup_name}", total=len(failed_entries))
 
-            def _run_one(entry: dict) -> EpisodeResult:
-                sc = entry["scenario"]
+            def _run_one(
+                entry: dict,
+                *,
+                dataset=dataset,
+                env=env,
+                learner_gen=learner_gen,
+                opponent_gen=opponent_gen,
+                learner_label=learner_label,
+                opponent_label=opponent_label,
+                settings=settings,
+                original_regulation=original_regulation,
+            ) -> EpisodeResult:
+                if (
+                    entry.get("economic_regulation", original_regulation)
+                    != original_regulation
+                ):
+                    raise ValueError(
+                        "Failure metadata has inconsistent regulation setting"
+                    )
+                sc = deserialize_scenario(dataset, entry["scenario"])
                 return run_episode(
                     env=env,
                     learner_gen=learner_gen,
@@ -538,9 +647,14 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
                     episode_id=entry["episode_id"],
                     learner_label=learner_label,
                     opponent_label=opponent_label,
-                    max_turns=max_turns,
-                    temperature=temperature,
-                    top_p=top_p,
+                    max_turns=settings.get("max_turns", max_turns),
+                    temperature=settings.get("temperature", temperature),
+                    top_p=settings.get("top_p", top_p),
+                    learner_agent_id=entry.get("learner_agent_id"),
+                    learner_goes_first=entry.get("learner_goes_first"),
+                    scenario_id=entry.get("scenario_id", ""),
+                    repeat=entry.get("repeat", 0),
+                    economic_regulation=original_regulation,
                 )
 
             with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
@@ -551,7 +665,7 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
                     entry = futures[future]
                     try:
                         ep = future.result()
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - persist each failed episode for retry
                         logger.warning(
                             f"Episode {entry['episode_id']} failed again: {e}"
                         )
@@ -559,7 +673,9 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
                         still_failed.append(entry)
                         progress.advance(task)
                         continue
-                    compute_episode_metrics(ep, env, entry["scenario"])
+                    compute_episode_metrics(
+                        ep, env, deserialize_scenario(dataset, entry["scenario"])
+                    )
                     succeeded.append(ep)
                     progress.advance(task)
 
@@ -578,6 +694,7 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
                 existing = json.load(f)
 
         existing.extend(_serialize_episodes(succeeded))
+        existing.sort(key=lambda ep: ep["episode_id"])
         with open(episodes_path, "w") as f:
             json.dump(existing, f, indent=2)
 
@@ -592,6 +709,30 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
             failed_path.unlink()
             logger.info(f"All {len(succeeded)} retries succeeded, removed failed.json")
 
+        overall = AggregateMetrics()
+        by_persona: dict[str, AggregateMetrics] = defaultdict(AggregateMetrics)
+        for raw in existing:
+            fields = {
+                k: v for k, v in raw.items() if k in EpisodeResult.__dataclass_fields__
+            }
+            fields.setdefault("learner_label", learner_label)
+            fields.setdefault("opponent_label", opponent_label)
+            episode = EpisodeResult(**fields)
+            overall.add(episode)
+            by_persona[episode.persona].add(episode)
+        metrics.update(
+            overall=overall.summary(),
+            failed_episodes=len(still_failed),
+            per_persona={p: a.summary() for p, a in sorted(by_persona.items())},
+        )
+        metrics_path.write_text(json.dumps(metrics, indent=2) + "\n")
+        summary_path = root / "summary.json"
+        if summary_path.exists():
+            summaries = json.loads(summary_path.read_text())
+            summaries[f"{dataset}/{matchup_name}"] = metrics
+            summary_path.write_text(json.dumps(summaries, indent=2) + "\n")
+            _save_comparison_csv(root / "comparison.csv", summaries)
+
         # Regenerate HTML
         from .render import render_episodes_html
 
@@ -600,6 +741,8 @@ def retry_failed(log_dir: str, config_path: str = "configs/eval.yaml") -> None:
         )
         with open(matchup_dir / "episodes.html", "w") as f:
             f.write(html_content)
+
+    refresh_shared_run(root)
 
 
 def main(
@@ -610,7 +753,7 @@ def main(
     """CLI entry point for negotiation evaluation.
 
     Args:
-        config_path: Path to YAML evaluation config.
+        config_path: Path to YAML or TOML evaluation config.
         evaluate_only: If set, re-score existing logs in this directory instead.
         retry: If set, retry failed episodes in this log directory.
     """
@@ -620,6 +763,5 @@ def main(
     if evaluate_only:
         score_negotiate_logs(evaluate_only)
         return
-    with open(config_path) as f:
-        cfg = yaml.safe_load(f)
+    cfg = load_eval_config(config_path)
     run_evaluation(cfg)

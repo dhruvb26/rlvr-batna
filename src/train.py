@@ -1,4 +1,10 @@
+from __future__ import annotations
+
 import asyncio
+import json
+import math
+import os
+from pathlib import Path
 import random
 import re
 from collections.abc import Sequence
@@ -7,7 +13,7 @@ from dataclasses import dataclass
 import chz
 import tinker
 from tinker import ModelInput
-from tinker_cookbook import cli_utils, model_info
+from tinker_cookbook import checkpoint_utils, cli_utils, model_info
 from tinker_cookbook.completers import (
     MessageCompleter,
     StopCondition,
@@ -28,6 +34,9 @@ from tinker_cookbook.tokenizer_utils import get_tokenizer
 
 from .envs import NegotiateEnv as EvalEnv
 from .envs import get_env
+from .scenarios import digest, scenario_id, serialize_scenario
+from .protocol import PROTOCOL_VERSION, parse_response, partner_observation
+from .tinker_tracking import create_service_client, record_tinker_sessions, track_tinker_sessions
 
 OUTCOMES = ("deal", "walk_away", "max_turns", "format_violation")
 
@@ -47,7 +56,7 @@ def _outcome_metrics(
     """
     m = {f"outcome_{o}": float(o == outcome) for o in OUTCOMES}
     if dataset:
-        m["dataset"] = hash(dataset) % 1000
+        m["dataset"] = int(digest(dataset)[:8], 16) % 1000
         m[f"outcome_deal/{dataset}"] = float(outcome == "deal")
         m[f"outcome_walk_away/{dataset}"] = float(outcome == "walk_away")
     return m | extra
@@ -92,13 +101,12 @@ class Scenario:
 
 
 def load_all_scenarios(
-    datasets: list[dict], target_size: int | None = None
+    datasets: list[dict], target_size: int | None = None, *, seed: int = 42
 ) -> list[Scenario]:
     """Load scenarios from multiple datasets with optional weighted resampling.
 
-    When datasets have a 'weight' key, scenarios are resampled so each dataset
-    contributes proportionally to its weight. Without weights (or all equal),
-    uses the natural distribution.
+    Each dataset is resampled in proportion to its weight (default 1.0).
+    Equal weights give equal task exposure, not the natural row distribution.
 
     Args:
         datasets: List of {name, data_path, weight?} dicts.
@@ -108,6 +116,7 @@ def load_all_scenarios(
     Returns:
         Flat list of Scenario objects, resampled according to weights.
     """
+    rng = random.Random(seed)
     per_dataset: dict[str, list[Scenario]] = {}
     weights: dict[str, float] = {}
 
@@ -115,8 +124,14 @@ def load_all_scenarios(
         name = ds["name"]
         data_path = ds["data_path"]
         weight = ds.get("weight", 1.0)
+        if name == "ji":
+            raise ValueError("JI is held out and cannot be included in revision training")
+        if name in per_dataset or not math.isfinite(weight) or weight <= 0:
+            raise ValueError("Datasets must be unique and have finite positive weights")
         env = get_env(name)
         raw_scenarios = env.load_scenarios(data_path)
+        if not raw_scenarios:
+            raise ValueError(f"No usable training scenarios for {name}")
         scenarios = []
         for s in raw_scenarios:
             agent_ids = s.get("agent_ids", s.get("agents", {}).keys())
@@ -126,6 +141,8 @@ def load_all_scenarios(
         per_dataset[name] = scenarios
         weights[name] = weight
 
+    if not per_dataset:
+        raise ValueError("At least one training dataset is required")
     total_raw = sum(len(s) for s in per_dataset.values())
     if target_size is None:
         target_size = total_raw
@@ -136,7 +153,7 @@ def load_all_scenarios(
         n_target = round(target_size * weights[name] / total_weight)
         if n_target <= 0 or not scenarios:
             continue
-        resampled = random.choices(scenarios, k=n_target)
+        resampled = rng.choices(scenarios, k=n_target)
         all_scenarios.extend(resampled)
 
     return all_scenarios
@@ -159,6 +176,11 @@ class NegotiationEnv(Env):
         renderer: Renderer,
         max_rounds: int = 6,
         batna_threshold: float = 0.0,
+        *,
+        learner_id: str | None = None,
+        seed: int = 42,
+        threshold_scope: str = "selective",
+        economic_regulation: bool = True,
     ):
         """Initialize a negotiation environment for one episode.
 
@@ -175,16 +197,26 @@ class NegotiationEnv(Env):
         self.renderer = renderer
         self.max_rounds = max_rounds
         self.batna_threshold = batna_threshold
+        self.threshold_scope = threshold_scope
+        self.economic_regulation = economic_regulation
+        self.seed = seed
+        self.regulation_interventions: list[dict] = []
+        self.format_failures: list[dict] = []
+        if threshold_scope not in {"selective", "uniform"}:
+            raise ValueError("threshold_scope must be selective or uniform")
+        if type(economic_regulation) is not bool or type(max_rounds) is not int or max_rounds < 1:
+            raise ValueError("Invalid regulation flag or round limit")
+        if not math.isfinite(batna_threshold) or not 0 <= batna_threshold <= 1:
+            raise ValueError("batna_threshold must be in [0, 1]")
 
         ids = scenario.agent_ids
         fixed = self.env.fixed_learner_role()
-        if fixed and fixed in ids:
-            self.learner_id = fixed
-            self.opponent_id = [a for a in ids if a != fixed][0]
-        else:
-            self.learner_id, self.opponent_id = (
-                (ids[0], ids[1]) if random.random() < 0.5 else (ids[1], ids[0])
-            )
+        if len(ids) != 2 or len(set(ids)) != 2:
+            raise ValueError("Training requires two distinct agent IDs")
+        self.learner_id = learner_id or fixed or random.Random(seed).choice(ids)
+        if self.learner_id not in ids or (fixed and self.learner_id != fixed):
+            raise ValueError("Invalid learner role")
+        self.opponent_id = next(a for a in ids if a != self.learner_id)
 
         self.learner_sys: Message = {
             "role": "system",
@@ -216,6 +248,8 @@ class NegotiationEnv(Env):
         Returns:
             StepResult with reward and episode metrics.
         """
+        if not self.env.validate_deal(learner_alloc, self.scenario.data):
+            raise ValueError("Invalid allocation reached reward calculation")
         ds = self.scenario.dataset_name
         points = self.env.compute_points(
             learner_alloc, self.scenario.data, self.learner_id
@@ -261,7 +295,7 @@ class NegotiationEnv(Env):
                 extra["first_offer_greed"] = first_pts / max_pts
                 extra[f"first_offer_greed/{ds}"] = extra["first_offer_greed"]
 
-        threshold = self.batna_threshold if ds in ("casino", "dnd", "ji") else 0.0
+        threshold = self.batna_threshold if (self.threshold_scope == "uniform" or ds in ("casino", "dnd")) else 0.0
         if threshold > 0 and bargained_ratio < threshold:
             reward = -0.5
         else:
@@ -275,6 +309,7 @@ class NegotiationEnv(Env):
             episode_done=True,
             reward=reward,
             metrics=_outcome_metrics("deal", ds, **extra),
+            logs=self._logs(learner_alloc),
         )
 
     def _learner_convo(self) -> list[Message]:
@@ -293,174 +328,127 @@ class NegotiationEnv(Env):
             self.stop_condition,
         )
 
-    async def step(
-        self, action: Action, *, extra: ActionExtra | None = None
-    ) -> StepResult:
-        """Process one round: learner spoke, now opponent responds.
+    def _logs(self, deal=None):
+        """Retain full terminal evidence in Cookbook rollout JSON logs."""
+        return {"negotiation": json.dumps({
+            "scenario_id": scenario_id(self.scenario.dataset_name, self.scenario.data),
+            "scenario": serialize_scenario(self.scenario.dataset_name, self.scenario.data),
+            "dataset": self.scenario.dataset_name,
+            "learner_agent_id": self.learner_id,
+            "opponent_agent_id": self.opponent_id,
+            "episode_seed": self.seed,
+            "threshold_scope": self.threshold_scope,
+            "batna_threshold": self.batna_threshold,
+            "economic_regulation": self.economic_regulation,
+            "protocol_version": PROTOCOL_VERSION,
+            "learner_messages": [self.learner_sys] + self.learner_turns,
+            "opponent_messages": [self.opponent_sys] + self.opponent_turns,
+            "regulation_interventions": self.regulation_interventions,
+            "format_failures": self.format_failures,
+            "deal": deal,
+        }, indent=2)}
 
-        Args:
-            action: The learner's generated action (tokenized response).
-            extra: Optional extra action metadata.
+    def _terminal(self, outcome, reward=0.0):
+        return StepResult(
+            next_observation=self.renderer.build_generation_prompt(self._learner_convo()),
+            next_stop_condition=self.stop_condition,
+            episode_done=True, reward=reward,
+            metrics=_outcome_metrics(outcome, self.scenario.dataset_name,
+                                     episode_length=float(self.turns_taken)),
+            logs=self._logs(),
+        )
 
-        Returns:
-            StepResult with reward, done flag, and next observation.
-        """
-        (learner_msg, _) = self.renderer.parse_response(action)
+    def _clear_offer(self):
+        self.last_submit_deal = None
+        self.last_submit_by = None
+
+    async def step(self, action: Action, *, extra: ActionExtra | None = None) -> StepResult:
+        """One learner turn and one opponent turn; validate before state changes."""
+        learner_msg, _ = self.renderer.parse_response(action)
         learner_text = get_text_content(learner_msg)
         self.turns_taken += 1
-
-        if not (
-            extract_section(learner_text, "Thought")
-            and extract_section(learner_text, "Talk")
-            and extract_section(learner_text, "Action")
-        ):
-            return StepResult(
-                next_observation=self.renderer.build_generation_prompt(
-                    self._learner_convo()
-                ),
-                next_stop_condition=self.stop_condition,
-                episode_done=True,
-                reward=-1.0,
-                metrics=_outcome_metrics(
-                    "format_violation",
-                    self.scenario.dataset_name,
-                    episode_length=float(self.turns_taken),
-                ),
-            )
-
         self.learner_turns.append({"role": "assistant", "content": learner_text})
-        visible = self.env.flip_deal(strip_thought(learner_text), self.scenario.data)
-        self.opponent_turns.append({"role": "user", "content": visible})
-
-        learner_action = extract_section(learner_text, "Action") or ""
-        learner_action_upper = learner_action.strip().upper()
-
-        parsed = self.env.parse_deal(learner_action)
-        if parsed is not None:
+        learner_response = parse_response(
+            learner_text, self.env, self.scenario.data, self.last_submit_by == "opponent"
+        )
+        learner_action = learner_response.action
+        if learner_response.error:
+            self.format_failures.append({
+                "turn_index": self.turns_taken - 1, "speaker": "learner",
+                "reason": learner_response.error, "raw_response": learner_text,
+                "stop_reason": (extra or {}).get("stop_reason"),
+            })
+            self._clear_offer()
+            return self._terminal("format_violation", -1.0)
+        kind = learner_response.kind
+        if kind == "ACCEPT_DEAL":
+            return self._deal_result(self.env.invert_alloc(self.last_submit_deal, self.scenario.data))
+        if kind == "WALK_AWAY":
+            return self._terminal("walk_away")
+        if kind == "SUBMIT_DEAL":
+            parsed = self.env.parse_deal(learner_action)
             if self.learner_first_offer is None:
                 self.learner_first_offer = parsed
-            self.last_submit_deal = parsed
-            self.last_submit_by = "learner"
+            self.last_submit_deal, self.last_submit_by = parsed, "learner"
+        else:
+            self._clear_offer()
+        self.opponent_turns.append({"role": "user", "content": partner_observation(
+            learner_response, self.env, self.scenario.data)})
 
-        if (
-            "[ACCEPT_DEAL]" in learner_action_upper
-            and self.last_submit_deal is not None
-            and self.last_submit_by == "opponent"
-        ):
-            learner_alloc = self.env.invert_alloc(
-                self.last_submit_deal, self.scenario.data
-            )
-            return self._deal_result(learner_alloc)
-
-        if "[WALK_AWAY]" in learner_action_upper:
-            return StepResult(
-                next_observation=self.renderer.build_generation_prompt(
-                    self._learner_convo()
-                ),
-                next_stop_condition=self.stop_condition,
-                episode_done=True,
-                reward=0.0,
-                metrics=_outcome_metrics(
-                    "walk_away",
-                    self.scenario.dataset_name,
-                    episode_length=float(self.turns_taken),
-                ),
-            )
-
-        self.round += 1
-        if self.round >= self.max_rounds:
-            return StepResult(
-                next_observation=self.renderer.build_generation_prompt(
-                    self._learner_convo()
-                ),
-                next_stop_condition=self.stop_condition,
-                episode_done=True,
-                reward=0.0,
-                metrics=_outcome_metrics(
-                    "max_turns",
-                    self.scenario.dataset_name,
-                    episode_length=float(self.turns_taken),
-                ),
-            )
-
+        # Even the final learner proposal receives its allotted opponent reply.
         opponent_msg = await self.opponent(self._opponent_convo())
         opponent_text = get_text_content(opponent_msg)
-
-        # Regulate: intercept any opponent action that violates cost constraint.
-        opp_action_pre = extract_section(opponent_text, "Action") or ""
-        opp_action_pre_upper = opp_action_pre.strip().upper()
-        if (
-            "[ACCEPT_DEAL]" in opp_action_pre_upper
-            and self.last_submit_deal is not None
-            and self.last_submit_by == "learner"
-        ):
-            opp_alloc = self.env.invert_alloc(self.last_submit_deal, self.scenario.data)
-            opp_pts = self.env.compute_points(
-                opp_alloc, self.scenario.data, self.opponent_id
-            )
-            if opp_pts < 0:
-                opponent_text = (
-                    "Thought: This offer leaves me with too little.\n"
-                    "Talk: I can't accept that offer.\n"
-                    "Action: [REJECT_DEAL]"
-                )
-        elif "[SUBMIT_DEAL]" in opp_action_pre_upper:
-            opp_deal = self.env.parse_deal(opp_action_pre)
-            if opp_deal is not None:
-                opp_alloc = self.env.invert_alloc(opp_deal, self.scenario.data)
-                opp_pts = self.env.compute_points(
-                    opp_alloc, self.scenario.data, self.opponent_id
-                )
-                if opp_pts < 0:
-                    opponent_text = (
-                        "Thought: This split gives me too little.\n"
-                        "Talk: I can't agree to that.\n"
-                        "Action: [REJECT_DEAL]"
-                    )
-
-        self.opponent_turns.append({"role": "assistant", "content": opponent_text})
-        visible_opp = self.env.flip_deal(
-            strip_thought(opponent_text), self.scenario.data
+        self.turns_taken += 1
+        opponent_response = parse_response(
+            opponent_text, self.env, self.scenario.data, self.last_submit_by == "learner"
         )
-        self.learner_turns.append({"role": "user", "content": visible_opp})
-
-        opp_action = extract_section(opponent_text, "Action") or ""
-        opp_action_upper = opp_action.strip().upper()
-
-        opp_parsed = self.env.parse_deal(opp_action)
-        if opp_parsed is not None:
-            self.last_submit_deal = opp_parsed
-            self.last_submit_by = "opponent"
-
-        if (
-            "[ACCEPT_DEAL]" in opp_action_upper
-            and self.last_submit_deal is not None
-            and self.last_submit_by == "learner"
-        ):
-            return self._deal_result(self.last_submit_deal)
-
-        if "[WALK_AWAY]" in opp_action_upper:
-            return StepResult(
-                next_observation=self.renderer.build_generation_prompt(
-                    self._learner_convo()
-                ),
-                next_stop_condition=self.stop_condition,
-                episode_done=True,
-                reward=0.0,
-                metrics=_outcome_metrics(
-                    "walk_away",
-                    self.scenario.dataset_name,
-                    episode_length=float(self.turns_taken),
-                ),
-            )
-
+        opponent_action = opponent_response.action
+        valid = opponent_response.error is None
+        if not valid:
+            self.format_failures.append({
+                "turn_index": self.turns_taken - 1, "speaker": "opponent",
+                "reason": opponent_response.error, "raw_response": opponent_text,
+            })
+        if valid:
+            kind = opponent_response.kind
+            # An opponent proposal is already expressed in the opponent's seat.
+            allocation = (self.env.parse_deal(opponent_action) if kind == "SUBMIT_DEAL"
+                          else self.env.invert_alloc(self.last_submit_deal, self.scenario.data)
+                          if kind == "ACCEPT_DEAL" else None)
+            if self.economic_regulation and allocation is not None:
+                points = self.env.compute_points(allocation, self.scenario.data, self.opponent_id)
+                if points < 0:
+                    replacement = "Thought: This offer leaves me with too little.\nTalk: I can't accept that offer.\nAction: [REJECT_DEAL]"
+                    self.regulation_interventions.append({
+                        "turn_index": self.turns_taken - 1,
+                        "opponent_utility": points,
+                        "original_response": opponent_text,
+                        "replacement_response": replacement,
+                    })
+                    opponent_text, kind = replacement, "REJECT_DEAL"
+                    opponent_response = parse_response(replacement, self.env, self.scenario.data, False)
+        self.opponent_turns.append({"role": "assistant", "content": opponent_text})
+        self.learner_turns.append({"role": "user", "content": partner_observation(
+            opponent_response, self.env, self.scenario.data)})
+        if valid:
+            if kind == "ACCEPT_DEAL":
+                return self._deal_result(self.last_submit_deal)
+            if kind == "WALK_AWAY":
+                return self._terminal("walk_away")
+            if kind == "SUBMIT_DEAL":
+                self.last_submit_deal = self.env.parse_deal(opponent_action)
+                self.last_submit_by = "opponent"
+            else:
+                self._clear_offer()
+        else:
+            # Invalid opponent actions consume a turn but cannot create a deal.
+            self._clear_offer()
+        self.round += 1
+        if self.round >= self.max_rounds:
+            return self._terminal("max_turns")
         return StepResult(
-            next_observation=self.renderer.build_generation_prompt(
-                self._learner_convo()
-            ),
-            next_stop_condition=self.stop_condition,
-            episode_done=False,
-            reward=0.0,
+            next_observation=self.renderer.build_generation_prompt(self._learner_convo()),
+            next_stop_condition=self.stop_condition, episode_done=False, reward=0.0,
         )
 
 
@@ -474,17 +462,22 @@ class NegotiationGroupBuilder(EnvGroupBuilder):
     num_envs: int
     max_rounds: int = 6
     batna_threshold: float = 0.0
+    seed: int = 42
+    threshold_scope: str = "selective"
+    economic_regulation: bool = True
 
     async def make_envs(self) -> Sequence[Env]:
+        # All completions within one GRPO group must start from the same prompt.
+        learner_id = self.scenario.env.fixed_learner_role() or random.Random(
+            derive_seed(self.seed, "role")).choice(self.scenario.agent_ids)
         return [
             NegotiationEnv(
-                self.opponent,
-                self.scenario,
-                self.renderer,
-                self.max_rounds,
-                self.batna_threshold,
-            )
-            for _ in range(self.num_envs)
+                self.opponent, self.scenario, self.renderer, self.max_rounds,
+                self.batna_threshold, learner_id=learner_id,
+                seed=derive_seed(self.seed, "trajectory", i),
+                threshold_scope=self.threshold_scope,
+                economic_regulation=self.economic_regulation,
+            ) for i in range(self.num_envs)
         ]
 
 
@@ -499,6 +492,9 @@ class NegotiationDataset(RLDataset):
     group_size: int
     max_rounds: int = 6
     batna_threshold: float = 0.0
+    seed: int = 42
+    threshold_scope: str = "selective"
+    economic_regulation: bool = True
 
     def get_batch(self, index: int) -> Sequence[EnvGroupBuilder]:
         start = (index * self.batch_size) % len(self.scenarios)
@@ -514,8 +510,11 @@ class NegotiationDataset(RLDataset):
                 num_envs=self.group_size,
                 max_rounds=self.max_rounds,
                 batna_threshold=self.batna_threshold,
+                seed=derive_seed(self.seed, "group", index, i),
+                threshold_scope=self.threshold_scope,
+                economic_regulation=self.economic_regulation,
             )
-            for s in batch_scenarios
+            for i, s in enumerate(batch_scenarios)
         ]
 
     def __len__(self) -> int:
@@ -536,12 +535,16 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
     opponent_temperature: float = 0.7
     eval_group_size: int = 4
     batna_threshold: float = 0.0
+    seed: int = 42
+    threshold_scope: str = "selective"
+    economic_regulation: bool = True
     renderer_name: str | None = None
     opponent_renderer_name: str | None = None
     opponent_max_tokens: int = 300
+    tinker_project_id: str | None = None
 
     async def __call__(self) -> tuple[RLDataset, RLDataset | None]:
-        service_client = tinker.ServiceClient()
+        service_client = create_service_client("opponent", project_id=self.tinker_project_id)
 
         opp_renderer_name = (
             self.opponent_renderer_name
@@ -553,6 +556,7 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
         opp_client = service_client.create_sampling_client(
             base_model=self.opponent_model
         )
+        record_tinker_sessions()
         opponent = TinkerMessageCompleter(
             sampling_client=opp_client,
             renderer=opp_renderer,
@@ -568,8 +572,8 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
         learner_renderer = get_renderer(learner_renderer_name, learner_tokenizer)
 
         ds_specs = _parse_datasets_str(self.datasets)
-        scenarios = load_all_scenarios(ds_specs)
-        random.shuffle(scenarios)
+        scenarios = load_all_scenarios(ds_specs, seed=derive_seed(self.seed, "data"))
+        random.Random(derive_seed(self.seed, "order")).shuffle(scenarios)
         scenarios = scenarios * self.num_epochs
 
         dataset = NegotiationDataset(
@@ -580,6 +584,9 @@ class NegotiationDatasetBuilder(RLDatasetBuilder):
             group_size=self.group_size,
             max_rounds=self.max_rounds,
             batna_threshold=self.batna_threshold,
+            seed=self.seed,
+            threshold_scope=self.threshold_scope,
+            economic_regulation=self.economic_regulation,
         )
         return dataset, None
 
@@ -615,8 +622,7 @@ DEFAULT_TRAIN_PATHS: dict[str, str] = {
     "casino": "data/casino/ca.train.csv",
     "dnd": "data/dnd/dnd.train.csv",
     "amazon": "data/ahp/train",
-    "craigslist": "data/craigslist/train.json",
-    "ji": "data/ji/ji.test.json",
+    "craigslist": "data/craigslist/revision/train.json",
 }
 
 
@@ -641,11 +647,16 @@ def _default_path(name: str) -> str:
 class CLIConfig:
     """CLI configuration for training runs."""
 
-    model_name: str = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    seed: int = 42
+    threshold_scope: str = "selective"
+    economic_regulation: bool = True
+    model_name: str = "Qwen/Qwen3.6-35B-A3B"
     renderer_name: str | None = None
     opponent_renderer_name: str | None = None
     opponent_max_tokens: int = 300
     recipe_name: str = "rlvr_batna"
+    tinker_project_id: str | None = None
+    run_label: str | None = None
     datasets: str = "casino:data/casino/ca.train.csv"
     group_size: int = 2
     batch_size: int = 2
@@ -679,6 +690,7 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
     """
     from datetime import datetime
 
+    validate_config(cli)
     renderer_name = cli.renderer_name or model_info.get_recommended_renderer_name(
         cli.model_name
     )
@@ -687,7 +699,24 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
         run_name = cli.resume_run
         log_path = f"logs/negotiation/{run_name}"
     else:
-        run_name = f"run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        model = re.sub(r"[^a-z0-9.-]+", "-", cli.model_name.rsplit("/", 1)[-1].lower()).strip("-")
+        condition = "surplus" if cli.batna_threshold == 0 else (
+            f"{cli.threshold_scope}-tau{cli.batna_threshold:g}"
+        )
+        datasets = {ds["name"] for ds in _parse_datasets_str(cli.datasets)}
+        if datasets == {"casino", "dnd", "amazon", "craigslist"}:
+            tasks = "all"
+        elif datasets == {"casino", "dnd"}:
+            tasks = "multiOnly"
+        elif datasets == {"amazon", "craigslist"}:
+            tasks = "priceOnly"
+        else:
+            tasks = "-".join(sorted(datasets))
+        regulation = "regOn" if cli.economic_regulation else "regOff"
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        run_name = f"{model}-{condition}-{tasks}-{regulation}-seed{cli.seed}-{timestamp}"
+        if cli.run_label:
+            run_name = f"{cli.run_label}-{run_name}"
         log_path = f"logs/negotiation/{run_name}"
 
     dataset_builder = NegotiationDatasetBuilder(
@@ -700,9 +729,13 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
         opponent_model=cli.model_name,
         opponent_temperature=cli.opponent_temperature,
         batna_threshold=cli.batna_threshold,
+        seed=cli.seed,
+        threshold_scope=cli.threshold_scope,
+        economic_regulation=cli.economic_regulation,
         renderer_name=cli.renderer_name,
         opponent_renderer_name=cli.opponent_renderer_name,
         opponent_max_tokens=cli.opponent_max_tokens,
+        tinker_project_id=cli.tinker_project_id,
     )
 
     config = train.Config(
@@ -727,36 +760,221 @@ def build_config(cli: CLIConfig) -> tuple[train.Config, str]:
     return config, run_name
 
 
-def main(config_path: str = "configs/train.yaml"):
+def derive_seed(seed: int, *parts) -> int:
+    return int(digest([seed, *parts])[:8], 16) & 0x7fffffff
+
+
+def validate_config(cli):
+    if cli.max_steps is not None and (type(cli.max_steps) is not int or cli.max_steps < 1):
+        raise ValueError("max_steps must be a positive integer or null")
+    if cli.tinker_project_id is not None:
+        from uuid import UUID
+        try:
+            UUID(cli.tinker_project_id)
+        except (ValueError, TypeError, AttributeError) as exc:
+            raise ValueError("tinker_project_id must be a UUID") from exc
+    if cli.run_label is not None and (
+        not isinstance(cli.run_label, str)
+        or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}", cli.run_label)
+    ):
+        raise ValueError("run_label must be 1-64 letters, digits, underscores or hyphens")
+    if type(cli.seed) is not int or not 0 <= cli.seed <= 0x7fffffff:
+        raise ValueError("seed must be an integer in [0, 2147483647]")
+    if cli.threshold_scope not in {"selective", "uniform"}:
+        raise ValueError("threshold_scope must be selective or uniform")
+    if type(cli.economic_regulation) is not bool:
+        raise ValueError("economic_regulation must be a boolean")
+    if not math.isfinite(cli.batna_threshold) or not 0 <= cli.batna_threshold <= 1:
+        raise ValueError("batna_threshold must be in [0, 1]")
+    for name in ("batch_size", "group_size", "num_epochs", "max_rounds", "max_tokens", "opponent_max_tokens"):
+        if type(getattr(cli, name)) is not int or getattr(cli, name) < 1:
+            raise ValueError(f"{name} must be a positive integer")
+    if cli.group_size < 2:
+        raise ValueError("GRPO requires at least two trajectories per group")
+    if cli.resume_run and (Path(cli.resume_run).name != cli.resume_run or cli.load_checkpoint_path):
+        raise ValueError("resume_run must be a run name and cannot accompany load_checkpoint_path")
+    # Fail before any service clients are opened.
+    load_all_scenarios(_parse_datasets_str(cli.datasets), seed=derive_seed(cli.seed, "data"))
+
+
+def load_config(config_path, *, seed=None):
+    import yaml
+    cfg = yaml.safe_load(Path(config_path).read_text())
+    if not isinstance(cfg, dict):
+        raise ValueError("Training config must be a mapping")
+    unknown = set(cfg) - set(chz.chz_fields(CLIConfig))
+    if unknown:
+        raise ValueError(f"Unknown training settings: {sorted(unknown)}")
+    if isinstance(cfg.get("datasets"), list):
+        parts = []
+        for ds in cfg["datasets"]:
+            if isinstance(ds, dict):
+                if set(ds) - {"name", "data_path", "weight"}:
+                    raise ValueError("Unknown dataset setting")
+                name = ds["name"]
+                path = ds["data_path"] if "data_path" in ds else _default_path(name)
+                parts.append(f"{name}:{path}:{ds.get('weight', 1.0)}")
+            else:
+                parts.append(ds)
+        cfg["datasets"] = ",".join(parts)
+    if seed is not None:
+        cfg["seed"] = seed
+    # Record the SDK's environment fallback in the manifest as a resolved setting.
+    if cfg.get("tinker_project_id") is None:
+        cfg["tinker_project_id"] = os.environ.get("TINKER_PROJECT_ID") or None
+    cli = CLIConfig(**cfg)
+    validate_config(cli)
+    return cli
+
+
+def save_run_manifest(cli, config):
+    """Pin config and training pool; refuse incompatible or legacy resumes."""
+    import importlib.metadata
+    import platform
+    resolved = {name: getattr(cli, name) for name in chz.chz_fields(CLIConfig)}
+    resolved.pop("resume_run")
+    resolved.pop("behavior_if_log_dir_exists")
+    specs = _parse_datasets_str(cli.datasets)
+    pools = {ds["name"]: digest([serialize_scenario(ds["name"], sc)
+             for sc in get_env(ds["name"]).load_scenarios(ds["data_path"])]) for ds in specs}
+    modules = ["src/train.py", "src/tinker_tracking.py", "src/envs.py", "src/protocol.py", "src/prompts.py", "src/scenarios.py", "src/craigslist_data.py"]
+    source_hashes = {p: digest(Path(p).read_text()) for p in modules}
+    manifest = {
+        "protocol_version": PROTOCOL_VERSION,
+        "schema_version": 1, "python_version": platform.python_version(), "config": resolved, "training_pool_hashes": pools,
+        "source_hashes": source_hashes,
+        "packages": {p: importlib.metadata.version(p) for p in ["tinker", "tinker-cookbook", "torch", "chz"]},
+        "seed_controls": ["dataset_resampling", "dataset_order", "group_roles"],
+        "uncontrolled_randomness": ["server_lora_initialization", "learner_sampling", "opponent_sampling"],
+        "note": "Independent run seed, not a guarantee of bitwise deterministic remote training.",
+    }
+    directory = Path(config.log_path)
+    path = directory / "training_manifest.json"
+    if cli.resume_run:
+        if not path.exists() or json.loads(path.read_text()) != manifest:
+            raise ValueError("Resume requires an identical revision training manifest; use a fresh run otherwise")
+    else:
+        directory.mkdir(parents=True, exist_ok=True)
+        if path.exists():
+            raise ValueError("Training manifest already exists")
+        path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
+def plan_execution(cli, config, run_steps=None):
+    """Resolve a launch boundary without changing the declared experiment budget."""
+    if run_steps is not None and (type(run_steps) is not int or run_steps < 1):
+        raise ValueError("run_steps must be a positive integer")
+    scenarios = load_all_scenarios(
+        _parse_datasets_str(cli.datasets), seed=derive_seed(cli.seed, "data")
+    )
+    available_steps = len(scenarios) * cli.num_epochs // cli.batch_size
+    total_steps = min(cli.max_steps, available_steps) if cli.max_steps is not None else available_steps
+    if total_steps < 1:
+        raise ValueError("Training pool is too small for one batch")
+    checkpoint = checkpoint_utils.get_last_checkpoint(config.log_path) if cli.resume_run else None
+    if cli.resume_run and (checkpoint is None or not checkpoint.state_path):
+        raise ValueError("Resume requires a saved training-state checkpoint; none was found")
+    start = checkpoint.batch if checkpoint else 0
+    if type(start) is not int or not 0 <= start <= total_steps:
+        raise ValueError("Saved checkpoint has an invalid batch position for this training budget")
+    end = min(start + run_steps, total_steps) if run_steps is not None else total_steps
+    return {
+        "start_step": start,
+        "end_step": end,
+        "steps_this_launch": end - start,
+        "total_steps": total_steps,
+        "requested_run_steps": run_steps,
+        "resume_checkpoint": checkpoint.state_path if checkpoint else None,
+    }
+
+
+def record_execution(log_path, plan, status, **extra):
+    """Keep launch boundaries separate from the immutable training manifest."""
+    from datetime import datetime, timezone
+
+    record = {"recorded_at": datetime.now(timezone.utc).isoformat(), **plan, "status": status, **extra}
+    with (Path(log_path) / "executions.jsonl").open("a") as file:
+        file.write(json.dumps(record) + "\n")
+
+
+def main(config_path: str = "configs/train.yaml", *, seed: int | None = None,
+         dry_run: bool = False, run_steps: int | None = None,
+         resume_run: str | None = None):
     """CLI entry point for negotiation training.
 
     Args:
         config_path: Path to YAML training config.
     """
-    import yaml
-
-    with open(config_path) as f:
-        cfg = yaml.safe_load(f)
-
-    if "datasets" in cfg and isinstance(cfg["datasets"], list):
-        parts = []
-        for ds in cfg["datasets"]:
-            if isinstance(ds, dict):
-                name = ds["name"]
-                path = ds.get("data_path", _default_path(name))
-                weight = ds.get("weight", 1.0)
-                parts.append(f"{name}:{path}:{weight}")
-            else:
-                parts.append(ds)
-        cfg["datasets"] = ",".join(parts)
-
-    cfg.pop("csv_path", None)
-    cfg.pop("eval_csv_path", None)
-
-    cli = CLIConfig(**{k: v for k, v in cfg.items() if hasattr(CLIConfig, k)})
+    cli = load_config(config_path, seed=seed)
+    if resume_run is not None:
+        cli = chz.replace(cli, resume_run=resume_run)
     config, run_name = build_config(cli)
+    plan = plan_execution(cli, config, run_steps)
+    if cli.resume_run:
+        # Read-only for resumed runs: enforce the full-budget manifest even in
+        # dry-run mode, before any clients, files, or remote jobs are created.
+        save_run_manifest(cli, config)
+    if dry_run:
+        print(json.dumps({name: getattr(cli, name) for name in chz.chz_fields(CLIConfig)}, indent=2))
+        print(json.dumps({"execution": plan}, indent=2))
+        print("Configuration and training data validated; no API clients or training jobs created.")
+        return
+    if not plan["steps_this_launch"]:
+        print(f"Run {run_name} is already complete at step {plan['total_steps']}; no training launched.")
+        return
     if not cli.resume_run:
         cli_utils.check_log_dir(
             config.log_path, behavior_if_exists=cli.behavior_if_log_dir_exists
         )
-    asyncio.run(train.main(config))
+        save_run_manifest(cli, config)
+    # Cookbook saves weights AND optimizer state at its execution endpoint.
+    # Only this invocation's config is capped; the manifest retains max_steps.
+    runtime_config = chz.replace(config, max_steps=plan["end_step"])
+    record_execution(config.log_path, plan, "started")
+    print(f"Run: {run_name}; training steps {plan['start_step']} -> {plan['end_step']} "
+          f"of {plan['total_steps']} total.", flush=True)
+    # Cookbook constructs the learner ServiceClient internally. Its SDK reads
+    # this variable; the opponent receives the same project explicitly above.
+    previous_project = os.environ.get("TINKER_PROJECT_ID")
+    try:
+        if cli.tinker_project_id:
+            os.environ["TINKER_PROJECT_ID"] = cli.tinker_project_id
+        with track_tinker_sessions(
+            train,
+            log_path=config.log_path,
+            project_id=cli.tinker_project_id,
+            metadata={
+                "run_name": run_name,
+                "recipe_name": cli.recipe_name,
+                "condition": "surplus" if cli.batna_threshold == 0 else cli.threshold_scope,
+                "seed": str(cli.seed),
+                "threshold_scope": cli.threshold_scope,
+                "batna_threshold": str(cli.batna_threshold),
+                "economic_regulation": str(cli.economic_regulation).lower(),
+                "total_steps": str(plan["total_steps"]),
+                "segment_start_step": str(plan["start_step"]),
+                "segment_end_step": str(plan["end_step"]),
+            },
+            wandb_enabled=bool(cli.wandb_project),
+        ):
+            asyncio.run(train.main(runtime_config))
+        checkpoint = checkpoint_utils.get_last_checkpoint(config.log_path)
+        if run_steps is not None or cli.resume_run:
+            if checkpoint is None or checkpoint.batch != plan["end_step"] or not checkpoint.state_path:
+                raise RuntimeError("Training returned without the expected resumable endpoint checkpoint")
+        status = "paused" if plan["end_step"] < plan["total_steps"] else "completed"
+        record_execution(config.log_path, plan, status,
+                         checkpoint=checkpoint.to_dict() if checkpoint else None)
+        print(f"Run {status} at step {plan['end_step']} of {plan['total_steps']}.")
+        if status == "paused":
+            print(f"Resume with: uv run python main.py train --config {config_path} "
+                  f"--seed {cli.seed} --resume-run {run_name}")
+    except BaseException as exc:
+        record_execution(config.log_path, plan, "interrupted" if isinstance(exc, KeyboardInterrupt) else "failed",
+                         error_type=type(exc).__name__)
+        raise
+    finally:
+        if previous_project is None:
+            os.environ.pop("TINKER_PROJECT_ID", None)
+        else:
+            os.environ["TINKER_PROJECT_ID"] = previous_project

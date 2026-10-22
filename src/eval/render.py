@@ -188,6 +188,10 @@ def _render_episode(ep: dict, idx: int) -> str:
                 )
 
             if not format_ok:
+                if msg.get("format_error"):
+                    parts.append(
+                        f'<div class="field">Format error: {_esc(msg["format_error"])}</div>'
+                    )
                 parts.append(
                     '<details class="raw-details"><summary class="raw-summary">Raw output</summary>'
                     f'<pre class="raw-output">{_esc(content)}</pre>'

@@ -216,6 +216,7 @@ class TinkerGenerator:
         model_path: str,
         max_tokens: int = 512,
         renderer_name: str | None = None,
+        project_id: str | None = None,
     ):
         import tinker
         from tinker_cookbook import model_info
@@ -223,7 +224,7 @@ class TinkerGenerator:
         from tinker_cookbook.tokenizer_utils import get_tokenizer
 
         _install_tinker_telemetry_filter()
-        service = tinker.ServiceClient()
+        service = tinker.ServiceClient(project_id=project_id)
         if model_path.startswith("tinker://"):
             self._sampler = service.create_sampling_client(model_path=model_path)
             base_model = self._sampler.get_base_model()
@@ -275,6 +276,7 @@ def make_generator(
     agent_cfg: dict,
     default_base_url: str = OPENAI_BASE_URL,
     default_api_key_env: str = "OPENAI_API_KEY",
+    default_tinker_project_id: str | None = None,
 ) -> APIGenerator | TinkerGenerator:
     """Build a generator from a matchup agent config block.
 
@@ -286,12 +288,18 @@ def make_generator(
     use_tinker = model.startswith("tinker://") or agent_cfg.get("provider") == "tinker"
     if use_tinker:
         renderer_name = agent_cfg.get("renderer_name")
-        cache_key = f"{model}|{renderer_name}"
+        project_id = (
+            agent_cfg.get("tinker_project_id")
+            or default_tinker_project_id
+            or os.getenv("TINKER_PROJECT_ID")
+        )
+        cache_key = f"{model}|{renderer_name}|{project_id}"
         if cache_key not in _tinker_cache:
             _tinker_cache[cache_key] = TinkerGenerator(
                 model_path=model,
                 max_tokens=agent_cfg.get("max_tokens", 512),
                 renderer_name=renderer_name,
+                project_id=project_id,
             )
         return _tinker_cache[cache_key]
 
