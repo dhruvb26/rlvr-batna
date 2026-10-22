@@ -1,187 +1,543 @@
+# CONSOLIDATED EVALUATION CONFIG — exactly one active learner/opponent matchup.
+# Active: completed Surplus seed43 step80 vs direct-OpenAI GPT-5.4, regulation ON,
+# five main manifests (517 episodes). Nested baseline scores need no extra calls.
+#   uv run --locked python main.py eval --config configs/eval.yaml
+# This is paid inference. Editing this file never starts a job automatically.
+#
+# SWITCHING RUNS:
+# 1. Comment out the active matchups block and uncomment ONE eval_runs block below.
+#    Each block replaces the whole matchups list; keep common top-level settings.
+# 2. For another opponent, replace that matchup's opponent mapping using the
+#    opponent blocks below. Use the documented token cap and provider route.
+# 3. For regulation sensitivity, replace the datasets/settings with the price
+#    baseline block; use only the learners and guard mode listed in the run matrix.
+# 4. Change storage_dir to describe the selected run. No automatic matrix expansion
+#    or custom profile loader is used. Do not leave duplicate top-level YAML keys.
+# Evaluation seed always stays 42; training seeds belong to the saved learners.
+
 datasets:
-  - ji
-  - dnd
-  # - name: amazon
-  #   data_path: data/ahp/test
-  - casino
-  - craigslist
-
+  - name: amazon
+    data_path: data/ahp/test
+    manifest_path: data/evaluation_manifests/revision/main/amazon.json
+    comparison_manifest_path: data/evaluation_manifests/revision/baseline/amazon.json
+  - name: casino
+    manifest_path: data/evaluation_manifests/revision/main/casino.json
+    comparison_manifest_path: data/evaluation_manifests/revision/baseline/casino.json
+    data_path: data/casino/ca.test.csv
+  - name: dnd
+    manifest_path: data/evaluation_manifests/revision/main/dnd.json
+    comparison_manifest_path: data/evaluation_manifests/revision/baseline/dnd.json
+    data_path: data/dnd/dnd.test.csv
+  - name: craigslist
+    data_path: data/craigslist/revision/test.json
+    manifest_path: data/evaluation_manifests/revision/main/craigslist.json
+    comparison_manifest_path: data/evaluation_manifests/revision/baseline/craigslist.json
+  - name: ji
+    manifest_path: data/evaluation_manifests/revision/main/ji.json
+    comparison_manifest_path: data/evaluation_manifests/revision/baseline/ji.json
+    data_path: data/ji/ji.test.json
 num_episodes: 100
+repeats: 1
 max_turns: 12
-max_concurrent: 16
+max_concurrent: 4
 temperature: 0.7
+top_p: 1.0
 seed: 42
-
-storage_dir: ./logs/eval
-
-# change opponent to the following for gpt-5.4
-# opponent:
-#       label: gpt-5.4
-#       base_url: https://openrouter.ai/api/v1
-#       api_key_env: OPENROUTER_API_KEY
-#       model: openai/gpt-5.4
-#       max_tokens: 512
-
-# tinker://3d768427-d10a-56e3-a826-d21a281904d8:train:0/sampler_weights/final - multi-item threshold agent
-# - learner:
-#       label: qwen3.6-35b-a3b-batna-multiitem
-#       model: tinker://3d768427-d10a-56e3-a826-d21a281904d8:train:0/sampler_weights/final
-#       renderer_name: qwen3_5_disable_thinking
-#       max_tokens: 512
-
+economic_regulation: true
+storage_dir: ./logs/eval/revision/surplus-seed43-gpt54-openai
 matchups:
-  - learner: 
-      label: qwen3-30b-a3b-instruct-2507-surplus
-      base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
-      api_key_env: TINKER_API_KEY
-      model: tinker://426c15f8-0db9-5010-879c-89b347d5f2a0:train:0/sampler_weights/final
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-
-  - learner: 
-      label: qwen3-30b-a3b-instruct-2507-batna
-      base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
-      api_key_env: TINKER_API_KEY
-      model: tinker://e9eedaf2-b5af-5b1b-975f-ac96e8e8b666:train:0/sampler_weights/final
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-  
   - learner:
-      label: qwen3.6-35b-a3b
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3.6-35b-a3b
+      label: qwen3.6-35b-a3b-surplus-temp1-seed43-step80
+      provider: tinker
+      model: tinker://aeea1a21-00dd-573f-8fd2-f987a881faa8:train:0/sampler_weights/final
+      renderer_name: qwen3_5_disable_thinking
       max_tokens: 512
     opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-    
-  - learner:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-
-  - learner:
-      label: qwen3-30b-a3b-thinking-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-thinking-2507
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-
-  - learner:
-      label: qwen3-235b-a22b-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-235b-a22b-2507
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-  
-  - learner:
-      label: qwen3-235b-a22b-thinking-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-235b-a22b-thinking-2507
-      max_tokens: 2048
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-  
-  - learner:
-      label: gpt-5.4
+      label: gpt-5.4-openai
       base_url: https://api.openai.com/v1
       api_key_env: OPENAI_API_KEY
       model: gpt-5.4
       max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-    
-  - learner:
-      label: gpt-5.4-mini
-      base_url: https://api.openai.com/v1
-      api_key_env: OPENAI_API_KEY
-      model: gpt-5.4-mini
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-    
-  - learner:
-      label: kimi-k2-thinking
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: moonshotai/kimi-k2-thinking
-      max_tokens: 2048
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-  
-  - learner:
-      label: llama-4-maverick
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-4-maverick
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
-  
-  - learner:
-      label: deepseek-chat-v3.1
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: deepseek/deepseek-chat-v3.1
-      max_tokens: 512
-    opponent:
-      label: qwen3-30b-a3b-instruct-2507
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY
-      model: qwen/qwen3-30b-a3b-instruct-2507
-      max_tokens: 512
+tinker_project_id: 0f0bd816-b353-44c0-8faf-356f84ef16d0
+
+# selective-tau0.2-seed42: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.2-seed42
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.2-temp1-seed42-step80
+#       provider: tinker
+#       model: tinker://e2dbcb20-0238-5fe1-baa7-5cf2f1c85b10:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.2-seed42
+
+# selective-tau0.2-seed43: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.2-seed43
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.2-temp1-seed43-step80
+#       provider: tinker
+#       model: tinker://617c02f1-d427-5ef7-8be5-7db278430f14:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.2-seed43
+
+# selective-tau0.2-seed44: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.2-seed44
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.2-temp1-seed44-step80
+#       provider: tinker
+#       model: tinker://6a4065cd-7937-57b0-95c5-d4da7494be8d:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.2-seed44
+
+# selective-tau0.4-seed42: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.4-seed42
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80
+#       provider: tinker
+#       model: tinker://78f1db17-4aed-535d-a16f-d135985b7163:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.4-seed42
+
+# selective-tau0.4-seed43: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.4-seed43
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80
+#       provider: tinker
+#       model: tinker://60551c3b-63e4-5dd8-abf6-23ee8ca6250c:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.4-seed43
+
+# selective-tau0.4-seed44: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.4-seed44
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80
+#       provider: tinker
+#       model: tinker://700ef41b-f031-539f-8019-9fa4e82bc6ed:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.4-seed44
+
+# selective-tau0.6-seed42: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.6-seed42
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.6-temp1-seed42-step80
+#       provider: tinker
+#       model: tinker://03a18a56-b3dd-5219-8807-94c945740901:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.6-seed42
+
+# selective-tau0.6-seed43: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.6-seed43
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.6-temp1-seed43-step80
+#       provider: tinker
+#       model: tinker://49bf78e6-a499-53b2-a6f4-d5327e5610f4:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.6-seed43
+
+# selective-tau0.6-seed44: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:selective-tau0.6-seed44
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-selective-tau0.6-temp1-seed44-step80
+#       provider: tinker
+#       model: tinker://e93b9435-b2b3-5f62-b61a-d2344405b27d:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:selective-tau0.6-seed44
+
+# surplus-tau0-seed42: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:surplus-tau0-seed42
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-surplus-temp1-seed42-step80
+#       provider: tinker
+#       model: tinker://0a009552-f2e7-539a-9473-1f6f9aad7ab5:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:surplus-tau0-seed42
+
+# surplus-tau0-seed43: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:surplus-tau0-seed43
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-surplus-temp1-seed43-step80
+#       provider: tinker
+#       model: tinker://aeea1a21-00dd-573f-8fd2-f987a881faa8:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:surplus-tau0-seed43
+
+# surplus-tau0-seed44: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:surplus-tau0-seed44
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-surplus-temp1-seed44-step80
+#       provider: tinker
+#       model: tinker://0c6c47f5-cc0a-51fd-b9a0-dafd720d0f45:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:surplus-tau0-seed44
+
+# uniform-tau0.4-seed42: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:uniform-tau0.4-seed42
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80
+#       provider: tinker
+#       model: tinker://a337075b-e85d-5269-ae81-ddaca2686594:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:uniform-tau0.4-seed42
+
+# uniform-tau0.4-seed43: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:uniform-tau0.4-seed43
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80
+#       provider: tinker
+#       model: tinker://068ec22b-7fa9-5a07-9b23-4fef886babcd:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:uniform-tau0.4-seed43
+
+# uniform-tau0.4-seed44: recorded final step80 sampler checkpoint.
+# GPT-5.4 direct OpenAI is shown; use the matrix below to select other completed opponents.
+# BEGIN eval_runs:uniform-tau0.4-seed44
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80
+#       provider: tinker
+#       model: tinker://c2ce555e-c4bd-56be-a8c0-a6b287f79242:train:0/sampler_weights/final
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:uniform-tau0.4-seed44
+
+# UNTRAINED BASELINE: native Tinker Qwen3.6, non-thinking, vs GPT-5.4 direct.
+# One base evaluation on all 517 scenarios; no training-seed averaging.
+# BEGIN eval_runs:untrained-base
+# matchups:
+#   - learner:
+#       label: qwen3.6-35b-a3b-untrained-nonthinking
+#       provider: tinker
+#       model: Qwen/Qwen3.6-35B-A3B
+#       renderer_name: qwen3_5_disable_thinking
+#       max_tokens: 512
+#     opponent:
+#       label: gpt-5.4-openai
+#       base_url: https://api.openai.com/v1
+#       api_key_env: OPENAI_API_KEY
+#       model: gpt-5.4
+#       max_tokens: 512
+# END eval_runs:untrained-base
+
+# OPPONENT REPLACEMENTS — replace only the active matchup's opponent mapping.
+# Caps differ between opponents but stay fixed across learners within a comparison.
+# Do not infer that a thinking-model cap is a per-turn visible-dialogue budget.
+# Checkpoint access uses the configured Tinker project; keys stay in environment variables.
+
+# gpt54-openai: exact route/model/cap from eval-surplus-seed43-gpt54-openai.yaml.
+# BEGIN opponents:gpt54-openai
+# opponent:
+#   label: gpt-5.4-openai
+#   base_url: https://api.openai.com/v1
+#   api_key_env: OPENAI_API_KEY
+#   model: gpt-5.4
+#   max_tokens: 512
+# END opponents:gpt54-openai
+
+# gpt54-openrouter-historical: exact route/model/cap from eval-surplus-gpt54.yaml.
+# BEGIN opponents:gpt54-openrouter-historical
+# opponent:
+#   label: gpt-5.4
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: openai/gpt-5.4
+#   max_tokens: 512
+# END opponents:gpt54-openrouter-historical
+
+# gpt54-mini-openai: exact route/model/cap from gpt-5.4-mini.yaml.
+# BEGIN opponents:gpt54-mini-openai
+# opponent:
+#   label: gpt-5.4-mini
+#   base_url: https://api.openai.com/v1
+#   api_key_env: OPENAI_API_KEY
+#   model: gpt-5.4-mini
+#   max_tokens: 512
+# END opponents:gpt54-mini-openai
+
+# qwen36-tinker: exact route/model/cap from qwen3.6-35b-a3b.yaml.
+# BEGIN opponents:qwen36-tinker
+# opponent:
+#   label: qwen3.6-35b-a3b-tinker-nonthinking
+#   provider: tinker
+#   model: Qwen/Qwen3.6-35B-A3B
+#   renderer_name: qwen3_5_disable_thinking
+#   max_tokens: 512
+# END opponents:qwen36-tinker
+
+# qwen30-instruct: exact route/model/cap from qwen3-30b-a3b-instruct-2507.yaml.
+# BEGIN opponents:qwen30-instruct
+# opponent:
+#   label: qwen3-30b-a3b-instruct-2507
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: qwen/qwen3-30b-a3b-instruct-2507
+#   max_tokens: 512
+# END opponents:qwen30-instruct
+
+# qwen30-thinking: exact route/model/cap from qwen3-30b-a3b-thinking-2507.yaml.
+# BEGIN opponents:qwen30-thinking
+# opponent:
+#   label: qwen3-30b-a3b-thinking-2507
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: qwen/qwen3-30b-a3b-thinking-2507
+#   max_tokens: 512
+# END opponents:qwen30-thinking
+
+# qwen235-instruct: exact route/model/cap from qwen3-235b-a22b-2507.yaml.
+# BEGIN opponents:qwen235-instruct
+# opponent:
+#   label: qwen3-235b-a22b-2507
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: qwen/qwen3-235b-a22b-2507
+#   max_tokens: 512
+# END opponents:qwen235-instruct
+
+# qwen235-thinking: exact route/model/cap from qwen3-235b-a22b-thinking-2507.yaml.
+# BEGIN opponents:qwen235-thinking
+# opponent:
+#   label: qwen3-235b-a22b-thinking-2507
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: qwen/qwen3-235b-a22b-thinking-2507
+#   max_tokens: 2048
+# END opponents:qwen235-thinking
+
+# llama4-maverick: exact route/model/cap from llama-4-maverick.yaml.
+# BEGIN opponents:llama4-maverick
+# opponent:
+#   label: llama-4-maverick
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: meta-llama/llama-4-maverick
+#   max_tokens: 512
+# END opponents:llama4-maverick
+
+# kimi-k2-thinking: exact route/model/cap from kimi-k2-thinking.yaml.
+# BEGIN opponents:kimi-k2-thinking
+# opponent:
+#   label: kimi-k2-thinking
+#   base_url: https://openrouter.ai/api/v1
+#   api_key_env: OPENROUTER_API_KEY
+#   model: moonshotai/kimi-k2-thinking
+#   max_tokens: 2048
+# END opponents:kimi-k2-thinking
+
+# REGULATION OFF: Amazon50 + Craigslist50, one selected learner at a time.
+# Use Surplus and Selective .4, seeds42/43/44, vs direct OpenAI GPT-5.4.
+# Six matchups x 100 episodes = 600. Domain/protocol validation stays enabled.
+# BEGIN panels:price-regulation-off
+# datasets:
+#   - name: amazon
+#     data_path: data/ahp/test
+#     manifest_path: data/evaluation_manifests/revision/baseline/amazon.json
+#     comparison_manifest_path: data/evaluation_manifests/revision/baseline/amazon.json
+#   - name: craigslist
+#     data_path: data/craigslist/revision/test.json
+#     manifest_path: data/evaluation_manifests/revision/baseline/craigslist.json
+#     comparison_manifest_path: data/evaluation_manifests/revision/baseline/craigslist.json
+# num_episodes: 50
+# repeats: 1
+# max_turns: 12
+# max_concurrent: 4
+# temperature: 0.7
+# top_p: 1.0
+# seed: 42
+# economic_regulation: false
+# storage_dir: ./logs/eval/regulation-off-gpt54-price
+# END panels:price-regulation-off
+
+# MATCHED ON CONTROLS: use Surplus/Selective .4 seed42 only, direct OpenAI GPT-5.4.
+# Two matchups x 100 = 200 fresh episodes. Reuse main v3/direct-OpenAI seed43/44
+# guarded episodes on this same subset; do not count them as additional observations.
+# BEGIN panels:price-regulation-on-controls
+# datasets:
+#   - name: amazon
+#     data_path: data/ahp/test
+#     manifest_path: data/evaluation_manifests/revision/baseline/amazon.json
+#     comparison_manifest_path: data/evaluation_manifests/revision/baseline/amazon.json
+#   - name: craigslist
+#     data_path: data/craigslist/revision/test.json
+#     manifest_path: data/evaluation_manifests/revision/baseline/craigslist.json
+#     comparison_manifest_path: data/evaluation_manifests/revision/baseline/craigslist.json
+# num_episodes: 50
+# repeats: 1
+# max_turns: 12
+# max_concurrent: 4
+# temperature: 0.7
+# top_p: 1.0
+# seed: 42
+# economic_regulation: true
+# storage_dir: ./logs/eval/regulation-on-seed42-gpt54-price
+# END panels:price-regulation-on-controls
+
+# COMPLETED RUN MATRIX (15 trained learners, nine opponent models).
+# MAIN: Surplus, Selective .4, Uniform .4 x seeds42/43/44 x all nine opponents.
+#   81 learner/opponent combinations x 517 = 41,877 episodes.
+# TAU .6: Selective .6 x seeds42/43/44 x GPT-5.4, GPT-5.4-mini, Qwen3.6 Tinker.
+#   9 combinations x 517 = 4,653 episodes.
+# TAU .2: Selective .2 x seeds42/43/44 x those same three opponents.
+#   9 combinations x 517 = 4,653 episodes.
+# BASE: untrained Qwen3.6 Tinker vs GPT-5.4 direct, 517 episodes.
+# REGULATION OFF: Surplus + Selective .4 x all three seeds, price baseline, 600.
+# MATCHED ON: Surplus + Selective .4 seed42, price baseline, 200 fresh episodes.
+# TOTAL: 52,500 unique completed revision evaluation episodes.
+#
+# HISTORICAL ROUTE / PROTOCOL QUALIFICATIONS:
+# - Original GPT-5.4 Surplus/Selective .4 seed42 main runs used OpenRouter and v2.
+#   All other retained GPT-5.4 main/sweep runs use direct OpenAI; Uniform seed42
+#   was already v3. Fresh seed42 price controls use direct OpenAI/current parser.
+# - Seed42 Surplus/Selective .4/Uniform training used v2; later training used v3.
+# - Current source executes v3 + turn-limit evaluation. YAML cannot restore old
+#   parsing or the removed repeated-offer termination. Earlier comparisons and
+#   old configs are provenance, not interchangeable replications of current runs.
+# - Qwen3.6 is native Tinker with thinking disabled, not an OpenRouter replacement.
+# - Kimi's authoritative matrix retains original 2048-cap episodes and fills only
+#   missing cells. Continuations/recovery copies are not separate experiments.
+#   The canceled 8192-cap run is excluded. DeepSeek was prepared, not in this matrix.
+# - Multi-only step40/step80 configs are planned and have no bound checkpoints yet;
+#   they are not part of completed coverage. Their originals are archived locally.
+#
+# FROZEN PANELS: main = Amazon93/CaSiNo124/DnD100/Craigslist100/JI100.
+# Baseline = 50 per dataset, assignments inherited from main. For a smaller full
+# baseline run, change every manifest_path /main/ to /baseline/; comparison paths
+# already use baseline. The price experiment uses only its two baseline datasets.
+# Do not regenerate schedules to select a favorable test sample.
+#
+# OFFLINE REPORTS / RETRIES:
+#   uv run --locked python main.py eval --score-only logs/eval/RUN_DIRECTORY_NAME
+#   uv run --locked python main.py eval --config configs/eval.yaml --retry logs/eval/RUN_DIRECTORY_NAME
+# For retries, first select the saved run's original learner/opponent labels and
+# settings in this file. The CLI retries execution failures, not invalid model turns.
+# Historical protocol-mismatched runs cannot be retried under current source.
+# No paid calls were made to consolidate these recipes.

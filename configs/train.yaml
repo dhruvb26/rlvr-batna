@@ -1,5 +1,27 @@
-model_name: Qwen/Qwen3-30B-A3B-Instruct-2507
+# CONSOLIDATED TRAINING CONFIG — one active run, alternatives commented below.
+# Active: fresh Surplus, seed 42, all four training datasets, 80 updates.
+# Run from the repository root. The dry run below makes no model calls:
+#   uv run --locked python main.py train --config configs/train.yaml --dry-run
+# Remove --dry-run to launch training. This file does not launch a sweep.
+#
+# To use an alternative, replace the corresponding active keys with its commented
+# values; do not leave duplicate YAML keys. Unmentioned settings stay unchanged.
+# All five completed conditions used the same shared settings below.
+# Training seeds 42/43/44 are independent runs; pass --seed to avoid per-seed files.
+# Seeded data/order/roles are reproducible locally; remote sampling is stochastic.
+# Historical source/protocol/dependency versions remain in the saved run manifests;
+# these recipes do not recreate retired models or undo v2/v3 differences.
 
+model_name: Qwen/Qwen3.6-35B-A3B
+renderer_name: qwen3_5_disable_thinking
+opponent_renderer_name: qwen3_5_disable_thinking
+recipe_name: rlvr_batna_revision
+run_label: ijpr
+tinker_project_id: 0f0bd816-b353-44c0-8faf-356f84ef16d0
+seed: 42
+threshold_scope: selective
+batna_threshold: 0.0
+economic_regulation: true
 datasets:
   - name: casino
     data_path: data/casino/ca.train.csv
@@ -11,51 +33,114 @@ datasets:
     data_path: data/ahp/train
     weight: 0.25
   - name: craigslist
-    data_path: data/craigslist/train.json
+    data_path: data/craigslist/revision/train.json
     weight: 0.25
-
 num_epochs: 1
 max_steps: 80
 batch_size: 64
 group_size: 8
 max_rounds: 6
 max_tokens: 512
-
-learning_rate: 3.0e-5
-lora_rank: 32
+opponent_max_tokens: 512
+train_temperature: 1.0
 opponent_temperature: 0.7
+learning_rate: 3.0e-05
+lora_rank: 32
 kl_penalty_coef: 0.0
-batna_threshold: 0.0
-
 save_every: 10
 eval_every: 0
+resume_run: null
+load_checkpoint_path: null
+wandb_project: rlvr-batna-maj-revision
 
-resume_run: run-20260509-115751 # surplus-training and run-20260509-142749 is threshold-training
-wandb_project: rlvr-batna
+# COMPLETED MAIN MATRIX: five conditions x seeds 42/43/44 = 15 runs.
+# Each retained lineage has 80 updates x 64 groups x 8 trajectories = 40,960 episodes.
+# For EACH condition, use its field replacement, then launch separately:
+#   uv run --locked python main.py train --config configs/train.yaml --seed 42
+#   uv run --locked python main.py train --config configs/train.yaml --seed 43
+#   uv run --locked python main.py train --config configs/train.yaml --seed 44
+# Start each independent run with both resume fields null. JI stays held out.
 
-# Transfer-mechanism ablation (rebuttal): train the threshold agent on
-# multi-item tasks ONLY (CaSiNo + DnD), then evaluate on the price tasks
-# (AHP, CRA) it never saw. If walk-away tolerance transfers as aggressive
-# anchoring, first-bid ratio on price tasks should drop well below the
-# untrained base model (~0.8).
-#
-# Base model: Qwen3.6-35B-A3B (official Tinker replacement for the retired
-# Qwen3-30B-A3B-Instruct-2507). Non-thinking learner AND opponent, matching the
-# paper's non-thinking Instruct setup as closely as the hybrid replacement
-# allows. Note: standalone sampling put first-turn format violations at ~50% on
-# DnD (the model reasons inside Thought: and can drop Talk:); temp 0.7 keeps
-# generations from rambling/truncating without hurting compliance. Format
-# violations are penalized (-1.0) while good deals earn positive reward, so the
-# full-batch GRPO signal should push the policy toward format compliance over
-# training. Watch env/all/outcome_format_violation over the first ~15-20 steps.
+# Surplus baseline: threshold inactive on every dataset (the active condition).
+# BEGIN train:surplus
+# threshold_scope: selective
+# batna_threshold: 0.0
+# END train:surplus
 
-# model_name: Qwen/Qwen3.6-35B-A3B
-# renderer_name: qwen3_5_disable_thinking
-# opponent_renderer_name: qwen3_5_disable_thinking
-# opponent_max_tokens: 512
+# Selective treatment: threshold on CaSiNo/DnD; surplus on Amazon/Craigslist.
+# BEGIN train:selective-0.4
+# threshold_scope: selective
+# batna_threshold: 0.4
+# END train:selective-0.4
+
+# Uniform ablation: threshold on all four training datasets.
+# BEGIN train:uniform-0.4
+# threshold_scope: uniform
+# batna_threshold: 0.4
+# END train:uniform-0.4
+
+# Lower trained threshold: same selective scope and budget.
+# BEGIN train:selective-0.2
+# threshold_scope: selective
+# batna_threshold: 0.2
+# END train:selective-0.2
+
+# Higher trained threshold: same selective scope and budget.
+# BEGIN train:selective-0.6
+# threshold_scope: selective
+# batna_threshold: 0.6
+# END train:selective-0.6
+
+# PAUSE / RESUME — leave max_steps at the full budget.
+#   uv run --locked python main.py train --config configs/train.yaml --seed 42 --run-steps 5
+#   uv run --locked python main.py train --config configs/train.yaml --seed 42 --resume-run RUN_DIRECTORY_NAME
+# Resume requires the original seed and an identical saved configuration, code,
+# data and dependency manifest. Source cleanup can invalidate historical resumes.
+# Tau .2 seed42 resumed from batch20 in its retained lineage; the default here is fresh.
+# A checkpoint called final can be an early launch endpoint: check batch=80.
+
+# DEVELOPMENT ONLY: 512-token smoke recipe; 2 x 4 x 4 = 32 episodes.
+# Use the active Surplus/seed42 recipe as the base. This is not a paper replicate.
+# The separate balanced protocol pilot schedules/results remain in logs/pilots/.
+# BEGIN train:smoke-512
+# recipe_name: rlvr_batna_revision_smoke
+# run_label: smoke
+# max_steps: 2
+# batch_size: 4
+# group_size: 4
 # train_temperature: 0.7
-# recipe_name: rlvr_batna_multiitem
+# save_every: 1
+# END train:smoke-512
 
+# DEVELOPMENT ONLY: 1024-token smoke recipe; 2 x 4 x 4 = 32 episodes.
+# Use the active Surplus/seed42 recipe as the base. This is not a paper replicate.
+# The separate balanced protocol pilot schedules/results remain in logs/pilots/.
+# BEGIN train:smoke-1024
+# recipe_name: rlvr_batna_revision_smoke
+# run_label: smoke-1024
+# max_steps: 2
+# batch_size: 4
+# group_size: 4
+# max_tokens: 1024
+# opponent_max_tokens: 1024
+# train_temperature: 0.7
+# save_every: 1
+# END train:smoke-1024
+
+# HISTORICAL DIAGNOSTICS — separate from the 15 retained paper runs.
+# The degraded Surplus reference used learner temperature .7 (seed147).
+# The adopted fresh confirmation changes that temperature to 1.0 at LR 3e-5.
+# Optimizer-preserving diagnostic forks from batch10 changed ONLY temperature to
+# 1.0, or ONLY learning rate to 1e-5, and stopped at batch40. Those forks require
+# scripts/fork_training.py and their saved parent/checkpoint metadata; setting
+# load_checkpoint_path or editing this fresh-run YAML is not an equivalent resume.
+# Do not mix diagnostic/smoke runs into the three-seed paper averages.
+
+# PLANNED, NOT RUN: multi-item-only transfer ablation, CaSiNo/DnD at equal weights.
+# Two epochs supply the 80-update budget; one epoch supplies only 43 updates.
+# Seeds 42/43/44; save step40 and step80, then bind their own sampler paths.
+# No trained multi-only checkpoint is claimed by this file.
+# BEGIN train:planned-multi-only
 # datasets:
 #   - name: casino
 #     data_path: data/casino/ca.train.csv
@@ -63,21 +148,8 @@ wandb_project: rlvr-batna
 #   - name: dnd
 #     data_path: data/dnd/dnd.train.csv
 #     weight: 0.5
-
-# num_epochs: 1
-# max_steps: 80
-# batch_size: 64
-# group_size: 8
-# max_rounds: 6
-# max_tokens: 512
-
-# learning_rate: 3.0e-5
-# lora_rank: 32
-# opponent_temperature: 0.7
-# kl_penalty_coef: 0.0
+# num_epochs: 2
+# threshold_scope: selective
 # batna_threshold: 0.4
-
-# save_every: 10
-# eval_every: 0
-
-# wandb_project: rlvr-batna
+# run_label: ijpr-multi-ablation
+# END train:planned-multi-only

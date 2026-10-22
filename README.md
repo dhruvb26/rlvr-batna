@@ -59,57 +59,38 @@ ignored by Git.
 | Regulation controls and intervention evidence | Measure the effect of the opponent safeguard and retain the original and replacement responses for analysis. |
 | Run manifests, checkpointed execution, and session tracking | Detect incompatible resumes and connect local logs, Tinker checkpoints, and W&B histories. |
 
-The config files under `configs/` retain historical experiment settings until
-those recipes are updated separately. Before launching a new experiment, select
-available models, the correct checkpoint/project, repaired data paths, and the
-intended reward and evaluation panel. Historical training runs cannot be resumed
-as revision runs without an identical revision manifest.
+Two consolidated recipes cover the completed experiment matrix:
+[`configs/train.yaml`](configs/train.yaml) and
+[`configs/eval.yaml`](configs/eval.yaml). Each has one active run and documented,
+commented alternatives. Replace the relevant active fields when switching runs;
+these files do not launch sweeps or interpret commented profiles automatically.
+This avoids maintaining separate files for every condition, seed, and opponent.
+
+The original per-run configs are preserved locally under the Git-ignored
+`files/config-archive/2026-10-22/`, with hashes in `archive-index.json`.
+Checkpoint IDs, provider routes, token caps, and historical protocol differences
+are documented in the consolidated files. Historical training resumes still
+require an identical saved manifest; a recipe alone cannot restore old code.
 
 ## Training
 
-Create a local YAML config, for example `files/train-revision.yaml`:
+`configs/train.yaml` defaults to fresh Surplus training, seed 42, with equal
+weights across CaSiNo, DnD, Amazon, and repaired Craigslist data: 80 updates,
+64 groups per update, and 8 trajectories per group (40,960 episodes).
+Commented replacements cover Surplus, Selective thresholds 0.2/0.4/0.6, Uniform
+threshold 0.4, and the two smoke recipes. Each main condition uses seeds 42/43/44.
+The multi-item-only ablation is explicitly marked planned, with no trained
+checkpoint claimed.
 
-```yaml
-model_name: Qwen/Qwen3.6-35B-A3B
-renderer_name: qwen3_5_disable_thinking
-opponent_renderer_name: qwen3_5_disable_thinking
-seed: 42
-threshold_scope: selective
-batna_threshold: 0.0
-economic_regulation: true
-datasets:
-  - {name: casino, data_path: data/casino/ca.train.csv, weight: 0.25}
-  - {name: dnd, data_path: data/dnd/dnd.train.csv, weight: 0.25}
-  - {name: amazon, data_path: data/ahp/train, weight: 0.25}
-  - {name: craigslist, data_path: data/craigslist/revision/train.json, weight: 0.25}
-num_epochs: 1
-max_steps: 80
-batch_size: 64
-group_size: 8
-max_rounds: 6
-max_tokens: 512
-opponent_max_tokens: 512
-train_temperature: 1.0
-opponent_temperature: 0.7
-learning_rate: 3.0e-5
-lora_rank: 32
-kl_penalty_coef: 0.0
-save_every: 10
-eval_every: 0
-resume_run: null
-load_checkpoint_path: null
-wandb_project: rlvr-batna
-```
-
-This is a fresh Surplus example, not a claim that it reproduces every historical
-run. Set `tinker_project_id` to your project UUID when needed; otherwise the
-resolved `TINKER_PROJECT_ID` environment setting or SDK default is used. Optional
-`run_label` prefixes the readable run name.
+Use the recipe directly or copy it into `files/` for local experiments. Set
+`tinker_project_id` to your project UUID; the checked-in recipe records the
+original project. When omitted, the resolved `TINKER_PROJECT_ID` environment
+setting or SDK default is used. Optional `run_label` prefixes the readable name.
 
 Validate configuration and data offline before training:
 
 ```bash
-uv run --locked python main.py train --config files/train-revision.yaml --dry-run
+uv run --locked python main.py train --config configs/train.yaml --dry-run
 ```
 
 To train, omit `--dry-run`. Override `--seed 43` or `--seed 44` for fresh independent
@@ -124,16 +105,16 @@ initialization and both participants' generations remain stochastic.
 | Uniform Threshold | `uniform` | 0.4 |
 
 Selective applies the threshold to CaSiNo/DnD; Uniform also applies it to
-Amazon/Craigslist. Additional threshold values are configurable. JI is rejected
-as a training dataset. Equal dataset weights give equal expected task exposure.
+Amazon/Craigslist. Commented Selective variants also cover thresholds 0.2 and 0.6.
+JI is rejected as a training dataset. Equal dataset weights give equal expected task exposure.
 
 ### Pause, inspect, and resume
 
 Keep the full budget in YAML and limit only the current launch:
 
 ```bash
-uv run --locked python main.py train --config files/train-revision.yaml --run-steps 5
-uv run --locked python main.py train --config files/train-revision.yaml --seed 42 --resume-run RUN_DIRECTORY_NAME
+uv run --locked python main.py train --config configs/train.yaml --run-steps 5
+uv run --locked python main.py train --config configs/train.yaml --seed 42 --resume-run RUN_DIRECTORY_NAME
 ```
 
 The first command trains five updates and saves model and optimizer state. The
@@ -159,10 +140,16 @@ not enable them.
 
 ## Evaluation
 
-Evaluation accepts YAML or TOML. Copy `configs/eval.yaml` to a local config,
-update its learner/opponent settings for the intended providers and checkpoints,
-and select dataset manifests explicitly. For example, this dataset entry runs
-Amazon's main panel and also scores its nested baseline panel:
+Evaluation accepts YAML or TOML. `configs/eval.yaml` defaults to one matchup:
+Surplus seed 43 at step 80 against direct OpenAI GPT-5.4, regulation enabled,
+on all 517 main-panel episodes. Its commented alternatives record all 15 trained
+learners, the untrained baseline, nine opponent models (including the historical
+GPT-5.4 provider route), and regulation sensitivity panels. The run matrix shows
+which combinations were completed. Switch the documented blocks and update
+`storage_dir`, or copy the recipe into `files/` for local experiments.
+
+For example, this dataset entry runs Amazon's main panel and also scores its
+nested baseline panel:
 
 ```yaml
 datasets:
@@ -177,16 +164,16 @@ seed: 42
 economic_regulation: true
 ```
 
-Retain the desired `matchups` from your local config. Agent blocks specify
+Keep one desired `matchups` block active. Agent blocks specify
 `label`, `model`, `max_tokens`, and either API `base_url`/`api_key_env` or
 `provider: tinker` with an optional renderer. Tinker checkpoint access can use
 `tinker_project_id` at the top level or on an agent, falling back to
 `TINKER_PROJECT_ID` or the SDK default project.
 
 ```bash
-uv run --locked python main.py eval --config files/eval-revision.yaml
+uv run --locked python main.py eval --config configs/eval.yaml
 uv run --locked python main.py eval --score-only logs/eval/RUN_DIRECTORY_NAME
-uv run --locked python main.py eval --config files/eval-revision.yaml --retry logs/eval/RUN_DIRECTORY_NAME
+uv run --locked python main.py eval --config configs/eval.yaml --retry logs/eval/RUN_DIRECTORY_NAME
 ```
 
 The first command launches inference; score-only aggregates saved episode
