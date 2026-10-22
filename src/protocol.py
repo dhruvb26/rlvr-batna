@@ -1,6 +1,6 @@
 """Live negotiation protocol shared by training and evaluation."""
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 # v3 requires complete proposal parsing; fractional item counts cannot be truncated.
 PROTOCOL_VERSION = "explicit-allocation-v3"
@@ -48,7 +48,7 @@ def parse_response(text, env, scenario, has_opponent_offer):
         text[h.end():headers[i + 1].start() if i < 2 else len(text)].strip()
         for i, h in enumerate(headers)
     ]
-    empty = [name for name, content in zip(names, sections) if not content]
+    empty = [name for name, content in zip(names, sections, strict=True) if not content]
     if empty:
         return ParsedResponse(*sections, error="empty_section:" + ",".join(empty))
     if "\n" in sections[2]:

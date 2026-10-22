@@ -4,14 +4,14 @@ import asyncio
 import json
 import math
 import os
-from pathlib import Path
 import random
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import UTC
+from pathlib import Path
 
 import chz
-import tinker
 from tinker import ModelInput
 from tinker_cookbook import checkpoint_utils, cli_utils, model_info
 from tinker_cookbook.completers import (
@@ -26,6 +26,7 @@ from tinker_cookbook.rl.types import (
     ActionExtra,
     Env,
     EnvGroupBuilder,
+    Logs,
     RLDataset,
     RLDatasetBuilder,
     StepResult,
@@ -34,9 +35,13 @@ from tinker_cookbook.tokenizer_utils import get_tokenizer
 
 from .envs import NegotiateEnv as EvalEnv
 from .envs import get_env
-from .scenarios import digest, scenario_id, serialize_scenario
 from .protocol import PROTOCOL_VERSION, parse_response, partner_observation
-from .tinker_tracking import create_service_client, record_tinker_sessions, track_tinker_sessions
+from .scenarios import digest, scenario_id, serialize_scenario
+from .tinker_tracking import (
+    create_service_client,
+    record_tinker_sessions,
+    track_tinker_sessions,
+)
 
 OUTCOMES = ("deal", "walk_away", "max_turns", "format_violation")
 
@@ -279,14 +284,15 @@ class NegotiationEnv(Env):
                 opp_alloc, self.scenario.data, self.opponent_id
             )
             max_joint = self.env.max_joint_points(self.scenario.data)
-            if max_joint > 0:
+            if max_joint is not None and max_joint > 0:
                 extra["joint_surplus"] = (points + opp_points) / max_joint
                 extra[f"joint_surplus/{ds}"] = extra["joint_surplus"]
             pareto = self.env.is_pareto_efficient(
                 learner_alloc, self.scenario.data, self.learner_id
             )
-            extra["pareto_efficient"] = float(pareto)
-            extra[f"pareto_efficient/{ds}"] = float(pareto)
+            if pareto is not None:
+                extra["pareto_efficient"] = float(pareto)
+                extra[f"pareto_efficient/{ds}"] = float(pareto)
 
             if self.learner_first_offer is not None and max_pts > 0:
                 first_pts = self.env.compute_points(
@@ -328,7 +334,7 @@ class NegotiationEnv(Env):
             self.stop_condition,
         )
 
-    def _logs(self, deal=None):
+    def _logs(self, deal=None) -> Logs:
         """Retain full terminal evidence in Cookbook rollout JSON logs."""
         return {"negotiation": json.dumps({
             "scenario_id": scenario_id(self.scenario.dataset_name, self.scenario.data),
@@ -382,11 +388,13 @@ class NegotiationEnv(Env):
             return self._terminal("format_violation", -1.0)
         kind = learner_response.kind
         if kind == "ACCEPT_DEAL":
+            assert self.last_submit_deal is not None
             return self._deal_result(self.env.invert_alloc(self.last_submit_deal, self.scenario.data))
         if kind == "WALK_AWAY":
             return self._terminal("walk_away")
         if kind == "SUBMIT_DEAL":
             parsed = self.env.parse_deal(learner_action)
+            assert parsed is not None
             if self.learner_first_offer is None:
                 self.learner_first_offer = parsed
             self.last_submit_deal, self.last_submit_by = parsed, "learner"
@@ -412,9 +420,14 @@ class NegotiationEnv(Env):
         if valid:
             kind = opponent_response.kind
             # An opponent proposal is already expressed in the opponent's seat.
-            allocation = (self.env.parse_deal(opponent_action) if kind == "SUBMIT_DEAL"
-                          else self.env.invert_alloc(self.last_submit_deal, self.scenario.data)
-                          if kind == "ACCEPT_DEAL" else None)
+            if kind == "SUBMIT_DEAL":
+                allocation = self.env.parse_deal(opponent_action)
+                assert allocation is not None
+            elif kind == "ACCEPT_DEAL":
+                assert self.last_submit_deal is not None
+                allocation = self.env.invert_alloc(self.last_submit_deal, self.scenario.data)
+            else:
+                allocation = None
             if self.economic_regulation and allocation is not None:
                 points = self.env.compute_points(allocation, self.scenario.data, self.opponent_id)
                 if points < 0:
@@ -432,6 +445,7 @@ class NegotiationEnv(Env):
             opponent_response, self.env, self.scenario.data)})
         if valid:
             if kind == "ACCEPT_DEAL":
+                assert self.last_submit_deal is not None
                 return self._deal_result(self.last_submit_deal)
             if kind == "WALK_AWAY":
                 return self._terminal("walk_away")
@@ -801,7 +815,7 @@ def load_config(config_path, *, seed=None):
     import yaml
     cfg = yaml.safe_load(Path(config_path).read_text())
     if not isinstance(cfg, dict):
-        raise ValueError("Training config must be a mapping")
+        raise TypeError("Training config must be a mapping")
     unknown = set(cfg) - set(chz.chz_fields(CLIConfig))
     if unknown:
         raise ValueError(f"Unknown training settings: {sorted(unknown)}")
@@ -890,9 +904,9 @@ def plan_execution(cli, config, run_steps=None):
 
 def record_execution(log_path, plan, status, **extra):
     """Keep launch boundaries separate from the immutable training manifest."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    record = {"recorded_at": datetime.now(timezone.utc).isoformat(), **plan, "status": status, **extra}
+    record = {"recorded_at": datetime.now(UTC).isoformat(), **plan, "status": status, **extra}
     with (Path(log_path) / "executions.jsonl").open("a") as file:
         file.write(json.dumps(record) + "\n")
 
@@ -959,9 +973,10 @@ def main(config_path: str = "configs/train.yaml", *, seed: int | None = None,
         ):
             asyncio.run(train.main(runtime_config))
         checkpoint = checkpoint_utils.get_last_checkpoint(config.log_path)
-        if run_steps is not None or cli.resume_run:
-            if checkpoint is None or checkpoint.batch != plan["end_step"] or not checkpoint.state_path:
-                raise RuntimeError("Training returned without the expected resumable endpoint checkpoint")
+        if (run_steps is not None or cli.resume_run) and (
+            checkpoint is None or checkpoint.batch != plan["end_step"] or not checkpoint.state_path
+        ):
+            raise RuntimeError("Training returned without the expected resumable endpoint checkpoint")
         status = "paused" if plan["end_step"] < plan["total_steps"] else "completed"
         record_execution(config.log_path, plan, status,
                          checkpoint=checkpoint.to_dict() if checkpoint else None)

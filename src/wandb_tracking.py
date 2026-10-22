@@ -3,8 +3,8 @@
 This logging-only integration lives outside the manifest-pinned training code,
 so adopting it does not invalidate existing weights/optimizer checkpoints.
 """
-from contextlib import contextmanager
 import json
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from uuid import uuid4
@@ -120,12 +120,13 @@ class _WandbAdapter:
 @contextmanager
 def reuse_wandb_run(*, fork_checkpoint=None):
     """Adapt only Cookbook logging; no training state or SDK globals are changed."""
-    original = ml_log.wandb
+    logging_namespace = ml_log.__dict__
+    original = logging_namespace["wandb"]
     if original is None:
         yield
         return
-    ml_log.wandb = _WandbAdapter(original, fork_checkpoint=fork_checkpoint)
+    logging_namespace["wandb"] = _WandbAdapter(original, fork_checkpoint=fork_checkpoint)
     try:
         yield
     finally:
-        ml_log.wandb = original
+        logging_namespace["wandb"] = original

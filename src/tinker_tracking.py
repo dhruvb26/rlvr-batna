@@ -1,13 +1,13 @@
 """Attach experiment identity to Tinker sessions and retain their console links."""
 from __future__ import annotations
 
+import json
+import logging
+import sys
 from contextlib import contextmanager
 from contextvars import ContextVar
-from datetime import datetime, timezone
-import logging
+from datetime import UTC, datetime
 from pathlib import Path
-import json
-import sys
 from urllib.parse import unquote, urlparse
 
 import tinker
@@ -49,7 +49,7 @@ class SessionTracker:
             if not session_id:
                 continue
             record = {
-                "recorded_at": datetime.now(timezone.utc).isoformat(),
+                "recorded_at": datetime.now(UTC).isoformat(),
                 "run_name": self.metadata["run_name"],
                 "role": role,
                 "project_id": self.project_id,

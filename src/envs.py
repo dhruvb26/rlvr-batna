@@ -34,7 +34,7 @@ class NegotiateEnv(ABC):
         return f"Proposed terms: {terms(deal)}"
 
     @abstractmethod
-    def load_scenarios(self, csv_path: str) -> list[dict]:
+    def load_scenarios(self, csv_path: str, /) -> list[dict]:
         """Load negotiation scenarios from a data file.
 
         Args:
@@ -745,9 +745,7 @@ class JobInterviewEnv(NegotiateEnv):
             return False
         if deal.get("Company") not in _JI_COMPANIES:
             return False
-        if deal.get("Workplace") not in _JI_WORKPLACES:
-            return False
-        return True
+        return deal.get("Workplace") in _JI_WORKPLACES
 
     def invert_alloc(self, deal: dict, scenario: dict) -> dict:
         return deal

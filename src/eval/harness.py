@@ -26,6 +26,8 @@ from .generator import OPENAI_BASE_URL, make_generator
 from .manifest import build_manifest, load_manifest
 from .runner import (
     EVAL_PROTOCOL_VERSION as PROTOCOL_VERSION,
+)
+from .runner import (
     AggregateMetrics,
     EpisodeResult,
     compute_episode_metrics,

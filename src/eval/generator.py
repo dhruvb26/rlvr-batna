@@ -3,9 +3,13 @@ from __future__ import annotations
 import json
 import logging
 import os
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from openai import APIConnectionError, APITimeoutError, RateLimitError
+from openai.types.responses import ResponseInputParam
+from openai.types.shared import ReasoningEffort
+from openai.types.shared_params import Reasoning
 from tenacity import (
     before_sleep_log,
     retry,
@@ -13,6 +17,9 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
+
+if TYPE_CHECKING:
+    from tinker_cookbook.renderers import Message
 
 OPENAI_BASE_URL = "https://api.openai.com/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -71,7 +78,7 @@ class APIGenerator:
         api_keys: list[str],
         max_tokens: int = 512,
         thinking: bool | None = None,
-        reasoning: str | None = None,
+        reasoning: ReasoningEffort | None = None,
         thinking_token_budget: int | None = None,
     ):
         from openai import OpenAI
@@ -106,7 +113,7 @@ class APIGenerator:
         self.model = model
         self.max_tokens = max_tokens
         self.thinking = thinking if thinking is not None else True
-        self.reasoning = reasoning
+        self.reasoning: ReasoningEffort | None = reasoning
         self.thinking_token_budget = thinking_token_budget
         self._is_openrouter = is_openrouter
         self._use_responses_api = reasoning is not None and is_openai
@@ -148,10 +155,15 @@ class APIGenerator:
     @_api_retry
     def _call_responses_api(self, messages: list[dict]) -> str:
         """Call the OpenAI Responses API for reasoning models."""
+        response_input: ResponseInputParam = [
+            {"role": message["role"], "content": message["content"]}
+            for message in messages
+        ]
+        reasoning_options: Reasoning = {"effort": self.reasoning, "summary": "auto"}
         resp = self.client.responses.create(
             model=self.model,
-            input=self._sanitize_msgs(messages),
-            reasoning={"effort": self.reasoning, "summary": "auto"},
+            input=response_input,
+            reasoning=reasoning_options,
             max_output_tokens=self.max_tokens,
         )
         reasoning_text = ""
@@ -250,7 +262,9 @@ class TinkerGenerator:
         import tinker
         from tinker_cookbook.renderers import get_text_content
 
-        renderer_msgs = [{"role": m["role"], "content": m["content"]} for m in messages]
+        renderer_msgs: list[Message] = [
+            {"role": m["role"], "content": m["content"]} for m in messages
+        ]
         model_input = self._renderer.build_generation_prompt(renderer_msgs)
         stop = self._renderer.get_stop_sequences()
 

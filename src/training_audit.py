@@ -37,7 +37,7 @@ def check_training_data(groups, advantages, data, metadata):
             actual_tokens, actual_lp = got[(gi, ti)]
             assert actual_tokens == expected_tokens, "Target/action mismatch"
             assert len(actual_lp) == len(expected_lp)
-            assert all(abs(x - y) < 1e-4 for x, y in zip(actual_lp, expected_lp)), (
+            assert all(abs(x - y) < 1e-4 for x, y in zip(actual_lp, expected_lp, strict=True)), (
                 "Logprob alignment mismatch"
             )
             if traj.transitions[-1].metrics.get("outcome_format_violation"):
@@ -61,7 +61,8 @@ def check_training_data(groups, advantages, data, metadata):
 
 @contextmanager
 def audit_training_inputs(log_path):
-    original = train.assemble_training_data
+    train_namespace = train.__dict__
+    original = train_namespace["assemble_training_data"]
 
     def checked(groups, advantages):
         data, meta = original(groups, advantages)
@@ -70,8 +71,8 @@ def audit_training_inputs(log_path):
             f.write(json.dumps(result) + "\n")
         return data, meta
 
-    train.assemble_training_data = checked
+    train_namespace["assemble_training_data"] = checked
     try:
         yield
     finally:
-        train.assemble_training_data = original
+        train_namespace["assemble_training_data"] = original

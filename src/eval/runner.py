@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import random
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from ..envs import NegotiateEnv
 from ..protocol import PROTOCOL_VERSION, parse_response, partner_observation
 
 EVAL_PROTOCOL_VERSION = f"{PROTOCOL_VERSION}-turn-limit-v1"
-from ..envs import NegotiateEnv
-from .generator import APIGenerator
 
 
 def extract_section(text: str, section: str) -> str | None:
@@ -207,13 +207,14 @@ class AggregateMetrics:
         avg_lp = sum(deals) / len(deals) if deals else None
         avg_op = sum(opp_deals) / len(opp_deals) if opp_deals else None
 
-        joint_scores = [lp + op for lp, op in zip(deals, opp_deals)]
+        joint_scores = [lp + op for lp, op in zip(deals, opp_deals, strict=False)]
         avg_joint = (
             round(sum(joint_scores) / len(joint_scores), 2) if joint_scores else None
         )
 
         score_ratios = [
-            lp / (lp + op) if (lp + op) > 0 else 0.5 for lp, op in zip(deals, opp_deals)
+            lp / (lp + op) if (lp + op) > 0 else 0.5
+            for lp, op in zip(deals, opp_deals, strict=False)
         ]
         avg_score_ratio = (
             round(sum(score_ratios) / len(score_ratios), 3) if score_ratios else None
@@ -300,8 +301,8 @@ class AggregateMetrics:
 
 def run_episode(
     env: NegotiateEnv,
-    learner_gen: APIGenerator,
-    opponent_gen: APIGenerator,
+    learner_gen: Callable[[list[dict], float, float], str],
+    opponent_gen: Callable[[list[dict], float, float], str],
     scenario: dict,
     agent_ids: list[str],
     persona: str,
@@ -400,10 +401,12 @@ def run_episode(
         opp_points = None
         if not is_learner_turn and economic_regulation and parsed.error is None:
             if parsed.kind == "ACCEPT_DEAL":
+                assert last_submit_deal is not None
                 opp_alloc = env.invert_alloc(last_submit_deal, scenario)
                 opp_points = env.compute_points(opp_alloc, scenario, opponent_id)
             elif parsed.kind == "SUBMIT_DEAL":
                 opp_alloc = env.parse_deal(parsed.action)
+                assert opp_alloc is not None
                 opp_points = env.compute_points(opp_alloc, scenario, opponent_id)
         if opp_points is not None and opp_points < 0:
             original_response, original_parsed = raw_response, parsed
