@@ -26,8 +26,12 @@ Requires Python 3.13+ and [`uv`](https://docs.astral.sh/uv/).
 ```bash
 git clone https://github.com/dhruvb26/rlvr-batna.git
 cd rlvr-batna
-uv sync
+uv sync --locked
 ```
+
+Dependencies are resolved in `uv.lock`. The project requires Tinker SDK 0.30.4 or
+newer; the lockfile pins version 0.30.4. Use `uv sync --locked` to install the
+recorded dependency versions.
 
 Copy `.env.example` to `.env` and fill in your keys:
 
@@ -41,6 +45,10 @@ WANDB_API_KEY=...
 OPENROUTER_API_KEY=...
 HF_TOKEN=...        # optional, for gated HF models
 ```
+
+Training and evaluation outputs are stored under `logs/`. Keep local working
+documents in the repository-root `files/` directory. Both directories, `.env`, and
+`.venv` are ignored by Git.
 
 ## Usage
 
@@ -99,7 +107,7 @@ The transfer ablation (multi-item-only training, evaluated zero-shot on price ta
 | `batna_threshold` | BR threshold below which multi-item deals are penalized; default `0.0` (surplus reward), set to `0.4` for the threshold agent |
 | `train_temperature` | Learner sampling temperature during training |
 | `max_steps` | Training steps |
-| `resume_run` | Tinker run ID to resume from |
+| `resume_run` | Local run directory name under `logs/negotiation/` to resume |
 | `wandb_project` | W&B project name |
 
 ## Datasets
