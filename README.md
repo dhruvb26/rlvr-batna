@@ -291,3 +291,14 @@ revision training with `data/craigslist/revision/train.json`; evaluation's defau
 Craigslist path already selects the revision test copy. Fixed data and manifests
 permit comparisons on the checked split identities; they do not undo exposure
 in old checkpoints or rule out every possible near-duplicate.
+
+
+## IJPR revision figures
+
+The [October 4 revision figure snapshot](ijpr-submission/figures/revision-2026-10-04/README.md)
+contains 12 PNG/vector-PDF pairs and saved numeric inputs for the training and
+`bar_*` plots. These preserve the revision results for manuscript preparation;
+the original manuscript still references the earlier figures. The figure README
+records seed aggregation, the retained Craigslist outlier, historical protocol
+and provider differences, and the snapshot's tau .4/.6 coverage. The later tau .2
+experiments are not included in these plots.
