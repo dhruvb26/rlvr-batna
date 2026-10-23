@@ -1,0 +1,2203 @@
+{
+  "datasets": [
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 83,
+      "quality": 0.18623132530120481,
+      "utility": 0.16620645161290323,
+      "deal_rate": 0.8924731182795699,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 77,
+      "quality": 0.29136233766233766,
+      "utility": 0.24123548387096774,
+      "deal_rate": 0.8279569892473119,
+      "regulation_affected": 2,
+      "replacements": 3,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 93,
+      "quality": 0.4031172043010753,
+      "utility": 0.4031172043010753,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 80,
+      "quality": 0.10857625,
+      "utility": 0.0933989247311828,
+      "deal_rate": 0.8602150537634409,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 71,
+      "quality": 0.2868901408450704,
+      "utility": 0.2190236559139785,
+      "deal_rate": 0.7634408602150538,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 92,
+      "quality": 0.4010423913043478,
+      "utility": 0.3967301075268817,
+      "deal_rate": 0.989247311827957,
+      "regulation_affected": 1,
+      "replacements": 1,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 90,
+      "quality": 0.7317833333333333,
+      "utility": 0.5311330645161291,
+      "deal_rate": 0.7258064516129032,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 87,
+      "quality": 0.7503114942528736,
+      "utility": 0.5264282258064517,
+      "deal_rate": 0.7016129032258065,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 108,
+      "quality": 0.8150861111111111,
+      "utility": 0.7099137096774193,
+      "deal_rate": 0.8709677419354839,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 121,
+      "quality": 0.6418644628099174,
+      "utility": 0.6263354838709677,
+      "deal_rate": 0.9758064516129032,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 112,
+      "quality": 0.6917133928571428,
+      "utility": 0.6247733870967742,
+      "deal_rate": 0.9032258064516129,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 117,
+      "quality": 0.6944495726495726,
+      "utility": 0.6552467741935484,
+      "deal_rate": 0.9435483870967742,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 84,
+      "quality": 0.85,
+      "utility": 0.714,
+      "deal_rate": 0.84,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 80,
+      "quality": 0.86,
+      "utility": 0.6880000000000001,
+      "deal_rate": 0.8,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 94,
+      "quality": 0.8808510638297873,
+      "utility": 0.828,
+      "deal_rate": 0.94,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 90,
+      "quality": 0.7722222222222223,
+      "utility": 0.695,
+      "deal_rate": 0.9,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 89,
+      "quality": 0.7741573033707865,
+      "utility": 0.6890000000000001,
+      "deal_rate": 0.89,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.8178947368421052,
+      "utility": 0.777,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 83,
+      "quality": 0.030620481927710844,
+      "utility": 0.025415,
+      "deal_rate": 0.83,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 73,
+      "quality": 0.0966972602739726,
+      "utility": 0.070589,
+      "deal_rate": 0.73,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 99,
+      "quality": 0.3687666666666667,
+      "utility": 0.365079,
+      "deal_rate": 0.99,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 81,
+      "quality": 0.026014814814814814,
+      "utility": 0.021072,
+      "deal_rate": 0.81,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 68,
+      "quality": 0.12118235294117646,
+      "utility": 0.082404,
+      "deal_rate": 0.68,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 100,
+      "quality": 0.312388,
+      "utility": 0.312388,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.7730526315789473,
+      "utility": 0.7344,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 69,
+      "quality": 0.7989855072463768,
+      "utility": 0.5513,
+      "deal_rate": 0.69,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 72,
+      "quality": 0.8245833333333333,
+      "utility": 0.5937,
+      "deal_rate": 0.72,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 96,
+      "quality": 0.7317708333333334,
+      "utility": 0.7025,
+      "deal_rate": 0.96,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 71,
+      "quality": 0.7608450704225352,
+      "utility": 0.5402,
+      "deal_rate": 0.71,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 62,
+      "quality": 0.7979032258064516,
+      "utility": 0.49470000000000003,
+      "deal_rate": 0.62,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed42-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 86,
+      "quality": 0.08708488372093023,
+      "utility": 0.08053010752688172,
+      "deal_rate": 0.9247311827956989,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 92,
+      "quality": 0.40324130434782607,
+      "utility": 0.398905376344086,
+      "deal_rate": 0.989247311827957,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 93,
+      "quality": 0.3756010752688172,
+      "utility": 0.3756010752688172,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 79,
+      "quality": 0.2039607594936709,
+      "utility": 0.17325698924731184,
+      "deal_rate": 0.8494623655913979,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 67,
+      "quality": 0.14448507462686566,
+      "utility": 0.10409139784946236,
+      "deal_rate": 0.7204301075268817,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 71,
+      "quality": 0.26639577464788733,
+      "utility": 0.20337741935483872,
+      "deal_rate": 0.7634408602150538,
+      "regulation_affected": 1,
+      "replacements": 3,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 93,
+      "quality": 0.34569354838709676,
+      "utility": 0.34569354838709676,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 92,
+      "quality": 0.41134565217391306,
+      "utility": 0.4069225806451613,
+      "deal_rate": 0.989247311827957,
+      "regulation_affected": 1,
+      "replacements": 2,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 65,
+      "quality": 0.22323076923076923,
+      "utility": 0.1560215053763441,
+      "deal_rate": 0.6989247311827957,
+      "regulation_affected": 1,
+      "replacements": 4,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 83,
+      "quality": 0.11240240963855422,
+      "utility": 0.10031612903225806,
+      "deal_rate": 0.8924731182795699,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 73,
+      "quality": 0.2611931506849315,
+      "utility": 0.2050225806451613,
+      "deal_rate": 0.7849462365591398,
+      "regulation_affected": 1,
+      "replacements": 2,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "amazon",
+      "episodes": 93,
+      "deals": 79,
+      "quality": 0.12562911392405063,
+      "utility": 0.10671720430107527,
+      "deal_rate": 0.8494623655913979,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309/amazon/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 113,
+      "quality": 0.7374548672566371,
+      "utility": 0.6720354838709678,
+      "deal_rate": 0.9112903225806451,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 97,
+      "quality": 0.7657567010309279,
+      "utility": 0.5990193548387097,
+      "deal_rate": 0.782258064516129,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 97,
+      "quality": 0.8144463917525773,
+      "utility": 0.6371072580645161,
+      "deal_rate": 0.782258064516129,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 111,
+      "quality": 0.6328702702702703,
+      "utility": 0.5665209677419355,
+      "deal_rate": 0.8951612903225806,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 114,
+      "quality": 0.6571605263157895,
+      "utility": 0.6041637096774194,
+      "deal_rate": 0.9193548387096774,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 110,
+      "quality": 0.6709609090909091,
+      "utility": 0.5952072580645161,
+      "deal_rate": 0.8870967741935484,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 91,
+      "quality": 0.7681318681318682,
+      "utility": 0.699,
+      "deal_rate": 0.91,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 87,
+      "quality": 0.8172413793103448,
+      "utility": 0.711,
+      "deal_rate": 0.87,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 97,
+      "quality": 0.8412371134020619,
+      "utility": 0.8160000000000001,
+      "deal_rate": 0.97,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.7652631578947369,
+      "utility": 0.727,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 91,
+      "quality": 0.7912087912087912,
+      "utility": 0.72,
+      "deal_rate": 0.91,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 93,
+      "quality": 0.7827956989247312,
+      "utility": 0.728,
+      "deal_rate": 0.93,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 93,
+      "quality": -0.005110752688172043,
+      "utility": -0.004753,
+      "deal_rate": 0.93,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 71,
+      "quality": 0.06153521126760564,
+      "utility": 0.04369,
+      "deal_rate": 0.71,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 100,
+      "quality": 0.349361,
+      "utility": 0.349361,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 84,
+      "quality": 0.008395238095238095,
+      "utility": 0.007051999999999999,
+      "deal_rate": 0.84,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 66,
+      "quality": 0.10401666666666666,
+      "utility": 0.068651,
+      "deal_rate": 0.66,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 98,
+      "quality": 0.3281540816326531,
+      "utility": 0.321591,
+      "deal_rate": 0.98,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 96,
+      "quality": 0.7235416666666666,
+      "utility": 0.6946,
+      "deal_rate": 0.96,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 87,
+      "quality": 0.7526436781609196,
+      "utility": 0.6548,
+      "deal_rate": 0.87,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 76,
+      "quality": 0.7855263157894736,
+      "utility": 0.597,
+      "deal_rate": 0.76,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.7156842105263158,
+      "utility": 0.6799,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 81,
+      "quality": 0.7493827160493827,
+      "utility": 0.607,
+      "deal_rate": 0.81,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 68,
+      "quality": 0.7513235294117647,
+      "utility": 0.5109,
+      "deal_rate": 0.68,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed43-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 122,
+      "quality": 0.666655737704918,
+      "utility": 0.6559032258064516,
+      "deal_rate": 0.9838709677419355,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 111,
+      "quality": 0.7137036036036036,
+      "utility": 0.6388798387096775,
+      "deal_rate": 0.8951612903225806,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 118,
+      "quality": 0.7570745762711865,
+      "utility": 0.7204419354838709,
+      "deal_rate": 0.9516129032258065,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 115,
+      "quality": 0.6164147826086956,
+      "utility": 0.571675,
+      "deal_rate": 0.9274193548387096,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 115,
+      "quality": 0.6548321739130435,
+      "utility": 0.6073040322580645,
+      "deal_rate": 0.9274193548387096,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "casino",
+      "episodes": 124,
+      "deals": 107,
+      "quality": 0.6690093457943925,
+      "utility": 0.5772903225806452,
+      "deal_rate": 0.8629032258064516,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/casino/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.791578947368421,
+      "utility": 0.752,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 96,
+      "quality": 0.821875,
+      "utility": 0.789,
+      "deal_rate": 0.96,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 97,
+      "quality": 0.8412371134020619,
+      "utility": 0.8160000000000001,
+      "deal_rate": 0.97,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.7347368421052631,
+      "utility": 0.698,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 95,
+      "quality": 0.7736842105263158,
+      "utility": 0.735,
+      "deal_rate": 0.95,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "dnd",
+      "episodes": 100,
+      "deals": 94,
+      "quality": 0.7797872340425532,
+      "utility": 0.733,
+      "deal_rate": 0.94,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/dnd/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 84,
+      "quality": 0.013785714285714285,
+      "utility": 0.01158,
+      "deal_rate": 0.84,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 54,
+      "quality": 0.1074611111111111,
+      "utility": 0.058029,
+      "deal_rate": 0.54,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 100,
+      "quality": 0.279565,
+      "utility": 0.279565,
+      "deal_rate": 1.0,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 83,
+      "quality": 0.018395180722891567,
+      "utility": 0.015268,
+      "deal_rate": 0.83,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 52,
+      "quality": 0.104225,
+      "utility": 0.054197,
+      "deal_rate": 0.52,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "craigslist",
+      "episodes": 100,
+      "deals": 99,
+      "quality": 0.3192959595959596,
+      "utility": 0.316103,
+      "deal_rate": 0.99,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/craigslist/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 98,
+      "quality": 0.7221428571428572,
+      "utility": 0.7077,
+      "deal_rate": 0.98,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 86,
+      "quality": 0.7352325581395349,
+      "utility": 0.6323,
+      "deal_rate": 0.86,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 86,
+      "quality": 0.7743023255813953,
+      "utility": 0.6659,
+      "deal_rate": 0.86,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step80_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 93,
+      "quality": 0.7244086021505376,
+      "utility": 0.6737,
+      "deal_rate": 0.93,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-openai/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 88,
+      "quality": 0.7513636363636363,
+      "utility": 0.6612,
+      "deal_rate": 0.88,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_gpt-5.4-mini/episodes.json"
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "dataset": "ji",
+      "episodes": 100,
+      "deals": 78,
+      "quality": 0.7626923076923077,
+      "utility": 0.5949,
+      "deal_rate": 0.78,
+      "regulation_affected": 0,
+      "replacements": 0,
+      "source": "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151/ji/qwen3.6-35b-a3b-multi-only-selective-tau0.4-seed44-step40_vs_qwen3.6-35b-a3b-tinker-nonthinking/episodes.json"
+    }
+  ],
+  "macro": [
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.4560897166360576,
+      "utility": 0.4276612817204301,
+      "deal_rate": 0.9052224371373307
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.5269576520873422,
+      "utility": 0.43108020860215057,
+      "deal_rate": 0.7949709864603481
+    },
+    {
+      "seed": 42,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.6047355853204954,
+      "utility": 0.527212976344086,
+      "deal_rate": 0.9013539651837524
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.5143375544282393,
+      "utility": 0.4342309032258065,
+      "deal_rate": 0.8413926499032882
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.5594713198871122,
+      "utility": 0.41551054193548387,
+      "deal_rate": 0.746615087040619
+    },
+    {
+      "seed": 42,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.6584808758483948,
+      "utility": 0.5799619827956989,
+      "deal_rate": 0.9013539651837524
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.4652347272560464,
+      "utility": 0.43074599139784947,
+      "deal_rate": 0.8974854932301741
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.5125923701851123,
+      "utility": 0.44096745806451615,
+      "deal_rate": 0.8220502901353965
+    },
+    {
+      "seed": 43,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.5872951046815769,
+      "utility": 0.5109207268817204,
+      "deal_rate": 0.8916827852998066
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.46728401180111084,
+      "utility": 0.43223972258064514,
+      "deal_rate": 0.9206963249516441
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.5083324088793327,
+      "utility": 0.4225201505376344,
+      "deal_rate": 0.7911025145067698
+    },
+    {
+      "seed": 43,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.6403832946236052,
+      "utility": 0.5612781677419355,
+      "deal_rate": 0.8936170212765957
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.4439169043022877,
+      "utility": 0.41307204086021504,
+      "deal_rate": 0.8994197292069632
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.501467158006753,
+      "utility": 0.4427445075268817,
+      "deal_rate": 0.8027079303675049
+    },
+    {
+      "seed": 44,
+      "step": 40,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.5752956791024619,
+      "utility": 0.5133973741935484,
+      "deal_rate": 0.9110251450676983
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-openai",
+      "quality": 0.45624962804456815,
+      "utility": 0.44154266666666664,
+      "deal_rate": 0.9381044487427466
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "gpt-5.4-mini",
+      "quality": 0.5289336095004274,
+      "utility": 0.4643172516129032,
+      "deal_rate": 0.8085106382978723
+    },
+    {
+      "seed": 44,
+      "step": 80,
+      "opponent": "qwen3.6-35b-a3b-tinker-nonthinking",
+      "quality": 0.6055560181046922,
+      "utility": 0.5715016021505377,
+      "deal_rate": 0.9555125725338491
+    }
+  ],
+  "reference": {
+    "untrained": {
+      "amazon": {
+        "episodes": 93,
+        "deals": 62,
+        "quality": 0.13701612903225807,
+        "utility": 0.09134408602150537,
+        "deal_rate": 0.6666666666666666,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      "casino": {
+        "episodes": 124,
+        "deals": 121,
+        "quality": 0.5002181818181818,
+        "utility": 0.4881161290322581,
+        "deal_rate": 0.9758064516129032,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      "craigslist": {
+        "episodes": 100,
+        "deals": 69,
+        "quality": 0.03386231884057971,
+        "utility": 0.023365,
+        "deal_rate": 0.69,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      "dnd": {
+        "episodes": 100,
+        "deals": 93,
+        "quality": 0.6440860215053763,
+        "utility": 0.599,
+        "deal_rate": 0.93,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      "ji": {
+        "episodes": 100,
+        "deals": 90,
+        "quality": 0.6585555555555556,
+        "utility": 0.5927,
+        "deal_rate": 0.9,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      }
+    },
+    "joint": [
+      {
+        "opponent": "GPT-5.4",
+        "seed": 42,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 79,
+        "quality": 0.4828075949367089,
+        "utility": 0.4101268817204301,
+        "deal_rate": 0.8494623655913979,
+        "protocols": [
+          "explicit-allocation-v2-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 42,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 120,
+        "quality": 0.6479033333333334,
+        "utility": 0.6270032258064516,
+        "deal_rate": 0.967741935483871,
+        "protocols": [
+          "explicit-allocation-v2-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 42,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 89,
+        "quality": 0.41941685393258427,
+        "utility": 0.373281,
+        "deal_rate": 0.89,
+        "protocols": [
+          "explicit-allocation-v2-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 42,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 98,
+        "quality": 0.7520408163265306,
+        "utility": 0.737,
+        "deal_rate": 0.98,
+        "protocols": [
+          "explicit-allocation-v2-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 42,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 99,
+        "quality": 0.7017171717171717,
+        "utility": 0.6947,
+        "deal_rate": 0.99,
+        "protocols": [
+          "explicit-allocation-v2-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 43,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 81,
+        "quality": 0.6010172839506173,
+        "utility": 0.5234666666666666,
+        "deal_rate": 0.8709677419354839,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 43,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 117,
+        "quality": 0.6419700854700855,
+        "utility": 0.6057298387096774,
+        "deal_rate": 0.9435483870967742,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 43,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 86,
+        "quality": 0.4550918604651163,
+        "utility": 0.391379,
+        "deal_rate": 0.86,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 43,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 96,
+        "quality": 0.7520833333333333,
+        "utility": 0.722,
+        "deal_rate": 0.96,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 43,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 99,
+        "quality": 0.7126262626262626,
+        "utility": 0.7055,
+        "deal_rate": 0.99,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 44,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 66,
+        "quality": 0.4636272727272727,
+        "utility": 0.3290258064516129,
+        "deal_rate": 0.7096774193548387,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 44,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 115,
+        "quality": 0.5632826086956522,
+        "utility": 0.5223991935483872,
+        "deal_rate": 0.9274193548387096,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 44,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 84,
+        "quality": 0.3797714285714286,
+        "utility": 0.319008,
+        "deal_rate": 0.84,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 44,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 98,
+        "quality": 0.7377551020408163,
+        "utility": 0.723,
+        "deal_rate": 0.98,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4",
+        "seed": 44,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 87,
+        "quality": 0.6424137931034483,
+        "utility": 0.5589,
+        "deal_rate": 0.87,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 42,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 90,
+        "quality": 0.6056655555555556,
+        "utility": 0.5861279569892474,
+        "deal_rate": 0.967741935483871,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 42,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 112,
+        "quality": 0.6733598214285714,
+        "utility": 0.6081959677419355,
+        "deal_rate": 0.9032258064516129,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 42,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 92,
+        "quality": 0.6107956521739131,
+        "utility": 0.561932,
+        "deal_rate": 0.92,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 42,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 97,
+        "quality": 0.8010309278350516,
+        "utility": 0.777,
+        "deal_rate": 0.97,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 42,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 91,
+        "quality": 0.71,
+        "utility": 0.6461,
+        "deal_rate": 0.91,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 43,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 83,
+        "quality": 0.6758204819277108,
+        "utility": 0.6031516129032258,
+        "deal_rate": 0.8924731182795699,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 43,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 118,
+        "quality": 0.6643135593220338,
+        "utility": 0.6321693548387096,
+        "deal_rate": 0.9516129032258065,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 43,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 89,
+        "quality": 0.6574415730337079,
+        "utility": 0.585123,
+        "deal_rate": 0.89,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 43,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 95,
+        "quality": 0.7494736842105263,
+        "utility": 0.712,
+        "deal_rate": 0.95,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 43,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 93,
+        "quality": 0.6744086021505377,
+        "utility": 0.6272,
+        "deal_rate": 0.93,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 44,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 76,
+        "quality": 0.6457802631578947,
+        "utility": 0.5277344086021506,
+        "deal_rate": 0.8172043010752689,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 44,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 119,
+        "quality": 0.6076126050420169,
+        "utility": 0.5831120967741935,
+        "deal_rate": 0.9596774193548387,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 44,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 74,
+        "quality": 0.49117972972972973,
+        "utility": 0.363473,
+        "deal_rate": 0.74,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 44,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 99,
+        "quality": 0.7636363636363637,
+        "utility": 0.756,
+        "deal_rate": 0.99,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "GPT-5.4-mini",
+        "seed": 44,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 58,
+        "quality": 0.676896551724138,
+        "utility": 0.3926,
+        "deal_rate": 0.58,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 42,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 90,
+        "quality": 0.9020888888888889,
+        "utility": 0.8729892473118279,
+        "deal_rate": 0.967741935483871,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 42,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 110,
+        "quality": 0.6878954545454545,
+        "utility": 0.6102298387096774,
+        "deal_rate": 0.8870967741935484,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 42,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 99,
+        "quality": 0.9296444444444445,
+        "utility": 0.9203479999999999,
+        "deal_rate": 0.99,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 42,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 97,
+        "quality": 0.8134020618556701,
+        "utility": 0.789,
+        "deal_rate": 0.97,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 42,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 88,
+        "quality": 0.7465909090909091,
+        "utility": 0.657,
+        "deal_rate": 0.88,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 43,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 84,
+        "quality": 0.9360726190476191,
+        "utility": 0.8454849462365591,
+        "deal_rate": 0.9032258064516129,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 43,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 110,
+        "quality": 0.6863736363636364,
+        "utility": 0.6088798387096774,
+        "deal_rate": 0.8870967741935484,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 43,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 95,
+        "quality": 0.9421526315789474,
+        "utility": 0.895045,
+        "deal_rate": 0.95,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 43,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 91,
+        "quality": 0.7681318681318682,
+        "utility": 0.699,
+        "deal_rate": 0.91,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 43,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 79,
+        "quality": 0.7132911392405064,
+        "utility": 0.5635,
+        "deal_rate": 0.79,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 44,
+        "dataset": "amazon",
+        "episodes": 93,
+        "deals": 89,
+        "quality": 0.9444123595505618,
+        "utility": 0.9037924731182796,
+        "deal_rate": 0.956989247311828,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 44,
+        "dataset": "casino",
+        "episodes": 124,
+        "deals": 116,
+        "quality": 0.6238120689655172,
+        "utility": 0.583566129032258,
+        "deal_rate": 0.9354838709677419,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 44,
+        "dataset": "craigslist",
+        "episodes": 100,
+        "deals": 99,
+        "quality": 0.9591676767676768,
+        "utility": 0.949576,
+        "deal_rate": 0.99,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 44,
+        "dataset": "dnd",
+        "episodes": 100,
+        "deals": 96,
+        "quality": 0.8145833333333333,
+        "utility": 0.782,
+        "deal_rate": 0.96,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      },
+      {
+        "opponent": "Qwen3.6 native",
+        "seed": 44,
+        "dataset": "ji",
+        "episodes": 100,
+        "deals": 65,
+        "quality": 0.7346153846153847,
+        "utility": 0.4775,
+        "deal_rate": 0.65,
+        "protocols": [
+          "explicit-allocation-v3-turn-limit-v1"
+        ]
+      }
+    ]
+  },
+  "runs": [
+    "logs/eval/multi-only-threshold-seed42-step40-step80-three-opponents/run_20261023_004237_016489",
+    "logs/eval/multi-only-threshold-seeds43-44-step40-step80-three-opponents/run_20261023_033238_383309",
+    "logs/eval/multi-only-threshold-seed43-remaining-step40-step80-three-opponents/run_20261023_035206_241767",
+    "logs/eval/multi-only-threshold-seed44-remaining-step40-step80-three-opponents/run_20261023_035206_807151"
+  ],
+  "matched_protocol_check": [
+    {
+      "opponent": "GPT-5.4",
+      "tasks": "price",
+      "step": 40,
+      "joint": 0.3907198682795699,
+      "multi_only": 0.07557354838709678,
+      "delta": -0.3151463198924731,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4",
+      "tasks": "price",
+      "step": 80,
+      "joint": 0.3907198682795699,
+      "multi_only": 0.046918309139784946,
+      "delta": -0.34380155913978494,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4",
+      "tasks": "JI",
+      "step": 40,
+      "joint": 0.6322,
+      "multi_only": 0.6768,
+      "delta": 0.04459999999999997,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4",
+      "tasks": "JI",
+      "step": 80,
+      "joint": 0.6322,
+      "multi_only": 0.7011499999999999,
+      "delta": 0.06894999999999996,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4-mini",
+      "tasks": "price",
+      "step": 40,
+      "joint": 0.519870505376344,
+      "multi_only": 0.12097302150537635,
+      "delta": -0.3988974838709677,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4-mini",
+      "tasks": "price",
+      "step": 80,
+      "joint": 0.519870505376344,
+      "multi_only": 0.10229695430107527,
+      "delta": -0.4175735510752688,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4-mini",
+      "tasks": "JI",
+      "step": 40,
+      "joint": 0.5099,
+      "multi_only": 0.6341,
+      "delta": 0.12419999999999998,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "GPT-5.4-mini",
+      "tasks": "JI",
+      "step": 80,
+      "joint": 0.5099,
+      "multi_only": 0.6435500000000001,
+      "delta": 0.13365000000000005,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "Qwen3.6 native",
+      "tasks": "price",
+      "step": 40,
+      "joint": 0.8984746048387097,
+      "multi_only": 0.3455732311827957,
+      "delta": -0.552901373655914,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "Qwen3.6 native",
+      "tasks": "price",
+      "step": 80,
+      "joint": 0.8984746048387097,
+      "multi_only": 0.3528624139784946,
+      "delta": -0.5456121908602151,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "Qwen3.6 native",
+      "tasks": "JI",
+      "step": 40,
+      "joint": 0.5205,
+      "multi_only": 0.5529,
+      "delta": 0.032399999999999984,
+      "seeds": [
+        43,
+        44
+      ]
+    },
+    {
+      "opponent": "Qwen3.6 native",
+      "tasks": "JI",
+      "step": 80,
+      "joint": 0.5205,
+      "multi_only": 0.6314500000000001,
+      "delta": 0.1109500000000001,
+      "seeds": [
+        43,
+        44
+      ]
+    }
+  ]
+}
