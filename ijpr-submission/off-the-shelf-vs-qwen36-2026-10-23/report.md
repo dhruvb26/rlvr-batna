@@ -1,12 +1,14 @@
 # Revised results against base Qwen3.6
 
-Revised trained-model rows (Threshold, Surplus and Uniform) average seeds 42, 43 and 44. Off-the-shelf models have one evaluation per scenario. BR cells show mean clipped bargained ratio (deal %); — indicates unavailable results.
+All trained-model rows (Selective τ=.2/.4/.6, Surplus and Uniform τ=.4) average seeds 42, 43 and 44. Off-the-shelf models have one evaluation per scenario. BR cells show mean clipped bargained ratio (deal %); — indicates unavailable results.
 
 ## Table 1 — mean clipped bargained ratio (deal %)
 
 | Learner | AHP | CA | CRA | DnD | JI |
 |---|---:|---:|---:|---:|---:|
-| Threshold (Ours) | 0.93 (94) | 0.67 (90) | 0.94 (98) | 0.80 (95) | 0.73 (77) |
+| Threshold (Ours, τ=.4) | 0.93 (94) | 0.67 (90) | 0.94 (98) | 0.80 (95) | 0.73 (77) |
+| Selective τ=.2 | 0.93 (98) | 0.67 (94) | 0.95 (98) | 0.81 (96) | 0.74 (84) |
+| Selective τ=.6 | 0.94 (95) | 0.81 (79) | 0.94 (98) | 0.88 (90) | 0.81 (63) |
 | Surplus | 0.85 (97) | 0.66 (93) | 0.91 (99) | 0.80 (97) | 0.70 (77) |
 | Uniform (new) | 0.89 (97) | 0.64 (91) | 0.94 (98) | 0.80 (97) | 0.75 (75) |
 | Qwen3-30B | -0.06 (94) | 0.53 (90) | -0.15 (90) | 0.63 (94) | 0.55 (73) |
@@ -24,7 +26,9 @@ Revised trained-model rows (Threshold, Surplus and Uniform) average seeds 42, 43
 
 | Learner | Pareto CA ↑ | Pareto DnD ↑ | First bid AHP ↓ | First bid CRA ↓ |
 |---|---:|---:|---:|---:|
-| Threshold (Ours) | 0.4598 | 0.6964 | 0.4332 | 0.4110 |
+| Threshold (Ours, τ=.4) | 0.4598 | 0.6964 | 0.4332 | 0.4110 |
+| Selective τ=.2 | 0.5612 | 0.7879 | 0.4150 | 0.3882 |
+| Selective τ=.6 | 0.7987 | 0.8409 | 0.3938 | 0.3668 |
 | Surplus | 0.5205 | 0.6789 | 0.5208 | 0.4933 |
 | Uniform (new) | 0.5579 | 0.7429 | 0.4554 | 0.4329 |
 | Qwen3-30B | 0.4196 | 0.5745 | 0.9691 | 0.9874 |

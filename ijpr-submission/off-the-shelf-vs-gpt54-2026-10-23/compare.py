@@ -39,6 +39,8 @@ def measure(ds,label,path,*,reused=False,seed=None,require_group=True):
     meta = read(path/'metrics.json')
     assert meta['failed_episodes']==0, ('Retry outstanding execution failures first',path)
     assert meta['economic_regulation'] is True
+    if (path/'failed.json').exists():
+        assert not read(path/'failed.json'), ('Outstanding execution failures', path)
     if require_group:
         assert meta['protocol_version']==V3 and meta['comparison_group']==group
     assert meta['evaluation_settings']==dict(max_turns=12,temperature=.7,top_p=1.,economic_regulation=True)
@@ -76,7 +78,7 @@ def measure(ds,label,path,*,reused=False,seed=None,require_group=True):
 cells=[measure(ds,label,path,reused=reused) for ds,label,path,reused in specs]
 assert sum(c['episodes'] for c in cells if not c['reused'])==4136
 assert sum(c['episodes'] for c in cells)==4653
-trained_labels=['Selective τ=.4','Surplus','Uniform τ=.4']
+trained_labels=['Selective τ=.2', 'Selective τ=.4', 'Selective τ=.6', 'Surplus', 'Uniform τ=.4']
 refresh_launch=ROOT/'files/seed42-gpt54-v3-eval-2026-10-23'
 refresh_cfg=yaml.safe_load((refresh_launch/'eval-seed42-v3.yaml').read_text())
 refresh_runs=sorted((ROOT/refresh_cfg['storage_dir']).glob('run_*'))
@@ -95,12 +97,17 @@ for c in read(ROOT/'ijpr-revision/original-metrics-2026-10-23/results.json')['ce
     if c['opponent']=='GPT-5.4' and c['condition'] in trained_labels:
         source=ROOT/c['source']
         assert hashlib.sha256(source.read_bytes()).hexdigest()==c['source_sha256']
-        if c['seed']==42:
+        if c['seed']==42 and c['condition'] in refresh_labels:
             row=measure(c['dataset'],c['condition'],refresh_paths[c['condition'],c['dataset']],seed=42,require_group=True)
         else:
             row=measure(c['dataset'],c['condition'],source.parent,reused=True,seed=c['seed'],require_group=True)
             assert abs(row['quality']-c['clipped_br'])<1e-12
         cells.append(row)
+for label in trained_labels:
+    records = [c for c in cells if c['learner'] == label]
+    assert len(records) == 15, ('Expected 15 trained cells', label)
+    assert {(c['seed'], c['dataset']) for c in records} == {(seed, ds) for seed in [42, 43, 44] for ds in DS}
+    assert sum(c['episodes'] for c in records) == 1551
 groups=defaultdict(list)
 for c in cells:
     groups[c['learner'],c['dataset']].append(c)
@@ -114,7 +121,8 @@ old_means={}
 for line in old_table(3).splitlines()[2:]:
     fields=[v.strip() for v in line.strip('|').split('|')]
     old_means[fields[0]]=st.mean(float(re.match(r'(-?[\d.]+)',v).group(1)) for v in fields[1:])
-mapping=[('Threshold (Ours)','Selective τ=.4'),('Surplus','Surplus'),('Uniform (new)','Uniform τ=.4'),
+mapping=[('Threshold (Ours, τ=.4)','Selective τ=.4'),('Selective τ=.2','Selective τ=.2'),
+         ('Selective τ=.6','Selective τ=.6'),('Surplus','Surplus'),('Uniform (new)','Uniform τ=.4'),
          ('Qwen3-30B','qwen3-30b-a3b-instruct-2507'),('Qwen3-30B-T',None),
          ('Qwen3-235B','qwen3-235b-a22b-2507'),('Qwen3-235B-T','qwen3-235b-a22b-thinking-2507'),
          ('Qwen3.6-35B','qwen3.6-35b-a3b-untrained-nonthinking'),('GPT-5.4','gpt-5.4-off-the-shelf-openai'),
@@ -132,14 +140,14 @@ def macro(label,seeds=None):
                                utility=st.mean(c['utility'] for c in records),deal_rate=sum(c['deals'] for c in records)/sum(c['episodes'] for c in records)))
     return dict(learner=label,seeds=list(by_seed),per_seed=statistics,
                 **{k:st.mean(s[k] for s in statistics) if all(s[k] is not None for s in statistics) else None for k in ['quality','utility','deal_rate']})
-summary=[dict(old_label=old,original_quality_rounded=old_means.get(old),**macro(label)) for old,label in mapping if label]
+summary=[dict(old_label=old,original_quality_rounded=old_means.get('Threshold (Ours)' if label == 'Selective τ=.4' else old),**macro(label)) for old,label in mapping if label]
 matched=[macro(label,[43,44]) for label in trained_labels]
 best=max((s for s in summary if s['learner'] not in trained_labels),key=lambda s:s['utility'])
 selective=next(s for s in summary if s['learner']=='Selective τ=.4')
 surplus=next(s for s in summary if s['learner']=='Surplus')
 fmt=lambda x:'—' if x is None else f'{x:.4f}'
 text = ['# Revised results against GPT-5.4', '',
-        'Revised trained-model rows (Threshold, Surplus and Uniform) average seeds 42, 43 and 44. Off-the-shelf models have one evaluation per scenario. BR cells show mean clipped bargained ratio (deal %); — indicates unavailable results.', '',
+        'All trained-model rows (Selective τ=.2/.4/.6, Surplus and Uniform τ=.4) average seeds 42, 43 and 44. Off-the-shelf models have one evaluation per scenario. BR cells show mean clipped bargained ratio (deal %); — indicates unavailable results.', '',
         '## Table 3 — mean clipped bargained ratio (deal %)', '',
         '| Learner | AHP | CA | CRA | DnD | JI |', '|---|---:|---:|---:|---:|---:|']
 for old, learner in mapping:
@@ -152,10 +160,11 @@ for old, learner in mapping:
     text.append('| '+old+' | '+' | '.join(values)+' |')
 results=dict(run=str(run.relative_to(ROOT)),completed_new_episodes=4136,new_dataset_cells=40,reused_baseline_episodes=517,
              off_the_shelf_total_episodes=4653,original_source='ijpr-submission/paper.tex',
+             trained_seeds=[42,43,44],trained_dataset_cells=75,reused_threshold_dataset_cells=30,reused_threshold_episodes=3102,
              summary=summary,matched_protocol_summary=matched,cells=cells,
              seed42_refresh_run=str(refresh_run.relative_to(ROOT)),seed42_refresh_new_episodes=1551,seed42_refresh_dataset_cells=15,
              historical_handoff_summary=read(refresh_launch/'previous-comparison-results.json')['summary'])
 (OUT/'results.json').write_text(json.dumps(results,indent=2,ensure_ascii=False)+'\n')
 (OUT/'report.md').write_text('\n'.join(text)+'\n')
-print('Verified 40 off-the-shelf cells /4,136 episodes, 517 reused baseline episodes, and 15 refreshed seed42 cells /1,551 episodes. Report:',OUT/'report.md')
+print('Verified 45 baseline cells /4,653 episodes and 75 trained cells /7,755 episodes, including 30 reused threshold cells and 15 refreshed seed42 cells. Report:',OUT/'report.md')
 print('Three-seed current-evaluation utility: Selective',selective['utility'],'Surplus',surplus['utility'],'best off-the-shelf',best['old_label'],best['utility'])
