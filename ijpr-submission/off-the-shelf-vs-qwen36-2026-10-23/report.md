@@ -1,0 +1,39 @@
+# Revised results against base Qwen3.6
+
+Revised trained-model rows (Threshold, Surplus and Uniform) average seeds 42, 43 and 44. Off-the-shelf models have one evaluation per scenario. BR cells show mean clipped bargained ratio (deal %); — indicates unavailable results.
+
+## Table 1 — mean clipped bargained ratio (deal %)
+
+| Learner | AHP | CA | CRA | DnD | JI |
+|---|---:|---:|---:|---:|---:|
+| Threshold (Ours) | 0.93 (94) | 0.67 (90) | 0.94 (98) | 0.80 (95) | 0.73 (77) |
+| Surplus | 0.85 (97) | 0.66 (93) | 0.91 (99) | 0.80 (97) | 0.70 (77) |
+| Uniform (new) | 0.89 (97) | 0.64 (91) | 0.94 (98) | 0.80 (97) | 0.75 (75) |
+| Qwen3-30B | -0.06 (94) | 0.53 (90) | -0.15 (90) | 0.63 (94) | 0.55 (73) |
+| Qwen3-30B-T | — | — | — | — | — |
+| Qwen3-235B | 0.44 (96) | 0.55 (96) | 0.25 (96) | 0.65 (97) | 0.67 (67) |
+| Qwen3-235B-T | 0.38 (97) | 0.54 (98) | 0.35 (99) | 0.74 (96) | 0.72 (74) |
+| Qwen3.6-35B | 0.31 (97) | 0.52 (93) | 0.27 (95) | 0.69 (88) | 0.71 (64) |
+| GPT-5.4 | 0.60 (100) | 0.55 (97) | 0.49 (100) | 0.71 (98) | 0.73 (74) |
+| GPT-5.4-mini | 0.32 (95) | 0.48 (97) | 0.14 (98) | 0.67 (94) | 0.69 (60) |
+| DeepSeek-V3.1 | 0.44 (98) | 0.48 (90) | 0.33 (98) | 0.71 (96) | 0.72 (79) |
+| Kimi-K2-T | 0.48 (98) | 0.52 (96) | 0.34 (98) | 0.71 (97) | 0.70 (76) |
+| Llama-4-Maverick | 0.20 (98) | 0.53 (99) | 0.16 (96) | 0.68 (98) | 0.68 (76) |
+
+## Table 2 — Pareto efficiency and first-bid ratios
+
+| Learner | Pareto CA ↑ | Pareto DnD ↑ | First bid AHP ↓ | First bid CRA ↓ |
+|---|---:|---:|---:|---:|
+| Threshold (Ours) | 0.4598 | 0.6964 | 0.4332 | 0.4110 |
+| Surplus | 0.5205 | 0.6789 | 0.5208 | 0.4933 |
+| Uniform (new) | 0.5579 | 0.7429 | 0.4554 | 0.4329 |
+| Qwen3-30B | 0.4196 | 0.5745 | 0.9691 | 0.9874 |
+| Qwen3-30B-T | — | — | — | — |
+| Qwen3-235B | 0.4118 | 0.5773 | 0.7976 | 0.8519 |
+| Qwen3-235B-T | 0.5738 | 0.6667 | 0.7943 | 0.7973 |
+| Qwen3.6-35B | 0.4522 | 0.6364 | 0.7558 | 0.8110 |
+| GPT-5.4 | 0.4583 | 0.6020 | 0.7092 | 0.7516 |
+| GPT-5.4-mini | 0.4000 | 0.5957 | 0.8171 | 0.8973 |
+| DeepSeek-V3.1 | 0.4732 | 0.5938 | 0.7738 | 0.8187 |
+| Kimi-K2-T | 0.5378 | 0.6701 | 0.8158 | 0.8159 |
+| Llama-4-Maverick | 0.4228 | 0.6837 | 0.8557 | 0.8762 |

@@ -1,0 +1,2161 @@
+{
+  "run": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172",
+  "completed_new_episodes": 4136,
+  "new_dataset_cells": 40,
+  "reused_baseline_episodes": 517,
+  "off_the_shelf_total_episodes": 4653,
+  "original_source": "ijpr-submission/paper.tex",
+  "summary": [
+    {
+      "old_label": "Threshold (Ours)",
+      "original_quality_rounded": 0.512,
+      "learner": "Selective τ=.4",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.6091361980277079,
+          "utility": 0.5785118688172043,
+          "deal_rate": 0.941972920696325
+        },
+        {
+          "seed": 43,
+          "quality": 0.632557765169083,
+          "utility": 0.5896151010752688,
+          "deal_rate": 0.9264990328820116
+        },
+        {
+          "seed": 44,
+          "quality": 0.5573700410277236,
+          "utility": 0.4904666,
+          "deal_rate": 0.8704061895551257
+        }
+      ],
+      "quality": 0.5996880014081715,
+      "utility": 0.552864523297491,
+      "deal_rate": 0.9129593810444875
+    },
+    {
+      "old_label": "Surplus",
+      "original_quality_rounded": 0.404,
+      "learner": "Surplus",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.6106749609705249,
+          "utility": 0.568838870967742,
+          "deal_rate": 0.9264990328820116
+        },
+        {
+          "seed": 43,
+          "quality": 0.5095632469516901,
+          "utility": 0.500062976344086,
+          "deal_rate": 0.9748549323017408
+        },
+        {
+          "seed": 44,
+          "quality": 0.5198813431021267,
+          "utility": 0.49024558279569896,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.5467065170081139,
+      "utility": 0.5197158100358423,
+      "deal_rate": 0.9464861379754996
+    },
+    {
+      "old_label": "Uniform (new)",
+      "original_quality_rounded": null,
+      "learner": "Uniform τ=.4",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.5924081883388569,
+          "utility": 0.5356447440860215,
+          "deal_rate": 0.8955512572533849
+        },
+        {
+          "seed": 43,
+          "quality": 0.6131905228386375,
+          "utility": 0.5628416731182796,
+          "deal_rate": 0.9148936170212766
+        },
+        {
+          "seed": 44,
+          "quality": 0.6075457169188175,
+          "utility": 0.5725243806451613,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.604381476032104,
+      "utility": 0.5570035992831541,
+      "deal_rate": 0.9161831076724694
+    },
+    {
+      "old_label": "Qwen3-30B",
+      "original_quality_rounded": 0.298,
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.2599356146970201,
+          "utility": 0.2563736344086021,
+          "deal_rate": 0.8568665377176016
+        }
+      ],
+      "quality": 0.2599356146970201,
+      "utility": 0.2563736344086021,
+      "deal_rate": 0.8568665377176016
+    },
+    {
+      "old_label": "Qwen3-235B",
+      "original_quality_rounded": 0.414,
+      "learner": "qwen3-235b-a22b-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3954455774451842,
+          "utility": 0.35450896559139783,
+          "deal_rate": 0.8336557059961315
+        }
+      ],
+      "quality": 0.3954455774451842,
+      "utility": 0.35450896559139783,
+      "deal_rate": 0.8336557059961315
+    },
+    {
+      "old_label": "Qwen3-235B-T",
+      "original_quality_rounded": 0.4,
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4101147461452098,
+          "utility": 0.3815288989247312,
+          "deal_rate": 0.8762088974854932
+        }
+      ],
+      "quality": 0.4101147461452098,
+      "utility": 0.3815288989247312,
+      "deal_rate": 0.8762088974854932
+    },
+    {
+      "old_label": "Qwen3.6-35B",
+      "original_quality_rounded": 0.438,
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3947476413503903,
+          "utility": 0.3589050430107527,
+          "deal_rate": 0.8413926499032882
+        }
+      ],
+      "quality": 0.3947476413503903,
+      "utility": 0.3589050430107527,
+      "deal_rate": 0.8413926499032882
+    },
+    {
+      "old_label": "GPT-5.4",
+      "original_quality_rounded": 0.45,
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4421401644969973,
+          "utility": 0.4007476344086021,
+          "deal_rate": 0.8878143133462283
+        }
+      ],
+      "quality": 0.4421401644969973,
+      "utility": 0.4007476344086021,
+      "deal_rate": 0.8878143133462283
+    },
+    {
+      "old_label": "GPT-5.4-mini",
+      "original_quality_rounded": 0.374,
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3567845151285154,
+          "utility": 0.3388596731182796,
+          "deal_rate": 0.8684719535783365
+        }
+      ],
+      "quality": 0.3567845151285154,
+      "utility": 0.3388596731182796,
+      "deal_rate": 0.8684719535783365
+    },
+    {
+      "old_label": "DeepSeek-V3.1",
+      "original_quality_rounded": 0.422,
+      "learner": "deepseek-chat-v3.1",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4129942252012765,
+          "utility": 0.37363219569892475,
+          "deal_rate": 0.8297872340425532
+        }
+      ],
+      "quality": 0.4129942252012765,
+      "utility": 0.37363219569892475,
+      "deal_rate": 0.8297872340425532
+    },
+    {
+      "old_label": "Kimi-K2-T",
+      "original_quality_rounded": 0.41400000000000003,
+      "learner": "kimi-k2-thinking",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.42836072790790986,
+          "utility": 0.39353940000000004,
+          "deal_rate": 0.8549323017408124
+        }
+      ],
+      "quality": 0.42836072790790986,
+      "utility": 0.39353940000000004,
+      "deal_rate": 0.8549323017408124
+    },
+    {
+      "old_label": "Llama-4-Maverick",
+      "original_quality_rounded": 0.308,
+      "learner": "llama-4-maverick",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3331964663749332,
+          "utility": 0.3354335720430108,
+          "deal_rate": 0.8704061895551257
+        }
+      ],
+      "quality": 0.3331964663749332,
+      "utility": 0.3354335720430108,
+      "deal_rate": 0.8704061895551257
+    }
+  ],
+  "matched_protocol_summary": [
+    {
+      "learner": "Selective τ=.4",
+      "seeds": [
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 43,
+          "quality": 0.632557765169083,
+          "utility": 0.5896151010752688,
+          "deal_rate": 0.9264990328820116
+        },
+        {
+          "seed": 44,
+          "quality": 0.5573700410277236,
+          "utility": 0.4904666,
+          "deal_rate": 0.8704061895551257
+        }
+      ],
+      "quality": 0.5949639030984033,
+      "utility": 0.5400408505376344,
+      "deal_rate": 0.8984526112185687
+    },
+    {
+      "learner": "Surplus",
+      "seeds": [
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 43,
+          "quality": 0.5095632469516901,
+          "utility": 0.500062976344086,
+          "deal_rate": 0.9748549323017408
+        },
+        {
+          "seed": 44,
+          "quality": 0.5198813431021267,
+          "utility": 0.49024558279569896,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.5147222950269084,
+      "utility": 0.4951542795698925,
+      "deal_rate": 0.9564796905222437
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "seeds": [
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 43,
+          "quality": 0.6131905228386375,
+          "utility": 0.5628416731182796,
+          "deal_rate": 0.9148936170212766
+        },
+        {
+          "seed": 44,
+          "quality": 0.6075457169188175,
+          "utility": 0.5725243806451613,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.6103681198787275,
+      "utility": 0.5676830268817205,
+      "deal_rate": 0.9264990328820115
+    }
+  ],
+  "cells": [
+    {
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 68,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/qwen3-30b-a3b-instruct-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d1fd086ae36efd5995ed2f6849eb1531a82d6153b0ba4aec0c63cca2ff77a648",
+      "quality": -0.12415,
+      "utility": -0.0907763440860215,
+      "deal_rate": 0.7311827956989247,
+      "pareto": null,
+      "first_bid": 0.9828170731707317
+    },
+    {
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 110,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/qwen3-30b-a3b-instruct-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "19edf82465cbe09f6d8e7ab80fe178067715b4fa9ec37165b9357d72f16e5ef7",
+      "quality": 0.5212109090909091,
+      "utility": 0.46236451612903223,
+      "deal_rate": 0.8870967741935484,
+      "pareto": 0.5,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 75,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/qwen3-30b-a3b-instruct-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "4c021eedd1eb403ba788a2d812df6b3b5d70a2faa2605546af72fafb72102246",
+      "quality": -0.2600266666666667,
+      "utility": -0.19502,
+      "deal_rate": 0.75,
+      "pareto": null,
+      "first_bid": 0.9834151515151515
+    },
+    {
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 97,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/qwen3-30b-a3b-instruct-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "4e92c15b4b35c2148790e67ab4f717650840232be2877a0fc1aa897890c7593e",
+      "quality": 0.6010309278350515,
+      "utility": 0.583,
+      "deal_rate": 0.97,
+      "pareto": 0.4329896907216495,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 93,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/qwen3-30b-a3b-instruct-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d7b9981ad2f7f4b4c821fb2c8ec4a07fe4f02d8c508288bb771816dff7026e26",
+      "quality": 0.5616129032258065,
+      "utility": 0.5223,
+      "deal_rate": 0.93,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-2507",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 63,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/qwen3-235b-a22b-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "14f31113c2c14203eaf5e2d73e9a7dfa6f613fee460bc3c4eafb551369fe69d7",
+      "quality": 0.20154603174603175,
+      "utility": 0.13653118279569892,
+      "deal_rate": 0.6774193548387096,
+      "pareto": null,
+      "first_bid": 0.8021521739130435
+    },
+    {
+      "learner": "qwen3-235b-a22b-2507",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 113,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/qwen3-235b-a22b-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "210a712165652c07b58b3b4fc0d64462d6a07e72f0c587018b09e9c98694d2db",
+      "quality": 0.5262929203539823,
+      "utility": 0.47960564516129034,
+      "deal_rate": 0.9112903225806451,
+      "pareto": 0.4424778761061947,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-2507",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 71,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/qwen3-235b-a22b-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "bd1a4d8929170ea657544a109603476235b9710ea9d17753289d6bbfa3f1b93a",
+      "quality": -0.03252394366197183,
+      "utility": -0.023092,
+      "deal_rate": 0.71,
+      "pareto": null,
+      "first_bid": 0.835522
+    },
+    {
+      "learner": "qwen3-235b-a22b-2507",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 96,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/qwen3-235b-a22b-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "b17694b015b1ff8425d9aa0f6ec71eda9e0bc78c3f7876cf2e7bda08375cd561",
+      "quality": 0.6427083333333333,
+      "utility": 0.617,
+      "deal_rate": 0.96,
+      "pareto": 0.6458333333333334,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-2507",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 88,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/qwen3-235b-a22b-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "933e90c42b99fadd7054322ddf827694693cc899eb23e9a138494b2a680be3ee",
+      "quality": 0.6392045454545454,
+      "utility": 0.5625,
+      "deal_rate": 0.88,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 73,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/qwen3-235b-a22b-thinking-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d09cdfdf7d376e0adc2d6f0e0b6cfda4e5929484c3f2b2180eeb23f2799b1d22",
+      "quality": 0.13207945205479452,
+      "utility": 0.1036752688172043,
+      "deal_rate": 0.7849462365591398,
+      "pareto": null,
+      "first_bid": 0.7729586206896552
+    },
+    {
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 118,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/qwen3-235b-a22b-thinking-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d9c3bf420a04028bc70f6ab3e6ee75e5eab54df924769b6bdd46f51de07ea0e7",
+      "quality": 0.5230627118644068,
+      "utility": 0.49775322580645165,
+      "deal_rate": 0.9516129032258065,
+      "pareto": 0.4661016949152542,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 74,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/qwen3-235b-a22b-thinking-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "2d3357f6bb9bfc6be9309fca30eef35a0ea22dbf82a30a0178c846ca4a90a369",
+      "quality": 0.035427027027027026,
+      "utility": 0.026216,
+      "deal_rate": 0.74,
+      "pareto": null,
+      "first_bid": 0.797217
+    },
+    {
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 99,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/qwen3-235b-a22b-thinking-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "15578018743896507f8dc83ec8789b3b30ed5ab9641f606d68068200219c523d",
+      "quality": 0.695959595959596,
+      "utility": 0.6890000000000001,
+      "deal_rate": 0.99,
+      "pareto": 0.696969696969697,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 89,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/qwen3-235b-a22b-thinking-2507_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "f39be5a529768158e8c25250dc8973bccb5ffcda8f0675ed71e3986d6c914cd9",
+      "quality": 0.6640449438202247,
+      "utility": 0.591,
+      "deal_rate": 0.89,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 76,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/gpt-5.4-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "4084e5ad48d057d5dff10e36abc87f2d0ffeb64f4bddad201128d58c42b7faa6",
+      "quality": 0.2384421052631579,
+      "utility": 0.19485591397849464,
+      "deal_rate": 0.8172043010752689,
+      "pareto": null,
+      "first_bid": 0.7141032258064516
+    },
+    {
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 119,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/gpt-5.4-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "69e145555489cebfe84d36a688fcddd2e17b2b04cc351beed990079c00e352d2",
+      "quality": 0.5247411764705883,
+      "utility": 0.5035822580645162,
+      "deal_rate": 0.9596774193548387,
+      "pareto": 0.47058823529411764,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 83,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/gpt-5.4-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "35986f15c2783cfaa14026c83f3c11699b167f7e7028041fa5edf967ed846a16",
+      "quality": 0.07012048192771084,
+      "utility": 0.0582,
+      "deal_rate": 0.83,
+      "pareto": null,
+      "first_bid": 0.745821
+    },
+    {
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 96,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/gpt-5.4-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "4ca8a6726e80fb3309c5f540c8c5ec3d6d0b04b651b6503c075c36e9f2c05bc0",
+      "quality": 0.69375,
+      "utility": 0.6659999999999999,
+      "deal_rate": 0.96,
+      "pareto": 0.6458333333333334,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 85,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/gpt-5.4-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "eb862116160bf8945b62a1575228516ef8c67105df1f241ad18dfc9d8c29ed8a",
+      "quality": 0.6836470588235294,
+      "utility": 0.5811,
+      "deal_rate": 0.85,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 62,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/gpt-5.4-mini-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "f235f781ef86389117f2220a7d9b13279a467a0ed4d2b95a2bde2238ec3f22cc",
+      "quality": 0.1410258064516129,
+      "utility": 0.09401720430107528,
+      "deal_rate": 0.6666666666666666,
+      "pareto": null,
+      "first_bid": 0.8358943820224719
+    },
+    {
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 123,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/gpt-5.4-mini-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "ada60e75e776d44e86ea97cf531d4946d516743bb2cca7f29c08a1add39af34a",
+      "quality": 0.4740178861788618,
+      "utility": 0.47019516129032257,
+      "deal_rate": 0.9919354838709677,
+      "pareto": 0.35772357723577236,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 75,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/gpt-5.4-mini-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "15652e203552c32c25352be17e610f37410ccfa012b255aeb6d117a390f3d206",
+      "quality": -0.131752,
+      "utility": -0.09881400000000001,
+      "deal_rate": 0.75,
+      "pareto": null,
+      "first_bid": 0.889204
+    },
+    {
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 97,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/gpt-5.4-mini-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "2b5c7424573a128e89757146c8260330954e266720eebe8e9883f19e3b0c3405",
+      "quality": 0.6463917525773196,
+      "utility": 0.627,
+      "deal_rate": 0.97,
+      "pareto": 0.6082474226804123,
+      "first_bid": null
+    },
+    {
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 92,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/gpt-5.4-mini-off-the-shelf-openai_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "5f27df91d083964635207fc88bedf433b35173e03d968d448a66078b78fba85c",
+      "quality": 0.6542391304347827,
+      "utility": 0.6019,
+      "deal_rate": 0.92,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "deepseek-chat-v3.1",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 69,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/deepseek-chat-v3.1_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "773adc81f339023bcdb868797d2a07366f4479f9f0b5bcbd8c4cf079d0857611",
+      "quality": 0.13431014492753623,
+      "utility": 0.0996494623655914,
+      "deal_rate": 0.7419354838709677,
+      "pareto": null,
+      "first_bid": 0.7796709677419355
+    },
+    {
+      "learner": "deepseek-chat-v3.1",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 105,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/deepseek-chat-v3.1_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "a9a6a38526500e2095460571fb334adf3337adb2b4fd4525cb3631999cbe764a",
+      "quality": 0.4849161904761905,
+      "utility": 0.41061451612903227,
+      "deal_rate": 0.8467741935483871,
+      "pareto": 0.4380952380952381,
+      "first_bid": null
+    },
+    {
+      "learner": "deepseek-chat-v3.1",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 66,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/deepseek-chat-v3.1_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "03ca7b61494209fb67607703ba7ceeee0dced40b37337d98bf5f17c44a6f3c82",
+      "quality": 0.03408636363636364,
+      "utility": 0.022497,
+      "deal_rate": 0.66,
+      "pareto": null,
+      "first_bid": 0.813813
+    },
+    {
+      "learner": "deepseek-chat-v3.1",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 89,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/deepseek-chat-v3.1_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "bad8aebe0b7fba55f2f2ef11a0ec6380492c433de06b250ad240bb6caac681de",
+      "quality": 0.6932584269662921,
+      "utility": 0.617,
+      "deal_rate": 0.89,
+      "pareto": 0.651685393258427,
+      "first_bid": null
+    },
+    {
+      "learner": "deepseek-chat-v3.1",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/deepseek-chat-v3.1_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "0c8932855dafb4934bdbc91c99fbce2bf96c7e06924bbd431b1b73b6fab56906",
+      "quality": 0.7184,
+      "utility": 0.7184,
+      "deal_rate": 1.0,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "kimi-k2-thinking",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 67,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/kimi-k2-thinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "30cfa39896126e46c46d3ecb931522d59f81f519bc3ad0bce1bee14fcfbe8352",
+      "quality": 0.19974179104477613,
+      "utility": 0.1439,
+      "deal_rate": 0.7204301075268817,
+      "pareto": null,
+      "first_bid": 0.8021397849462366
+    },
+    {
+      "learner": "kimi-k2-thinking",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 121,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/kimi-k2-thinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "e0f30ff2b4f172683529cce267e6008853a8c7ebbeab9a56152ed0739bfd11b4",
+      "quality": 0.5066578512396694,
+      "utility": 0.4944,
+      "deal_rate": 0.9758064516129032,
+      "pareto": 0.6198347107438017,
+      "first_bid": null
+    },
+    {
+      "learner": "kimi-k2-thinking",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 67,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/kimi-k2-thinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "c4acbb462fffe8c1133a45e72860cf64a22e3aaf1ab7a1467229050533d2f57f",
+      "quality": 0.054622388059701495,
+      "utility": 0.036597,
+      "deal_rate": 0.67,
+      "pareto": null,
+      "first_bid": 0.810258
+    },
+    {
+      "learner": "kimi-k2-thinking",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/kimi-k2-thinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "02c32dd8d1687d84caa3e5ee1e6371784c4eb9089993a80f6dc0a5df62151e31",
+      "quality": 0.704,
+      "utility": 0.7040000000000001,
+      "deal_rate": 1.0,
+      "pareto": 0.71,
+      "first_bid": null
+    },
+    {
+      "learner": "kimi-k2-thinking",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 87,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/kimi-k2-thinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "e9f8c5f4901d631a51ba15decc89bdf274a50a3a1141ed9db3ea5422e022ca11",
+      "quality": 0.6767816091954023,
+      "utility": 0.5888,
+      "deal_rate": 0.87,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "llama-4-maverick",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": false,
+      "episodes": 93,
+      "deals": 60,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/amazon/llama-4-maverick_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "eefad5f0f117fa9eb4c3186599d26875e8ca73b5a2f5c988fe7ca903554a4e44",
+      "quality": 0.01438833333333333,
+      "utility": 0.009282795698924729,
+      "deal_rate": 0.6451612903225806,
+      "pareto": null,
+      "first_bid": 0.8801032967032967
+    },
+    {
+      "learner": "llama-4-maverick",
+      "dataset": "casino",
+      "seed": null,
+      "reused": false,
+      "episodes": 124,
+      "deals": 124,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/casino/llama-4-maverick_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "18df549fd5d70a0c76b03414fc898c1ce5035d6c45ef9abe963be24979607b0e",
+      "quality": 0.503133064516129,
+      "utility": 0.503133064516129,
+      "deal_rate": 1.0,
+      "pareto": 0.4596774193548387,
+      "first_bid": null
+    },
+    {
+      "learner": "llama-4-maverick",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 71,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/craigslist/llama-4-maverick_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "515b86f6c13d3d374a4bcc1656039d1a829da3c49527af9395695f57fa9af47e",
+      "quality": -0.1744338028169014,
+      "utility": -0.123848,
+      "deal_rate": 0.71,
+      "pareto": null,
+      "first_bid": 0.888096
+    },
+    {
+      "learner": "llama-4-maverick",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/dnd/llama-4-maverick_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "ddb5d6ac7095d4ecbbee612d5e8aa259b503858795590bf936e5393263c1c9b7",
+      "quality": 0.637,
+      "utility": 0.637,
+      "deal_rate": 1.0,
+      "pareto": 0.56,
+      "first_bid": null
+    },
+    {
+      "learner": "llama-4-maverick",
+      "dataset": "ji",
+      "seed": null,
+      "reused": false,
+      "episodes": 100,
+      "deals": 95,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/off-the-shelf-original-models-vs-gpt54/run_20261023_224750_496172/ji/llama-4-maverick_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "a0608a009acba7877d1361ba7fec16904b1abfda2329670d1674ded2d2a23067",
+      "quality": 0.6858947368421052,
+      "utility": 0.6516,
+      "deal_rate": 0.95,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "dataset": "amazon",
+      "seed": null,
+      "reused": true,
+      "episodes": 93,
+      "deals": 62,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/base-qwen36-gpt54-openai/run_20261004_202248_117114/amazon/qwen3.6-35b-a3b-untrained-nonthinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "038138babf34ec459e3a00583a43156f01a3d5ab297d6e8812a92dc40f9e5661",
+      "quality": 0.13701612903225807,
+      "utility": 0.09134408602150537,
+      "deal_rate": 0.6666666666666666,
+      "pareto": null,
+      "first_bid": 0.770796511627907
+    },
+    {
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "dataset": "casino",
+      "seed": null,
+      "reused": true,
+      "episodes": 124,
+      "deals": 121,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/base-qwen36-gpt54-openai/run_20261004_202248_117114/casino/qwen3.6-35b-a3b-untrained-nonthinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "e5da85e7e97a625021193ea1d3d08df8f30b8621d1baa4e6829b7fbe2b28de93",
+      "quality": 0.5002181818181818,
+      "utility": 0.4881161290322581,
+      "deal_rate": 0.9758064516129032,
+      "pareto": 0.4628099173553719,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "dataset": "craigslist",
+      "seed": null,
+      "reused": true,
+      "episodes": 100,
+      "deals": 69,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/base-qwen36-gpt54-openai/run_20261004_202248_117114/craigslist/qwen3.6-35b-a3b-untrained-nonthinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "6ca37356bb04f37ffcdf4ce1d214b37732b1c11432f7737a7f3d69028ec50707",
+      "quality": 0.03386231884057971,
+      "utility": 0.023365,
+      "deal_rate": 0.69,
+      "pareto": null,
+      "first_bid": 0.769288
+    },
+    {
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "dataset": "dnd",
+      "seed": null,
+      "reused": true,
+      "episodes": 100,
+      "deals": 93,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/base-qwen36-gpt54-openai/run_20261004_202248_117114/dnd/qwen3.6-35b-a3b-untrained-nonthinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "c152e7d6a4ae246fae02ac11276fc6ec429cce62fb638c5ae94c53bea940dd99",
+      "quality": 0.6440860215053763,
+      "utility": 0.599,
+      "deal_rate": 0.93,
+      "pareto": 0.5806451612903226,
+      "first_bid": null
+    },
+    {
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "dataset": "ji",
+      "seed": null,
+      "reused": true,
+      "episodes": 100,
+      "deals": 90,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/base-qwen36-gpt54-openai/run_20261004_202248_117114/ji/qwen3.6-35b-a3b-untrained-nonthinking_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "98d272a5775f45634690fede90c709a05fc0df2b630c7abf9782ff3ee98d4dd0",
+      "quality": 0.6585555555555556,
+      "utility": 0.5927,
+      "deal_rate": 0.9,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "amazon",
+      "seed": 42,
+      "reused": false,
+      "episodes": 93,
+      "deals": 78,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/amazon/qwen3.6-35b-a3b-surplus-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d721c148222535457b141727588ee088a048b84eacdbdb4fe73457d8245ab0f6",
+      "quality": 0.5692615384615385,
+      "utility": 0.4774451612903226,
+      "deal_rate": 0.8387096774193549,
+      "pareto": null,
+      "first_bid": 0.4247440860215054
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "casino",
+      "seed": 42,
+      "reused": false,
+      "episodes": 124,
+      "deals": 114,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/casino/qwen3.6-35b-a3b-surplus-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "79ae73720b57a423e0621f2b0ff924661a363f51d357122ed3ffc0e53774cc29",
+      "quality": 0.6235342105263157,
+      "utility": 0.5732491935483871,
+      "deal_rate": 0.9193548387096774,
+      "pareto": 0.49122807017543857,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "craigslist",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 90,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/craigslist/qwen3.6-35b-a3b-surplus-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "8cee67738a070b1d2071d98964c640d29d24cbe756fdd998c150b2697bedf375",
+      "quality": 0.459,
+      "utility": 0.4131,
+      "deal_rate": 0.9,
+      "pareto": null,
+      "first_bid": 0.405701
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "dnd",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 98,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/dnd/qwen3.6-35b-a3b-surplus-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "c660fc7fce107006e09b735425a7a99f7eb94e6683a78db129c5b39d7dc2e647",
+      "quality": 0.7163265306122449,
+      "utility": 0.7020000000000001,
+      "deal_rate": 0.98,
+      "pareto": 0.7040816326530612,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "ji",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 99,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/ji/qwen3.6-35b-a3b-surplus-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "722fb01443fc8190599080fa8576e25802d21b5f71b97fe826c646b7de0d9a0f",
+      "quality": 0.6852525252525252,
+      "utility": 0.6784,
+      "deal_rate": 0.99,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "amazon",
+      "seed": 42,
+      "reused": false,
+      "episodes": 93,
+      "deals": 75,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/amazon/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "823b0ad9b9f0f2cf1167dd195486948803b77e9b4343786a4acc207cb9b0451e",
+      "quality": 0.4770466666666667,
+      "utility": 0.3847150537634409,
+      "deal_rate": 0.8064516129032258,
+      "pareto": null,
+      "first_bid": 0.4414591397849462
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "casino",
+      "seed": 42,
+      "reused": false,
+      "episodes": 124,
+      "deals": 121,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/casino/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "7abad4b44407bee8bf871c61b81538ed70c51803e3850b71e2030f93ec724c26",
+      "quality": 0.6409429752066116,
+      "utility": 0.6254362903225806,
+      "deal_rate": 0.9758064516129032,
+      "pareto": 0.5371900826446281,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "craigslist",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 92,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/craigslist/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "90a295fbcefeb6dcd8802c9cbf51f5327e122cba1fe938cdfadbcbf37a0dbfd7",
+      "quality": 0.47033478260869566,
+      "utility": 0.43270800000000004,
+      "deal_rate": 0.92,
+      "pareto": null,
+      "first_bid": 0.398758
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "dnd",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 99,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/dnd/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "9a6bbabc2374823830800505befe8663f650bfb25c5b97b5e46720d9fc8c7844",
+      "quality": 0.7656565656565657,
+      "utility": 0.758,
+      "deal_rate": 0.99,
+      "pareto": 0.8181818181818182,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "ji",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/ji/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "6b9f1383be16783cd180f2f68eb1fd2d8449ca40f276e86a6c534054b63ce2c1",
+      "quality": 0.6917,
+      "utility": 0.6917,
+      "deal_rate": 1.0,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "amazon",
+      "seed": 43,
+      "reused": true,
+      "episodes": 93,
+      "deals": 88,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed43-gpt54-openai/run_20260930_003426_461259/amazon/qwen3.6-35b-a3b-surplus-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "92702b948f9a5c44fb3f65cbb8480110226bf799fc99793aba58453f3f35cab7",
+      "quality": 0.24450454545454545,
+      "utility": 0.23135913978494624,
+      "deal_rate": 0.946236559139785,
+      "pareto": null,
+      "first_bid": 0.5448096774193548
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "casino",
+      "seed": 43,
+      "reused": true,
+      "episodes": 124,
+      "deals": 124,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed43-gpt54-openai/run_20260930_003426_461259/casino/qwen3.6-35b-a3b-surplus-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "a8151826403d0ba11e94bb20a9c7783acf91af134ca7236a5105a796dca0976d",
+      "quality": 0.6249927419354838,
+      "utility": 0.6249927419354838,
+      "deal_rate": 1.0,
+      "pareto": 0.5,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "craigslist",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 95,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed43-gpt54-openai/run_20260930_003426_461259/craigslist/qwen3.6-35b-a3b-surplus-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "dce9a9aadfe95d7a8a883a1485034b0d89e92ab1228447f3b5d52d05fce6ddc0",
+      "quality": 0.20711894736842107,
+      "utility": 0.19676300000000002,
+      "deal_rate": 0.95,
+      "pareto": null,
+      "first_bid": 0.514293
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "dnd",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 97,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed43-gpt54-openai/run_20260930_003426_461259/dnd/qwen3.6-35b-a3b-surplus-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "084a636ca24b6d966660cc60eec3ef1f4d75b8446fe26a4b2fe65cd6fe3bfa88",
+      "quality": 0.8,
+      "utility": 0.7759999999999999,
+      "deal_rate": 0.97,
+      "pareto": 0.6391752577319587,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "ji",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed43-gpt54-openai/run_20260930_003426_461259/ji/qwen3.6-35b-a3b-surplus-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "3e8b7291fb81eb2d87f6df7f3a76ac28ad1a8b916244043291ee95c7f6718a77",
+      "quality": 0.6712,
+      "utility": 0.6712,
+      "deal_rate": 1.0,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "amazon",
+      "seed": 44,
+      "reused": true,
+      "episodes": 93,
+      "deals": 80,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed44-gpt54-openai/run_20260930_205033_077559/amazon/qwen3.6-35b-a3b-surplus-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "c971c0f869af9ceb3ec5d180f5ad2b5a75c5cd324b79101fa9f2d96436d58e4d",
+      "quality": 0.4072025,
+      "utility": 0.3502817204301075,
+      "deal_rate": 0.8602150537634409,
+      "pareto": null,
+      "first_bid": 0.5954247311827957
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "casino",
+      "seed": 44,
+      "reused": true,
+      "episodes": 124,
+      "deals": 123,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed44-gpt54-openai/run_20260930_205033_077559/casino/qwen3.6-35b-a3b-surplus-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "9bbd2ebb81a7773657d8c2464ed1554f2295097fe82a2ba0462638737934d1b0",
+      "quality": 0.5320650406504065,
+      "utility": 0.5277741935483872,
+      "deal_rate": 0.9919354838709677,
+      "pareto": 0.4065040650406504,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "craigslist",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 91,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed44-gpt54-openai/run_20260930_205033_077559/craigslist/qwen3.6-35b-a3b-surplus-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "22c0e4c21be9502e707dee1abfe2eed415894167edd39e1ff6dd36da48cdf8ca",
+      "quality": 0.2854637362637363,
+      "utility": 0.259772,
+      "deal_rate": 0.91,
+      "pareto": null,
+      "first_bid": 0.571474
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "dnd",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 96,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed44-gpt54-openai/run_20260930_205033_077559/dnd/qwen3.6-35b-a3b-surplus-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d083174871c46040a6d5149b3975d206494b8e707386733c51ac8da6c6c0daec",
+      "quality": 0.7458333333333333,
+      "utility": 0.716,
+      "deal_rate": 0.96,
+      "pareto": 0.6875,
+      "first_bid": null
+    },
+    {
+      "learner": "Surplus",
+      "dataset": "ji",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 95,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/surplus-seed44-gpt54-openai/run_20260930_205033_077559/ji/qwen3.6-35b-a3b-surplus-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "b11120f3a0f0143a3829a831a6c07f8174d8619c8f7908c873271543cda4c181",
+      "quality": 0.6288421052631579,
+      "utility": 0.5974,
+      "deal_rate": 0.95,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "amazon",
+      "seed": 43,
+      "reused": true,
+      "episodes": 93,
+      "deals": 81,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed43-gpt54-openai/run_20260930_003431_868766/amazon/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "8bc173b69b9fdbdb4bd25424225ba0e5dd4544e653d7953904ce2da4a69e2880",
+      "quality": 0.6010172839506173,
+      "utility": 0.5234666666666666,
+      "deal_rate": 0.8709677419354839,
+      "pareto": null,
+      "first_bid": 0.4552333333333333
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "casino",
+      "seed": 43,
+      "reused": true,
+      "episodes": 124,
+      "deals": 117,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed43-gpt54-openai/run_20260930_003431_868766/casino/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "269da1f4faa63afb2f869fb9bd173607295ac22e17ed8071fbb927e6405e6fcf",
+      "quality": 0.6419700854700855,
+      "utility": 0.6057298387096774,
+      "deal_rate": 0.9435483870967742,
+      "pareto": 0.4444444444444444,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "craigslist",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 86,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed43-gpt54-openai/run_20260930_003431_868766/craigslist/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "3fb69cdc7aa38a9236a6920fe00dc339e7d6acf4e16ea785891be4ae15cf5434",
+      "quality": 0.4550918604651163,
+      "utility": 0.39137900000000003,
+      "deal_rate": 0.86,
+      "pareto": null,
+      "first_bid": 0.415059
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "dnd",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 96,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed43-gpt54-openai/run_20260930_003431_868766/dnd/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "803b21406970be06d574b615c0d1f7a335b44629794f9c331880abad749906f9",
+      "quality": 0.7520833333333333,
+      "utility": 0.722,
+      "deal_rate": 0.96,
+      "pareto": 0.7604166666666666,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "ji",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 99,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed43-gpt54-openai/run_20260930_003431_868766/ji/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "e2ef9d6056e677182d4df5f9a4918826d62a35dfa7ab6213f84d6f3af950998a",
+      "quality": 0.7126262626262626,
+      "utility": 0.7055,
+      "deal_rate": 0.99,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "amazon",
+      "seed": 44,
+      "reused": true,
+      "episodes": 93,
+      "deals": 66,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed44-gpt54-openai/run_20260930_205036_113426/amazon/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "8f1f1ed951cef12f96406dd7bb54208bb9b9d5e267df54fbbde8d77a3c361940",
+      "quality": 0.4636272727272727,
+      "utility": 0.3290258064516129,
+      "deal_rate": 0.7096774193548387,
+      "pareto": null,
+      "first_bid": 0.42093440860215053
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "casino",
+      "seed": 44,
+      "reused": true,
+      "episodes": 124,
+      "deals": 115,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed44-gpt54-openai/run_20260930_205036_113426/casino/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "85d943b884c6e9de82c79ad2976b5d26a057aabb0164813431262e7b8eaae500",
+      "quality": 0.5632826086956522,
+      "utility": 0.5223991935483872,
+      "deal_rate": 0.9274193548387096,
+      "pareto": 0.3652173913043478,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "craigslist",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 84,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed44-gpt54-openai/run_20260930_205036_113426/craigslist/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "976e7d3df0f6d7af279e66448416c93a43e2f0fb76607604cccdd54427febbbf",
+      "quality": 0.3797714285714286,
+      "utility": 0.319008,
+      "deal_rate": 0.84,
+      "pareto": null,
+      "first_bid": 0.40651
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "dnd",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 98,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed44-gpt54-openai/run_20260930_205036_113426/dnd/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "05ee140b7fc9c6ed28087b5a9e18a863708b77ec61486505c1b4383bb2773439",
+      "quality": 0.7377551020408163,
+      "utility": 0.723,
+      "deal_rate": 0.98,
+      "pareto": 0.7040816326530612,
+      "first_bid": null
+    },
+    {
+      "learner": "Selective τ=.4",
+      "dataset": "ji",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 87,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/selective-seed44-gpt54-openai/run_20260930_205036_113426/ji/qwen3.6-35b-a3b-selective-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "a73e815dfc113e733b48a169604ede532260e4dcfd3cd179d0605593e8d6b3da",
+      "quality": 0.6424137931034483,
+      "utility": 0.5589,
+      "deal_rate": 0.87,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "amazon",
+      "seed": 42,
+      "reused": false,
+      "episodes": 93,
+      "deals": 71,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/amazon/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "8be384e00ba8c7f5144450a0be64b1c8d1c29cdb78296f32e2088bc16bd61c86",
+      "quality": 0.47996338028169017,
+      "utility": 0.36642365591397846,
+      "deal_rate": 0.7634408602150538,
+      "pareto": null,
+      "first_bid": 0.3893225806451613
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "casino",
+      "seed": 42,
+      "reused": false,
+      "episodes": 124,
+      "deals": 119,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/casino/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "70b43b7a82c4b7d9a13fea3c1f8aef95de4d29ee2bac807362631fd2045efbe4",
+      "quality": 0.5935932773109244,
+      "utility": 0.5696580645161291,
+      "deal_rate": 0.9596774193548387,
+      "pareto": 0.5042016806722689,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "craigslist",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 82,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/craigslist/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "9c3e5afe2485fb8c70ab8afcb750db4ad24e41cce7d0bcf01425563022eec37c",
+      "quality": 0.4483439024390244,
+      "utility": 0.367642,
+      "deal_rate": 0.82,
+      "pareto": null,
+      "first_bid": 0.364892
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "dnd",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 94,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/dnd/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "98d7c1a5953da1cc0c186185d3902ebb41e82b07e247905933e01f6fb71e4848",
+      "quality": 0.747872340425532,
+      "utility": 0.703,
+      "deal_rate": 0.94,
+      "pareto": 0.7021276595744681,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "ji",
+      "seed": 42,
+      "reused": false,
+      "episodes": 100,
+      "deals": 97,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311/ji/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed42-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "0e0cddbd423caa091c1c6f96478aafe78e455b45c62e19f1fd71605cc56b4789",
+      "quality": 0.6922680412371134,
+      "utility": 0.6715000000000001,
+      "deal_rate": 0.97,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "amazon",
+      "seed": 43,
+      "reused": true,
+      "episodes": 93,
+      "deals": 77,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed43-gpt54-openai/run_20260930_003436_695868/amazon/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "90b6e8a5077886d4be73710fcbfdbf4236a7bcbfd19011756a340e242a71aa7c",
+      "quality": 0.5128766233766234,
+      "utility": 0.42463978494623655,
+      "deal_rate": 0.8279569892473119,
+      "pareto": null,
+      "first_bid": 0.5190032258064516
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "casino",
+      "seed": 43,
+      "reused": true,
+      "episodes": 124,
+      "deals": 118,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed43-gpt54-openai/run_20260930_003436_695868/casino/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "b1c5661e3abf575f7461ffb70bce68a72ecaedcdac7b66e6d248087ee5cdbc78",
+      "quality": 0.6327652542372881,
+      "utility": 0.6021475806451614,
+      "deal_rate": 0.9516129032258065,
+      "pareto": 0.423728813559322,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "craigslist",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 89,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed43-gpt54-openai/run_20260930_003436_695868/craigslist/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "867a53179dbb3387abcfa95eed72f21d462d7dd047a06ee8b987323dc1122e72",
+      "quality": 0.41586629213483145,
+      "utility": 0.37012100000000003,
+      "deal_rate": 0.89,
+      "pareto": null,
+      "first_bid": 0.482366
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "dnd",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 90,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed43-gpt54-openai/run_20260930_003436_695868/dnd/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "bb021eaa9bdba6daedcc5d1dcb1aa0541967de5fa757ed3240406d25f4b31543",
+      "quality": 0.8011111111111111,
+      "utility": 0.721,
+      "deal_rate": 0.9,
+      "pareto": 0.8333333333333334,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "ji",
+      "seed": 43,
+      "reused": true,
+      "episodes": 100,
+      "deals": 99,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed43-gpt54-openai/run_20260930_003436_695868/ji/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed43-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "5c52b67bbc36e167552e9a46c5be861d093d5c5065eb3b0c70e4e398c8be389a",
+      "quality": 0.7033333333333334,
+      "utility": 0.6962999999999999,
+      "deal_rate": 0.99,
+      "pareto": null,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "amazon",
+      "seed": 44,
+      "reused": true,
+      "episodes": 93,
+      "deals": 81,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed44-gpt54-openai/run_20260930_205039_805273/amazon/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "169a496437e443afc04042a950d06fd5dbe70c78aa771a5097b376518a657917",
+      "quality": 0.5307185185185185,
+      "utility": 0.46223870967741937,
+      "deal_rate": 0.8709677419354839,
+      "pareto": null,
+      "first_bid": 0.45452258064516127
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "casino",
+      "seed": 44,
+      "reused": true,
+      "episodes": 124,
+      "deals": 123,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed44-gpt54-openai/run_20260930_205039_805273/casino/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "30962dae9822608f12fc2c7827ba9e71d0a355c7eb7fb03950a084efbaa9eaa1",
+      "quality": 0.6063642276422764,
+      "utility": 0.6014741935483872,
+      "deal_rate": 0.9919354838709677,
+      "pareto": 0.4715447154471545,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "craigslist",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 86,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed44-gpt54-openai/run_20260930_205039_805273/craigslist/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "e0a6927a74a336eeb6bb31ac0ddc8016011f37a39f5a0610c6fa69a911d6cc6c",
+      "quality": 0.46466162790697674,
+      "utility": 0.39960900000000005,
+      "deal_rate": 0.86,
+      "pareto": null,
+      "first_bid": 0.43732
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "dnd",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 95,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed44-gpt54-openai/run_20260930_205039_805273/dnd/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "d5b66fc3f41c46632b1828a1cd29a5bb6f3d64e6c445a9e37bb27d55b9edb1cf",
+      "quality": 0.7336842105263158,
+      "utility": 0.6970000000000001,
+      "deal_rate": 0.95,
+      "pareto": 0.7052631578947368,
+      "first_bid": null
+    },
+    {
+      "learner": "Uniform τ=.4",
+      "dataset": "ji",
+      "seed": 44,
+      "reused": true,
+      "episodes": 100,
+      "deals": 100,
+      "protocol": "explicit-allocation-v3-turn-limit-v1",
+      "comparison_group": "ce659c2c98a2d967e18b07eb4de8a355bfbb69273b2320b43db06362a44e20b2",
+      "source": "logs/eval/uniform-seed44-gpt54-openai/run_20260930_205039_805273/ji/qwen3.6-35b-a3b-uniform-tau0.4-temp1-seed44-step80_vs_gpt-5.4-openai/episodes.json",
+      "sha256": "76dcf529e43d57c4512f4b6caeddf1344da89f1a1e9f82c4935b34e648f698d7",
+      "quality": 0.7023,
+      "utility": 0.7023,
+      "deal_rate": 1.0,
+      "pareto": null,
+      "first_bid": null
+    }
+  ],
+  "seed42_refresh_run": "logs/eval/seed42-main-rewards-vs-gpt54-v3/run_20261024_014315_573311",
+  "seed42_refresh_new_episodes": 1551,
+  "seed42_refresh_dataset_cells": 15,
+  "historical_handoff_summary": [
+    {
+      "old_label": "Threshold (Ours)",
+      "original_quality_rounded": 0.512,
+      "learner": "Selective τ=.4",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.6007771540492658,
+          "utility": 0.5684222215053764,
+          "deal_rate": 0.9381044487427466
+        },
+        {
+          "seed": 43,
+          "quality": 0.632557765169083,
+          "utility": 0.5896151010752688,
+          "deal_rate": 0.9264990328820116
+        },
+        {
+          "seed": 44,
+          "quality": 0.5573700410277236,
+          "utility": 0.4904666,
+          "deal_rate": 0.8704061895551257
+        }
+      ],
+      "quality": 0.5969016534153575,
+      "utility": 0.5495013075268818,
+      "deal_rate": 0.9116698903932946
+    },
+    {
+      "old_label": "Surplus",
+      "original_quality_rounded": 0.404,
+      "learner": "Surplus",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.6010331526441608,
+          "utility": 0.5520177741935484,
+          "deal_rate": 0.9110251450676983
+        },
+        {
+          "seed": 43,
+          "quality": 0.5095632469516901,
+          "utility": 0.500062976344086,
+          "deal_rate": 0.9748549323017408
+        },
+        {
+          "seed": 44,
+          "quality": 0.5198813431021267,
+          "utility": 0.49024558279569896,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.5434925808993258,
+      "utility": 0.5141087777777777,
+      "deal_rate": 0.9413281753707285
+    },
+    {
+      "old_label": "Uniform (new)",
+      "original_quality_rounded": null,
+      "learner": "Uniform τ=.4",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "per_seed": [
+        {
+          "seed": 42,
+          "quality": 0.5834654433926081,
+          "utility": 0.5441186021505376,
+          "deal_rate": 0.9245647969052224
+        },
+        {
+          "seed": 43,
+          "quality": 0.6131905228386375,
+          "utility": 0.5628416731182796,
+          "deal_rate": 0.9148936170212766
+        },
+        {
+          "seed": 44,
+          "quality": 0.6075457169188175,
+          "utility": 0.5725243806451613,
+          "deal_rate": 0.9381044487427466
+        }
+      ],
+      "quality": 0.601400561050021,
+      "utility": 0.5598282186379928,
+      "deal_rate": 0.9258542875564152
+    },
+    {
+      "old_label": "Qwen3-30B",
+      "original_quality_rounded": 0.298,
+      "learner": "qwen3-30b-a3b-instruct-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.2599356146970201,
+          "utility": 0.2563736344086021,
+          "deal_rate": 0.8568665377176016
+        }
+      ],
+      "quality": 0.2599356146970201,
+      "utility": 0.2563736344086021,
+      "deal_rate": 0.8568665377176016
+    },
+    {
+      "old_label": "Qwen3-235B",
+      "original_quality_rounded": 0.414,
+      "learner": "qwen3-235b-a22b-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3954455774451842,
+          "utility": 0.35450896559139783,
+          "deal_rate": 0.8336557059961315
+        }
+      ],
+      "quality": 0.3954455774451842,
+      "utility": 0.35450896559139783,
+      "deal_rate": 0.8336557059961315
+    },
+    {
+      "old_label": "Qwen3-235B-T",
+      "original_quality_rounded": 0.4,
+      "learner": "qwen3-235b-a22b-thinking-2507",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4101147461452098,
+          "utility": 0.3815288989247312,
+          "deal_rate": 0.8762088974854932
+        }
+      ],
+      "quality": 0.4101147461452098,
+      "utility": 0.3815288989247312,
+      "deal_rate": 0.8762088974854932
+    },
+    {
+      "old_label": "Qwen3.6-35B",
+      "original_quality_rounded": 0.438,
+      "learner": "qwen3.6-35b-a3b-untrained-nonthinking",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3947476413503903,
+          "utility": 0.3589050430107527,
+          "deal_rate": 0.8413926499032882
+        }
+      ],
+      "quality": 0.3947476413503903,
+      "utility": 0.3589050430107527,
+      "deal_rate": 0.8413926499032882
+    },
+    {
+      "old_label": "GPT-5.4",
+      "original_quality_rounded": 0.45,
+      "learner": "gpt-5.4-off-the-shelf-openai",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4421401644969973,
+          "utility": 0.4007476344086021,
+          "deal_rate": 0.8878143133462283
+        }
+      ],
+      "quality": 0.4421401644969973,
+      "utility": 0.4007476344086021,
+      "deal_rate": 0.8878143133462283
+    },
+    {
+      "old_label": "GPT-5.4-mini",
+      "original_quality_rounded": 0.374,
+      "learner": "gpt-5.4-mini-off-the-shelf-openai",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3567845151285154,
+          "utility": 0.3388596731182796,
+          "deal_rate": 0.8684719535783365
+        }
+      ],
+      "quality": 0.3567845151285154,
+      "utility": 0.3388596731182796,
+      "deal_rate": 0.8684719535783365
+    },
+    {
+      "old_label": "DeepSeek-V3.1",
+      "original_quality_rounded": 0.422,
+      "learner": "deepseek-chat-v3.1",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.4129942252012765,
+          "utility": 0.37363219569892475,
+          "deal_rate": 0.8297872340425532
+        }
+      ],
+      "quality": 0.4129942252012765,
+      "utility": 0.37363219569892475,
+      "deal_rate": 0.8297872340425532
+    },
+    {
+      "old_label": "Kimi-K2-T",
+      "original_quality_rounded": 0.41400000000000003,
+      "learner": "kimi-k2-thinking",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.42836072790790986,
+          "utility": 0.39353940000000004,
+          "deal_rate": 0.8549323017408124
+        }
+      ],
+      "quality": 0.42836072790790986,
+      "utility": 0.39353940000000004,
+      "deal_rate": 0.8549323017408124
+    },
+    {
+      "old_label": "Llama-4-Maverick",
+      "original_quality_rounded": 0.308,
+      "learner": "llama-4-maverick",
+      "seeds": [
+        null
+      ],
+      "per_seed": [
+        {
+          "seed": null,
+          "quality": 0.3331964663749332,
+          "utility": 0.3354335720430108,
+          "deal_rate": 0.8704061895551257
+        }
+      ],
+      "quality": 0.3331964663749332,
+      "utility": 0.3354335720430108,
+      "deal_rate": 0.8704061895551257
+    }
+  ]
+}
